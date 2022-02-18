@@ -19,15 +19,21 @@ const ImageMap: React.FC<DeckGLProps> = () => {
     0, 0, 0, 0,
   ]);
 
+  const setData = async () => {
+    await g.setUrl(url);
+    g.setAutoRange(false);
+    g.setDataRange(163, 340);
+
+    const image = await g.getBitmap();
+    // @ts-ignore
+    setImage(image);
+    const bbox = await g.getBoundingBox();
+    // @ts-ignore
+    setBoundingBox(bbox);
+  };
+
   useEffect(() => {
-    g.setUrl(url).then(() => {
-      g.getBoundingBox().then((bbox) => {
-        setBoundingBox(bbox as ExtentsLeftBottomRightTop);
-        // @ts-ignore
-        setImage(g.data);
-        console.log(g.data);
-      });
-    });
+    setData();
   }, []);
 
   const initialViewState = {
