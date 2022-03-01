@@ -1,2 +1,0 @@
-# Deck.gl geotiff
-
