@@ -15,6 +15,8 @@ export interface IGeoImage {
   clipHigh: number;
   color: number[];
   alpha: number;
+  imageWidth: number;
+  imageHeight: number;
   setUrl(url: string): Promise<void>;
   scale: (
     num: number,
@@ -23,12 +25,10 @@ export interface IGeoImage {
     outMin: number,
     outMax: number,
   ) => number;
-  heatMap: (num: number, min: number, max: number) => number[];
-  heightMap: (height: number) => number[];
   getOrigin: () => number[];
   getBoundingBox: () => number[];
-  getBitmap(): Promise<string>;
-  getHeightMap(): Promise<string>;
+  getBitmap(input: any): Promise<string>;
+  getHeightMap(input: any): Promise<string>;
   setDataOpacity(toggle?: boolean): void;
   setHeatMap(heat?: boolean): void;
   setAutoRange(auto?: boolean): void;

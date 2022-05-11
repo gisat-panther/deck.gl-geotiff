@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { useReducer } from '../recoil/reducers';
 const SideBar = () => {
+  const [opacity, setOpacity] = useState<number>(255);
+  const { updateOpacity } = useReducer();
+
+  const submitOpacity = () => {
+    updateOpacity(opacity);
+  };
   return (
     <SideNav>
       <NavLink to="/terrain-layer-example">Terrain Layer</NavLink>
       <NavLink to="/bitmap-layer-example">Bitmap Layer</NavLink>
+      <NavLink to="/tile-layer-example">Tile Layer</NavLink>
+      <Divider />
+      <HStack>
+        <p>Opacity</p>
+        <Input
+          type="text"
+          value={opacity}
+          onChange={(e) => setOpacity(e.target.value)}
+        ></Input>
+        <Button onClick={submitOpacity}>Submit</Button>
+      </HStack>
     </SideNav>
   );
 };
 
 const SideNav = styled.div`
-  width: 200px;
+  width: 300px;
   height: 100%;
   background-color: white;
   position: absolute;
@@ -21,6 +39,38 @@ const SideNav = styled.div`
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
   display: flex;
   flex-direction: column;
+`;
+
+const Input = styled.input`
+  border-radius: 20px;
+  margin: 10px;
+  padding-left: 8px;
+  width: 100px;
+  height: 30px;
+  border: solid;
+  border-color: grey;
+`;
+const HStack = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Button = styled.button`
+  border: none;
+  padding: 12px;
+  border-radius: 25px;
+  color: white;
+  background-color: #0087e0;
+`;
+
+const Divider = styled.div`
+  margin-top: 6px;
+  margin-bottom: 4px;
+  align-self: center;
+  width: 90%;
+  height: 1px;
+  background-color: grey;
 `;
 
 const NavLink = styled(Link)`

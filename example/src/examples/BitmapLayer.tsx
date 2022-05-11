@@ -5,10 +5,13 @@ import { useGeoData } from 'geolib';
 import { StaticMap } from 'react-map-gl';
 import { MAPBOX_ACCESS_TOKEN } from '../constants';
 import Spinner from '../components/Spinner';
+import { useSelectors } from '../recoil/selectors';
+import PlaceholderUpload from '../components/PlaceholderUpload';
 interface BitmapLayerProps {}
 
 const BitmapLayerExample: React.FC<BitmapLayerProps> = () => {
-  const geoObject = useGeoData('park.tif');
+  const { uploaded, opacity } = useSelectors();
+  const geoObject = useGeoData(uploaded, false, opacity);
 
   const layers = useMemo(
     () => [
@@ -18,7 +21,7 @@ const BitmapLayerExample: React.FC<BitmapLayerProps> = () => {
         image: geoObject.image,
       }),
     ],
-    [geoObject],
+    [geoObject, uploaded],
   );
 
   return (
@@ -32,7 +35,7 @@ const BitmapLayerExample: React.FC<BitmapLayerProps> = () => {
           <StaticMap mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN} />
         </DeckGL>
       ) : (
-        <Spinner />
+        <>{uploaded.length ? <Spinner /> : <PlaceholderUpload />}</>
       )}
     </>
   );
