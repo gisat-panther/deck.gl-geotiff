@@ -18,8 +18,6 @@ class GeoImage implements IGeoImage {
   multiplier = 1.0;
   color = [255, 0, 255];
   alpha = 150;
-  imageWidth = 0;
-  imageHeight = 0;
   options = {};
 
   scale = (
@@ -47,83 +45,7 @@ class GeoImage implements IGeoImage {
     this.origin = origin;
     this.boundingBox = bbox;
   }
-/*
-  async getAligned(heightImage:string, heightResolution:number[], heightBounds:number[], colorImage:string, colorResolution:number[], colorBounds:number[]){
 
-      console.log('Creating aligned bitmaps... ');
-
-      let aabb = [0,0,0,0] as ExtentsLeftBottomRightTop;
-
-      if(heightBounds[0] < colorBounds[0]){
-        aabb[0] = heightBounds[0];
-      }else{
-        aabb[0] = colorBounds[0];
-      }
-
-      if(heightBounds[2] > colorBounds[2]){
-        aabb[2] = heightBounds[2];
-      }else{
-        aabb[2] = colorBounds[2];
-      }
-
-      if(heightBounds[1] < colorBounds[1]){
-        aabb[1] = heightBounds[1];
-      }else{
-        aabb[1] = colorBounds[1];
-      }
-
-      if(heightBounds[3] > colorBounds[3]){
-        aabb[3] = heightBounds[3];
-      }else{
-        aabb[3] = colorBounds[3];
-      }
-
-      const aabbHeight = aabb[2] - aabb[0];
-      const aabbWidth = aabb[3] - aabb[1];
-      const mx = aabbWidth / (heightBounds[2] - heightBounds[0]);
-      const my = aabbHeight / (heightBounds[3] - heightBounds[1]);
-      const canvasWidth = Math.round(heightResolution[0] * mx);
-      const canvasHeight = Math.round(heightResolution[1] * my);
-
-      console.log('AABB: ' + aabb);
-      console.log('w:' + aabbWidth);
-      console.log('h:' + aabbHeight);
-
-      const combinationCanvas = document.createElement('canvas');
-      combinationCanvas.width = canvasWidth;
-      combinationCanvas.height = canvasHeight;
-      const combinationContext = combinationCanvas.getContext('2d');
-
-      console.log("canvas width: " + combinationCanvas.width);
-
-      const heightCanvasX = canvasWidth / (aabbWidth / (heightBounds[0] - aabb[0]));
-      const heightCanvasY = (canvasHeight / (aabbHeight / (heightBounds[3] - aabb[3])));
-
-      console.log('Resolution: ');
-      console.log('w:' + canvasWidth);
-      console.log('h:' + canvasHeight);
-
-
-      img.onload = function () { console.log("HUH"); };
-      img.src = heightImage;
-
-      console.log("------")
-      console.log("Converted image from DataURL: ");
-      console.log("width: " + img.width);
-      console.log(img);
-      console.log("------")
-
-      combinationContext!.drawImage(img, heightCanvasX, heightCanvasY);
-
-      console.log('canvas position:');
-      console.log(heightCanvasX);
-      console.log(heightCanvasY);
-
-      let output:any = [combinationCanvas.toDataURL('image/png'), aabb as ExtentsLeftBottomRightTop];
-
-      return output;
-  }
-*/
   async getHeightMap(input: any) {
     let rasters;
     let width : number;
@@ -142,9 +64,7 @@ class GeoImage implements IGeoImage {
       width = input.width;
       height = input.height;
     }
-
-    this.imageWidth = width;
-    this.imageHeight = height;
+    //console.log("library input: " + input);
 
     const channel = rasters[0];
 
@@ -203,9 +123,6 @@ class GeoImage implements IGeoImage {
       height = input.height;
 
     }
-
-    this.imageWidth = width;
-    this.imageHeight = height;
 
     const canvas = document.createElement('canvas');
     canvas.width = width;

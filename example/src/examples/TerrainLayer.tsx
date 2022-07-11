@@ -24,7 +24,7 @@ const TerrainLayerExample: React.FC<BitmapLayerProps> = () => {
           offset: -10000,
         },
         material: { diffuse: 1 },
-        meshMaxError: 5, // SET TO 1 FOR MAX QUALITY.
+        meshMaxError: 10, // SET TO 1 FOR MAX QUALITY.
         bounds: geoObject.bbox,
         elevationData: geoObject.heightMap,
         texture: geoObject.image,
@@ -32,7 +32,7 @@ const TerrainLayerExample: React.FC<BitmapLayerProps> = () => {
     ],
     [geoObject],
   );
-  console.log(layers[0]);
+
   return (
     <>
       {geoObject.loaded ? (

@@ -15,8 +15,6 @@ export interface IGeoImage {
   clipHigh: number;
   color: number[];
   alpha: number;
-  imageWidth: number;
-  imageHeight: number;
   setUrl(url: string): Promise<void>;
   scale: (
     num: number,
