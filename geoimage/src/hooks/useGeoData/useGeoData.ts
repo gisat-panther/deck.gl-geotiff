@@ -2,6 +2,7 @@ import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 /* eslint-disable import/no-unresolved */
 import { useState, useEffect } from 'react';
 import GeoImage from '../../classes/geoImage';
+
 interface IGeo {
   image: string;
   bbox: ExtentsLeftBottomRightTop
@@ -23,22 +24,27 @@ const useGeoData = (url: string, useHeightMap = false, opacity: number) => {
   const [geoObject, setGeoObject] = useState<IGeo>(defaultObject);
 
   const setData = async () => {
+
     const image = await g.getBitmap(url);
     const bbox = g.getBoundingBox() as ExtentsLeftBottomRightTop;
+    console.log(bbox)
+
     const initialViewState = {
       longitude: bbox[0],
       latitude: bbox[1],
       zoom: 12,
     };
+
     let heightMap = '';
     if (useHeightMap) {
       heightMap = await g.getHeightMap(url);
     }
+
     setGeoObject({
-      image,
-      bbox,
+      image: image,
+      bbox: bbox,
       viewState: initialViewState,
-      heightMap,
+      heightMap: heightMap,
       loaded: true,
     });
   };

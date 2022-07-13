@@ -1,15 +1,15 @@
 {
-  "name": "deckgl-geotiff",
+  "name": "geoimage-example",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
     "example",
-    "geolib"
+    "geoimage"
   ],
   "scripts": {
     "start": "yarn && yarn rollup && yarn example",
     "example": "yarn workspace example dev",
-    "rollup": "yarn workspace geolib rollup"
+    "rollup": "yarn workspace geoimage rollup"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.0",

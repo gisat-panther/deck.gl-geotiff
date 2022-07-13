@@ -46,20 +46,19 @@ height : number; //Height of the image in pixels
 import GeoImage from 'geoimage';
 
 const g = new GeoImage();
-await g.setUrl('image.tif');
 ```
 #### Get bitmap and bounds
 ```
-const bitmap = await g.getBitmap();
+const bitmap = await g.getBitmap('image.tif');
 const bounds = g.getBoundingBox();
 ```
 #### Get heightmap
 ```
-const heightmap = await g.getHeightmap();
+const heightmap = await g.getHeightmap('image.tif');
 ```
 ## Advanced example
 ```
-//Import the library, initiate GeoImage object and set input geoTIFF
+//Import the library and initiate GeoImage object:
 import GeoImage from 'geoimage';
 
 const g = new GeoImage();

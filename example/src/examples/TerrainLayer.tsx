@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import DeckGL from '@deck.gl/react';
-import { useGeoData } from 'geolib';
+import { useGeoData } from 'geoimage';
 import { StaticMap } from 'react-map-gl';
 import { MAPBOX_ACCESS_TOKEN } from '../constants';
 import { TerrainLayer } from '@deck.gl/geo-layers';
@@ -24,7 +24,7 @@ const TerrainLayerExample: React.FC<BitmapLayerProps> = () => {
           offset: -10000,
         },
         material: { diffuse: 1 },
-        meshMaxError: 10, // SET TO 1 FOR MAX QUALITY.
+        meshMaxError: 5, // SET TO 1 FOR MAX QUALITY.
         bounds: geoObject.bbox,
         elevationData: geoObject.heightMap,
         texture: geoObject.image,
@@ -32,7 +32,7 @@ const TerrainLayerExample: React.FC<BitmapLayerProps> = () => {
     ],
     [geoObject],
   );
-
+  console.log(layers[0]);
   return (
     <>
       {geoObject.loaded ? (
