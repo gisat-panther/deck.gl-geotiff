@@ -1,0 +1,7 @@
+{
+  "exclude": ["**/tests", "**/*.test.ts", "node_modules"],
+
+  "compilerOptions": {
+    "baseUrl": "."
+  }
+}

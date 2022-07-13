@@ -1,0 +1,27 @@
+{
+  "name": "geoimage-example",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "example",
+    "geoimage"
+  ],
+  "scripts": {
+    "start": "yarn && yarn rollup && yarn example",
+    "example": "yarn workspace example dev",
+    "rollup": "yarn workspace geoimage rollup"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "eslint-plugin-react": "^7.28.0",
+    "prettier": "^2.5.1"
+  }
+}
