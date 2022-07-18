@@ -20,7 +20,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/styled-components": "^5.1.23",
     "deck.gl": "^8.6.8",
-    "geoimage": "file:../geoimage/dist",
+    "geolib": "*",
     "geotiff": "^2.0.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

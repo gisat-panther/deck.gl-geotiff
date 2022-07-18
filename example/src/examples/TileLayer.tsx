@@ -7,7 +7,7 @@ import { FirstPersonView } from "@deck.gl/core"
 import { Deck } from "@deck.gl/core"
 import PlaceholderUpload from '../components/PlaceholderUpload';
 import { StaticMap } from 'react-map-gl';
-import { GeoImage } from 'geoimage';
+import { GeoImage } from 'geolib';
 import { SourceUrl } from '@chunkd/source-url';
 import { CogTiff } from '@cogeotiff/core';
 
@@ -24,7 +24,7 @@ import jpeg from 'jpeg-js';
 //let url = baseurl + '20HMD/2019_winter/2019_winter_41226_cereals_confidence_20HMD.tif';
 //let url = 'https://oin-hotosm.s3.amazonaws.com/56f9b5a963ebf4bc00074e70/0/56f9c2d42b67227a79b4faec.tif';
 
-class CogTiles extends React.Component {
+class ImageMap extends React.Component {
   //url = "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/2020/S2A_36QWD_20200701_0_L2A/TCI.tif";
   //url = new SourceUrl('https://oin-hotosm.s3.amazonaws.com/56f9b5a963ebf4bc00074e70/0/56f9c2d42b67227a79b4faec.tif');
   src: any;
@@ -218,4 +218,4 @@ class CogTiles extends React.Component {
 }
 //<StaticMap mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN} />
 
-export default CogTiles;
+export default ImageMap;

@@ -1,13 +1,13 @@
 {
-  "name": "geoimage",
-  "version": "1.2.0",
-  "description": "A library for processing and generating bitmap images and heightmaps out of the geotiff file format",
+  "name": "geolib",
+  "version": "1.1.0",
+  "description": "geoimage lib",
   "private": false,
   "scripts": {
     "rollup": "rollup -c",
     "test": "jest"
   },
-  "author": "Miroslav Kotalik",
+  "author": "Filip Micanek",
   "license": "ISC",
   "peerDependencies": {
     "deck.gl": "^8.6.8",
@@ -40,6 +40,9 @@
     "dist"
   ],
   "types": "dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/filipmicanek"
+  },
   "dependencies": {
     "jpeg-js": "^0.4.4",
     "pako": "^2.0.4"
