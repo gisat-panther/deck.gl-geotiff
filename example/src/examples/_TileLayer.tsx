@@ -188,7 +188,6 @@ class ImageMap extends React.Component {
           data: null,
           image: props.data,
           bounds: [west, south, east, north],
-
         });
       }
     });

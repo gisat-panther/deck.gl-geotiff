@@ -5,7 +5,7 @@ import SideBar from './components/SideBar';
 import TerrainLayerExample from './examples/TerrainLayer';
 import App from './App';
 import UploadImage from './components/UploadImage';
-import TileLayerExample from './examples/TileLayer';
+import { ImageMap } from './examples/ImageMap';
 
 interface RoutesProps {}
 const Routing: React.FC<RoutesProps> = () => {
@@ -23,7 +23,7 @@ const Routing: React.FC<RoutesProps> = () => {
           path={'/bitmap-layer-example'}
           element={<BitmapLayerExample />}
         />
-        <Route path={'/tile-layer-example'} element={<TileLayerExample />} />
+        <Route path={'/tile-layer-example'} element={<ImageMap />} />
       </Routes>
     </BrowserRouter>
   );
