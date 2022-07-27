@@ -46,7 +46,7 @@ const ImageMap: React.FC = () => {
     const sourceUrl = new SourceUrl(address);
     const { geoImage } = imageData;
 
-    imageData['cogTiff'] = await CogTiff.create(sourceUrl);
+    imageData.cogTiff = await CogTiff.create(sourceUrl);
     geoImage.setAutoRange(false);
     geoImage.setOpacity(200);
   };
@@ -54,7 +54,55 @@ const ImageMap: React.FC = () => {
   const initLayer = async (z: number) => {
     const { cogTiff } = imageData;
 
-    imageData['cogTiffImage'] = cogTiff?.getImage(z);
+    imageData.cogTiffImage = cogTiff?.getImage(z);
+  };
+
+  const preloadTiles = async () => {
+    const { cogTiff, cogTiffImage, geoImage, tiles } = imageData;
+
+    if (cogTiff && cogTiffImage) {
+      const {
+        compression,
+        getTile,
+        tileCount: { x, y },
+        tileSize: { width },
+      } = cogTiffImage;
+
+      for (let k = 0; k < cogTiff.images.length; k++) {
+        await initLayer(k);
+
+        for (let i = 0; i < y; i++) {
+          for (let j = 0; j < x; j++) {
+            if (j >= x || i >= y) {
+              return new Image(width, width);
+            }
+
+            const tile = await getTile(j, i);
+
+            if (tile) {
+              const data = tile.bytes;
+              const decompressedData = {
+                image: '',
+              };
+
+              if (compression === 'image/jpeg') {
+                return jpeg.decode(data, { useTArray: true });
+              }
+
+              if (compression === 'application/deflate') {
+                decompressedData.image = await geoImage.getBitmap({
+                  height: width,
+                  rasters: [],
+                  width,
+                });
+              }
+
+              tiles.set(j + ',' + i + ',' + k, decompressedData.image);
+            }
+          }
+        }
+      }
+    }
   };
 
   const loadCogTiff = async () => {
@@ -82,56 +130,8 @@ const ImageMap: React.FC = () => {
     }
   };
 
-  const preloadTiles = async () => {
-    const { cogTiff, cogTiffImage, geoImage, tiles } = imageData;
-
-    if (cogTiff && cogTiffImage) {
-      const {
-        compression,
-        getTile,
-        tileCount: { x, y },
-        tileSize: { width },
-      } = cogTiffImage;
-
-      for (let k = 0; k < cogTiff.images.length; k++) {
-        await initLayer(k);
-
-        for (let i = 0; i < i; i++) {
-          for (let j = 0; j < x; j++) {
-            if (j >= x || i >= y) {
-              return new Image(width, width);
-            }
-
-            const tile = await getTile(j, i);
-
-            if (tile) {
-              const data = tile.bytes;
-              const decompressedData = {
-                image: '',
-              };
-
-              if (compression === 'image/jpeg') {
-                return jpeg.decode(data, { useTArray: true });
-              }
-
-              if (compression === 'application/deflate') {
-                decompressedData['image'] = await geoImage.getBitmap({
-                  height: width,
-                  rasters: [],
-                  width,
-                });
-              }
-
-              tiles.set(j + ',' + i + ',' + k, decompressedData['image']);
-            }
-          }
-        }
-      }
-    }
-  };
-
   const getTileAt = async (xCoord: number, yCoord: number, zCoord: number) => {
-    if (imageData['cogTiffImage']) {
+    if (imageData.cogTiffImage) {
       const {
         cogTiffImage: {
           compression,
@@ -171,10 +171,13 @@ const ImageMap: React.FC = () => {
         }
       };
 
-      return new Promise((resolve, reject) => {
-        resolve(checkCompression());
-        reject('Cannot retrieve tile');
-      });
+      return new Promise(() => {})
+        .then(() => {
+          checkCompression();
+        })
+        .catch(() => {
+          console.log('Cannot retrieve tile');
+        });
     }
   };
 
@@ -214,7 +217,7 @@ const ImageMap: React.FC = () => {
 
       getTileData: ({ x, y, z }) => {
         // TODO: no idea to avoid any here
-        let image: any;
+        let image: unknown;
 
         if (cogTiff) {
           if (preloadLayers) {
