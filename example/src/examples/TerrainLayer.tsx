@@ -7,7 +7,8 @@ import { TerrainLayer } from '@deck.gl/geo-layers';
 import Spinner from '../components/Spinner';
 import { useSelectors } from '../recoil/selectors';
 import PlaceholderUpload from '../components/PlaceholderUpload';
-interface BitmapLayerProps {}
+
+interface BitmapLayerProps { }
 
 const TerrainLayerExample: React.FC<BitmapLayerProps> = () => {
   const { uploaded, opacity } = useSelectors();
@@ -50,4 +51,4 @@ const TerrainLayerExample: React.FC<BitmapLayerProps> = () => {
   );
 };
 
-export default TerrainLayerExample;
+export { TerrainLayerExample };
