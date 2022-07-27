@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DeckGL from '@deck.gl/react';
 import pako from 'pako';
 import jpeg from 'jpeg-js';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { TileLayerProps } from '@deck.gl/geo-layers/tile-layer/tile-layer';
-import { View } from '@deck.gl/core';
+import { MapView } from '@deck.gl/core';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
 import { GeoImage } from 'geolib';
 import { SourceUrl } from '@chunkd/source-url';
@@ -13,25 +13,20 @@ import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import { LayerProps } from 'react-map-gl';
 import { CSSProperties } from 'styled-components';
 
-// const url = 'https://oin-hotosm.s3.amazonaws.com/56f9b5a963ebf4bc00074e70/0/56f9c2d42b67227a79b4faec.tif';
+// const url = 'https://oin-hotosm.s3.amazonaws.com/59c66c5223c8440011d7b1e4/0/7ad397c0-bba2-4f98-a08a-931ec3a6e943.tif';
 
 interface TImageData {
   cogTiff: CogTiff | undefined;
   cogTiffImage: CogTiffImage | undefined;
   geoImage: GeoImage;
-  preloadLayers: boolean;
-  tiles: Map<string, string | number>;
 }
 
-const imageData: TImageData = {
-  cogTiff: undefined,
-  cogTiffImage: undefined,
-  geoImage: new GeoImage(),
-  preloadLayers: false,
-  tiles: new Map(),
-};
-
 const ImageMap: React.FC = () => {
+  const [imageData, setImageData] = useState<TImageData>({
+    cogTiff: undefined,
+    cogTiffImage: undefined,
+    geoImage: new GeoImage(),
+  });
   const [depth, setDepth] = useState<number>(0);
   const [inputValue, setInputValue] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -45,8 +40,12 @@ const ImageMap: React.FC = () => {
   const initImage = async (address: string) => {
     const sourceUrl = new SourceUrl(address);
     const { geoImage } = imageData;
+    const cogTiff = await CogTiff.create(sourceUrl);
 
-    imageData.cogTiff = await CogTiff.create(sourceUrl);
+    setImageData((imageData: TImageData): TImageData => ({
+      ...imageData,
+      cogTiff
+    }));
     geoImage.setAutoRange(false);
     geoImage.setOpacity(200);
   };
@@ -54,72 +53,26 @@ const ImageMap: React.FC = () => {
   const initLayer = async (z: number) => {
     const { cogTiff } = imageData;
 
-    imageData.cogTiffImage = cogTiff?.getImage(z);
-  };
-
-  const preloadTiles = async () => {
-    const { cogTiff, cogTiffImage, geoImage, tiles } = imageData;
-
-    if (cogTiff && cogTiffImage) {
-      const {
-        compression,
-        getTile,
-        tileCount: { x, y },
-        tileSize: { width },
-      } = cogTiffImage;
-
-      for (let k = 0; k < cogTiff.images.length; k++) {
-        await initLayer(k);
-
-        for (let i = 0; i < y; i++) {
-          for (let j = 0; j < x; j++) {
-            if (j >= x || i >= y) {
-              return new Image(width, width);
-            }
-
-            const tile = await getTile(j, i);
-
-            if (tile) {
-              const data = tile.bytes;
-              const decompressedData = {
-                image: '',
-              };
-
-              if (compression === 'image/jpeg') {
-                return jpeg.decode(data, { useTArray: true });
-              }
-
-              if (compression === 'application/deflate') {
-                decompressedData.image = await geoImage.getBitmap({
-                  height: width,
-                  rasters: [],
-                  width,
-                });
-              }
-
-              tiles.set(j + ',' + i + ',' + k, decompressedData.image);
-            }
-          }
-        }
-      }
+    if (cogTiff) {
+      setImageData((imageData: TImageData): TImageData => ({
+        ...imageData,
+        cogTiffImage: cogTiff.getImage(z)
+      }))
     }
   };
 
   const loadCogTiff = async () => {
-    const { cogTiff, cogTiffImage, preloadLayers } = imageData;
-    const imageCount = cogTiff?.images.length || 0;
-
-    await initImage(inputValue);
+    const imageCount = imageData.cogTiff?.images.length || 0;
     await initLayer(imageCount - 1);
+  };
 
-    if (preloadLayers) {
-      await preloadTiles();
-    }
+  const loadCogTiffImage = async () => {
+    const imageCount = imageData.cogTiff?.images.length || 0;
 
-    if (cogTiffImage) {
+    if (imageData.cogTiffImage) {
       const {
         tileSize: { width },
-      } = cogTiffImage;
+      } = imageData.cogTiffImage;
 
       setDepth(imageCount);
       setIsLoaded(true);
@@ -128,14 +81,14 @@ const ImageMap: React.FC = () => {
         tileSize: width,
       }));
     }
-  };
+  }
+
 
   const getTileAt = async (xCoord: number, yCoord: number, zCoord: number) => {
     if (imageData.cogTiffImage) {
       const {
         cogTiffImage: {
           compression,
-          getTile,
           id,
           tileCount: { x, y },
           tileSize: { width },
@@ -147,37 +100,28 @@ const ImageMap: React.FC = () => {
         await initLayer(zCoord);
       }
 
-      const checkCompression = async () => {
+      const checkDecomressed = async () => {
         if (xCoord >= x || yCoord >= y) {
           return new Image(width, width);
         }
 
-        const tile = await getTile(x, y);
+        const tile = await imageData.cogTiffImage?.getTile(xCoord, yCoord);
 
         if (tile) {
           const data = tile.bytes;
 
-          if (compression === 'image/jpeg') {
+          if (compression === "image/jpeg") {
             return jpeg.decode(data, { useTArray: true });
-          }
-
-          if (compression === 'application/deflate') {
-            return geoImage.getBitmap({
-              height: width,
-              rasters: [pako.inflate(data)],
-              width,
-            });
+          } else if (compression === "application/deflate") {
+            return await geoImage.getBitmap({ rasters: [pako.inflate(data)], width, height: width });
           }
         }
-      };
+      }
 
-      return new Promise(() => {})
-        .then(() => {
-          checkCompression();
-        })
-        .catch(() => {
-          console.log('Cannot retrieve tile');
-        });
+      return new Promise((resolve, reject) => {
+        resolve(checkDecomressed());
+        reject("Cannot retrieve tile ");
+      });
     }
   };
 
@@ -189,9 +133,9 @@ const ImageMap: React.FC = () => {
     setInputValue(value);
   };
 
-  const handleSubmit = (event: React.SyntheticEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
-    loadCogTiff();
+    await initImage(inputValue);
   };
 
   const renderImageMap = (): React.ReactElement => {
@@ -200,7 +144,7 @@ const ImageMap: React.FC = () => {
       longitude: 0,
       zoom: 0,
     };
-    const { cogTiff, preloadLayers, tiles } = imageData;
+    const { cogTiff } = imageData;
     const { tileSize, zoomOffset } = tileLayerProps;
     const labelStyle: CSSProperties = {
       position: 'absolute',
@@ -216,22 +160,9 @@ const ImageMap: React.FC = () => {
       zoomOffset,
 
       getTileData: ({ x, y, z }) => {
-        // TODO: no idea to avoid any here
-        let image: unknown;
-
         if (cogTiff) {
-          if (preloadLayers) {
-            const address = String(
-              x + ',' + y + ',' + String(cogTiff.images.length - z),
-            );
-
-            image = tiles.get(address);
-          }
-
-          image = getTileAt(x, y, cogTiff.images.length - z - 1);
+          return getTileAt(x, y, cogTiff.images.length - z - 1);
         }
-
-        return image;
       },
 
       renderSubLayers: (props) => {
@@ -247,38 +178,52 @@ const ImageMap: React.FC = () => {
       },
     });
 
-    if (isLoaded) {
-      return (
-        <DeckGL
+    return (
+      <>
+        <form onSubmit={handleSubmit}>
+          <label style={labelStyle}>
+            Enter url:&nbsp;
+            <input
+              name="name"
+              onChange={handleChange}
+              type="text"
+              value={inputValue}
+            />
+          </label>
+        </form>
+
+        {isLoaded && (<DeckGL
           controller
           initialViewState={initialViewState}
           layers={[layer]}
           views={[
-            new View({
+            new MapView({
               controller: true,
               height: '100%',
               id: 'map',
               width: '100%',
-            }),
+            })
           ]}
-        />
-      );
-    }
-
-    return (
-      <form onSubmit={handleSubmit}>
-        <label style={labelStyle}>
-          Enter url:&nbsp;
-          <input
-            name="name"
-            onChange={handleChange}
-            type="text"
-            value={inputValue}
-          />
-        </label>
-      </form>
+        />)}
+      </>
     );
   };
+
+  useEffect((): void => {
+    const { cogTiff } = imageData;
+
+    if (cogTiff) {
+      loadCogTiff();
+    }
+  }, [imageData.cogTiff]);
+
+  useEffect((): void => {
+    const { cogTiffImage } = imageData;
+
+    if (cogTiffImage) {
+      loadCogTiffImage();
+    }
+  }, [imageData.cogTiffImage]);
 
   return renderImageMap();
 };
