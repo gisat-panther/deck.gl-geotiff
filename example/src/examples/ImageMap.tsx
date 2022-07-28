@@ -180,7 +180,10 @@ const ImageMap: React.FC = () => {
 
     return (
       <>
-        <form onSubmit={handleSubmit}>
+        <form 
+          onSubmit={handleSubmit} 
+          style={{ position: 'relative', zIndex: 2 }}
+        >
           <label style={labelStyle}>
             Enter url:&nbsp;
             <input
