@@ -9,6 +9,7 @@ import { SourceUrl } from '@chunkd/source-url';
 import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import pako from 'pako';
 import jpeg from 'jpeg-js';
+import { CSSProperties } from 'styled-components';
 
 // const url = 'https://oin-hotosm.s3.amazonaws.com/59c66c5223c8440011d7b1e4/0/7ad397c0-bba2-4f98-a08a-931ec3a6e943.tif';
 
@@ -112,7 +113,7 @@ class ImageMap extends React.Component<{}, TState> {
     currentTarget,
   }: React.SyntheticEvent<HTMLInputElement>) {
     this.setState({ url: currentTarget.value });
-    console.log('current url: ' + this.state.url);
+    console.log('current url: ' + currentTarget.value);
   }
 
   handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
@@ -127,6 +128,12 @@ class ImageMap extends React.Component<{}, TState> {
       zoom: 0,
     };
     const { depth, loaded, zoomOffset, tileSize } = this.state;
+    const labelStyle: CSSProperties = {
+      position: 'absolute',
+      right: '100px',
+      top: '34px',
+      zIndex: 2,
+    };
 
     const layer = new TileLayer({
       getTileData: (tileData) => {
@@ -161,7 +168,7 @@ class ImageMap extends React.Component<{}, TState> {
     return (
       <>
         <form onSubmit={this.handleSubmit}>
-          <label style={{ position: 'absolute', right: '100px', top: '34px' }}>
+          <label style={labelStyle}>
             Enter url:&nbsp;
             <input type="text" name="name" onChange={this.handleChange} />
           </label>
