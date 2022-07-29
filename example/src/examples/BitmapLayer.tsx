@@ -7,7 +7,7 @@ import { MAPBOX_ACCESS_TOKEN } from '../constants';
 import Spinner from '../components/Spinner';
 import { useSelectors } from '../recoil/selectors';
 import PlaceholderUpload from '../components/PlaceholderUpload';
-interface BitmapLayerProps {}
+interface BitmapLayerProps { }
 
 const BitmapLayerExample: React.FC<BitmapLayerProps> = () => {
   const { uploaded, opacity } = useSelectors();
@@ -41,4 +41,4 @@ const BitmapLayerExample: React.FC<BitmapLayerProps> = () => {
   );
 };
 
-export default BitmapLayerExample;
+export { BitmapLayerExample };
