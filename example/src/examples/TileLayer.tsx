@@ -21,7 +21,7 @@ interface TState {
   zoomOffset: number;
 }
 
-class ImageMap extends React.Component<{}, TState> {
+class TileLayerExample extends React.Component<{}, TState> {
   cog: CogTiff;
   geo: GeoImage;
   img: CogTiffImage;
@@ -195,4 +195,4 @@ class ImageMap extends React.Component<{}, TState> {
   }
 }
 
-export { ImageMap };
+export { TileLayerExample };

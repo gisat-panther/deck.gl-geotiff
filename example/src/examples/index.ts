@@ -1,3 +1,3 @@
 export { BitmapLayerExample } from './BitmapLayer';
-export { ImageMap } from './ImageMap';
+export { TileLayerExample } from './TileLayer';
 export { TerrainLayerExample } from './TerrainLayer';

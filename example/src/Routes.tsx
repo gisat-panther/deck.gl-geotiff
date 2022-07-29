@@ -3,7 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import SideBar from './components/SideBar';
 import App from './App';
 import UploadImage from './components/UploadImage';
-import { BitmapLayerExample, ImageMap, TerrainLayerExample } from './examples';
+import {
+  BitmapLayerExample,
+  TileLayerExample,
+  TerrainLayerExample,
+} from './examples';
 
 interface RoutesProps {}
 
@@ -18,7 +22,7 @@ const Routing: React.FC<RoutesProps> = () => (
         element={<TerrainLayerExample />}
       />
       <Route path={'/bitmap-layer-example'} element={<BitmapLayerExample />} />
-      <Route path={'/tile-layer-example'} element={<ImageMap />} />
+      <Route path={'/tile-layer-example'} element={<TileLayerExample />} />
     </Routes>
   </BrowserRouter>
 );
