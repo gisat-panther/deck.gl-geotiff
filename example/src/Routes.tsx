@@ -5,7 +5,7 @@ import App from './App';
 import UploadImage from './components/UploadImage';
 import { BitmapLayerExample, ImageMap, TerrainLayerExample } from './examples';
 
-interface RoutesProps { }
+interface RoutesProps {}
 
 const Routing: React.FC<RoutesProps> = () => (
   <BrowserRouter>
@@ -17,10 +17,7 @@ const Routing: React.FC<RoutesProps> = () => (
         path={'/terrain-layer-example'}
         element={<TerrainLayerExample />}
       />
-      <Route
-        path={'/bitmap-layer-example'}
-        element={<BitmapLayerExample />}
-      />
+      <Route path={'/bitmap-layer-example'} element={<BitmapLayerExample />} />
       <Route path={'/tile-layer-example'} element={<ImageMap />} />
     </Routes>
   </BrowserRouter>
