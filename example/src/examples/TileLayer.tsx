@@ -10,8 +10,9 @@ import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import pako from 'pako';
 import jpeg from 'jpeg-js';
 import { CSSProperties } from 'styled-components';
+import { StaticMap } from 'react-map-gl';
 
-// const url = 'https://oin-hotosm.s3.amazonaws.com/59c66c5223c8440011d7b1e4/0/7ad397c0-bba2-4f98-a08a-931ec3a6e943.tif';
+// const url = 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif';
 
 interface TState {
   depth: number;
@@ -25,7 +26,9 @@ class TileLayerExample extends React.Component<{}, TState> {
   cog: CogTiff;
   geo: GeoImage;
   img: CogTiffImage;
+  blankImg: HTMLImageElement;
   src: SourceUrl;
+  possibleResolutions: number[];
 
   constructor(props: {}) {
     super(props);
@@ -41,30 +44,76 @@ class TileLayerExample extends React.Component<{}, TState> {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  generateBlankImage(width:number, height:number){
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    
+    const ctx = canvas.getContext('2d')
+    ctx!.fillStyle = 'rgba(0, 0, 0, 0)'
+    ctx!.fillRect(0, 0, width, height)
+  
+    const img = new Image(width, height)
+    img.src = canvas.toDataURL()
+  
+    return img
+  }
+
+  generatePossibleResolutions(tileSize: number, maxZoomLevel: number) {
+    const equatorC = 40075000;
+    const metersPerPixelAtEquator = equatorC / tileSize;
+    let resolutions: number[] = [];
+
+    for (let i = 0; i < maxZoomLevel; i++) {
+      resolutions[i] = metersPerPixelAtEquator / (Math.pow(2, i));
+    }
+
+    return resolutions;
+  }
+
+  indexOfClosestTo(array: number[], value: number) {
+    let closest = array[0];
+    let closestIndex = 0;
+    for (let i = 0; i < array.length; i++) {
+      if (Math.abs(array[i] - value) < Math.abs(closest - value)) {
+        closest = array[i];
+        closestIndex = i;
+      }
+    }
+    return closestIndex;
+  }
+
   async initImage(address: string) {
     this.src = new SourceUrl(address);
     this.cog = await CogTiff.create(this.src);
+    this.img = this.cog.getImage(this.cog.images.length - 1);
+    this.setState({tileSize:this.img.tileSize.width});
+    this.blankImg = this.generateBlankImage(this.state.tileSize,this.state.tileSize);
+    this.possibleResolutions = this.generatePossibleResolutions(this.state.tileSize,32);
+
     this.geo = new GeoImage();
     this.geo.setAutoRange(false);
     this.geo.setOpacity(200);
+
     // this.geo.setDataRange(128,0);
     // this.geo.setDataClip(0,254);
   }
 
   async initLayer(z: number) {
-    this.img = this.cog.getImage(z);
-    // this.img.loadGeoTiffTags()
-    // this.state.extent = this.img.bbox;
-    // console.log(this.img.epsg)
+    //this.img = this.cog.getImage(z);
+    this.img = this.cog.getImageByResolution(this.possibleResolutions[z]);
   }
 
   async getTileAt(x: number, y: number, z: number) {
     const {
-      img: { id, tileSize, tileCount },
+      img: {tileSize, tileCount, resolution, origin},
     } = this;
 
-    if (id !== z) {
-      await this.initLayer(z);
+    const wantedMpp = this.possibleResolutions[z];
+    const currentMpp = resolution[0];
+
+    if (z !== this.indexOfClosestTo(this.possibleResolutions, currentMpp)) {
+      await this.initLayer(this.indexOfClosestTo(this.possibleResolutions, wantedMpp));
     }
 
     const tileWidth = tileSize.width;
@@ -73,10 +122,24 @@ class TileLayerExample extends React.Component<{}, TState> {
 
     let decompressed: unknown;
 
-    if (x >= tilesX || y >= tilesY) {
-      decompressed = new Image(tileWidth, tileWidth);
+    const e = 40075000;
+
+    let cx = origin[0];
+    let cy = origin[1];
+
+    let acx = e * 0.5 + cx;
+    let acy = -(e * 0.5 + (cy - e));
+    let mpt = currentMpp * this.state.tileSize;
+
+    let ox = Math.ceil(acx/mpt);
+    let oy = Math.ceil(acy/mpt);
+
+    if (x >= ox + tilesX || y >= oy + tilesY) {
+      decompressed = this.blankImg;
+    }else if(x < ox || y < oy){
+      decompressed = this.blankImg;
     } else {
-      const tile = await this.img.getTile(x, y);
+      const tile = await this.img.getTile(x - ox, y - oy);
       const data = tile!.bytes;
 
       if (this.img.compression === 'image/jpeg') {
@@ -91,7 +154,7 @@ class TileLayerExample extends React.Component<{}, TState> {
       }
     }
 
-    return new Promise(function (resolve, reject) {
+    return new Promise( (resolve, reject) => {
       resolve(decompressed);
       reject('Cannot retrieve tile ');
     });
@@ -100,7 +163,7 @@ class TileLayerExample extends React.Component<{}, TState> {
   async loadCog() {
     await this.initImage(this.state.url);
     const imageCount = this.cog.images.length;
-    await this.initLayer(imageCount - 1);
+    await this.initLayer(this.indexOfClosestTo(this.possibleResolutions, 9999999));
 
     this.setState({
       depth: imageCount,
@@ -140,12 +203,12 @@ class TileLayerExample extends React.Component<{}, TState> {
         return this.getTileAt(
           tileData.x,
           tileData.y,
-          this.cog.images.length - tileData.z - 1,
+          tileData.z
         );
       },
 
       // minZoom: 3,
-      maxZoom: depth - 1, // don't try to load tiles level we didn't generate
+      //maxZoom: depth - 1,
       zoomOffset,
       tileSize,
       maxRequests: 5,
@@ -188,8 +251,11 @@ class TileLayerExample extends React.Component<{}, TState> {
                 width: '100%',
               }),
             ]}
-          />
-        )}
+          >
+          <StaticMap mapboxApiAccessToken='pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg'/>
+          </DeckGL>
+        )},
+        
       </>
     );
   }
