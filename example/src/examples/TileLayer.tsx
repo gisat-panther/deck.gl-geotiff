@@ -21,7 +21,9 @@ interface TState {
   tileSize: number;
   url: string;
   zoomOffset: number;
-  extent: number[]
+  extent: number[];
+  minZoom: number;
+  maxZoom: number;
 }
 
 class TileLayerExample extends React.Component<{}, TState> {
@@ -41,7 +43,9 @@ class TileLayerExample extends React.Component<{}, TState> {
       tileSize: 512,
       url: '',
       zoomOffset: 0,
-      extent: [0,0,0,0]
+      extent: [0,0,0,0],
+      minZoom: 0,
+      maxZoom: 0
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -100,6 +104,8 @@ class TileLayerExample extends React.Component<{}, TState> {
   async initImage(address: string) {
     this.src = new SourceUrl(address);
     this.cog = await CogTiff.create(this.src);
+    // this.geo.setDataRange(128,0);
+    // this.geo.setDataClip(0,254);
     this.img = this.cog.getImage(this.cog.images.length - 1);
     this.setState({tileSize:this.img.tileSize.width});
     this.blankImg = this.generateBlankImage(this.state.tileSize,this.state.tileSize);
@@ -108,6 +114,7 @@ class TileLayerExample extends React.Component<{}, TState> {
     console.log(this.img.bbox);
 
     var initialZoom = this.indexOfClosestTo(this.possibleResolutions, this.img.resolution[0]);
+    var finalZoom = initialZoom + this.cog.images.length;
 
     const origin = this.img.origin;
     const e = 40075000.0;
@@ -151,10 +158,7 @@ class TileLayerExample extends React.Component<{}, TState> {
 
     const ext:number[] = [unprojectedMin[0], unprojectedMin[1], unprojectedMax[0], unprojectedMax[1]];
 
-    this.setState({extent: ext});
-
-    // this.geo.setDataRange(128,0);
-    // this.geo.setDataClip(0,254);
+    this.setState({extent: ext, minZoom: initialZoom, maxZoom: finalZoom});
   }
 
   async initLayer(z: number) {
@@ -258,8 +262,8 @@ class TileLayerExample extends React.Component<{}, TState> {
         );
       },
 
-      minZoom: 15,
-      //maxZoom: depth - 1,
+      minZoom: this.state.minZoom,
+      maxZoom: this.state.maxZoom,
       zoomOffset,
       tileSize,
       maxRequests: 5,
