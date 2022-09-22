@@ -23,5 +23,8 @@
     "eslint-plugin-promise": "^5.2.0",
     "eslint-plugin-react": "^7.28.0",
     "prettier": "^2.5.1"
+  },
+  "dependencies": {
+    "utm": "^1.1.1"
   }
 }
