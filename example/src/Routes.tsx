@@ -7,6 +7,7 @@ import {
   BitmapLayerExample,
   TileLayerExample,
   TerrainLayerExample,
+  CogLayerExample
 } from './examples';
 
 interface RoutesProps {}
@@ -23,6 +24,7 @@ const Routing: React.FC<RoutesProps> = () => (
       />
       <Route path={'/bitmap-layer-example'} element={<BitmapLayerExample />} />
       <Route path={'/tile-layer-example'} element={<TileLayerExample />} />
+      <Route path={'/cog-layer-example'} element={<CogLayerExample />} />
     </Routes>
   </BrowserRouter>
 );

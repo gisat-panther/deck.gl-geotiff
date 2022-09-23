@@ -4,7 +4,6 @@ import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
-import { GeoImage } from 'geolib';
 import { SourceUrl } from '@chunkd/source-url';
 import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import pako from 'pako';
@@ -28,7 +27,6 @@ interface TState {
 
 class TileLayerExample extends React.Component<{}, TState> {
   cog: CogTiff;
-  geo: GeoImage;
   img: CogTiffImage;
   blankImg: HTMLImageElement;
   src: SourceUrl;
@@ -104,10 +102,7 @@ class TileLayerExample extends React.Component<{}, TState> {
   async initImage(address: string) {
     this.src = new SourceUrl(address);
     this.cog = await CogTiff.create(this.src);
-    // this.geo.setDataRange(128,0);
-    // this.geo.setDataClip(0,254);
     this.img = this.cog.getImage(this.cog.images.length - 1);
-    this.setState({tileSize:this.img.tileSize.width});
     this.blankImg = this.generateBlankImage(this.state.tileSize,this.state.tileSize);
     this.possibleResolutions = this.generatePossibleResolutions(this.state.tileSize,32);
 
@@ -141,10 +136,6 @@ class TileLayerExample extends React.Component<{}, TState> {
       this.zoomLevelOffsets.set(initialZoom + z, [px,py]);
     }
 
-    this.geo = new GeoImage();
-    this.geo.setAutoRange(false);
-    this.geo.setOpacity(200);
-
     let acxm = e * 0.5 + this.img.bbox[2];
     let acym = -(e * 0.5 + (this.img.bbox[1] - e));
 
@@ -158,7 +149,7 @@ class TileLayerExample extends React.Component<{}, TState> {
 
     const ext:number[] = [unprojectedMin[0], unprojectedMin[1], unprojectedMax[0], unprojectedMax[1]];
 
-    this.setState({extent: ext, minZoom: initialZoom, maxZoom: finalZoom});
+    this.setState({tileSize:this.img.tileSize.width, extent: ext, minZoom: initialZoom, maxZoom: finalZoom});
   }
 
   async initLayer(z: number) {
