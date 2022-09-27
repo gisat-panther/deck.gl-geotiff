@@ -181,19 +181,9 @@ class CogTileLayer extends CompositeLayer<{}> {
         });
     }
 
-    wait(ms:number){
-        var start = new Date().getTime();
-        var end = start;
-        while(end < start + ms) {
-          end = new Date().getTime();
-       }
-     }
-
     renderLayers() {
         this.loadCog();
-
-        this.wait(5000);
-
+        
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
                 return this.getTileAt(
