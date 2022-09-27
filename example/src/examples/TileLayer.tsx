@@ -10,12 +10,11 @@ import pako from 'pako';
 import jpeg from 'jpeg-js';
 import { CSSProperties } from 'styled-components';
 import { StaticMap } from 'react-map-gl';
-import {worldToLngLat} from '@math.gl/web-mercator';
+import { worldToLngLat } from '@math.gl/web-mercator';
 
 // const url = 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif';
 
 interface TState {
-  depth: number;
   loaded: boolean;
   tileSize: number;
   url: string;
@@ -36,12 +35,11 @@ class TileLayerExample extends React.Component<{}, TState> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      depth: 0,
       loaded: false,
       tileSize: 512,
       url: '',
       zoomOffset: 0,
-      extent: [0,0,0,0],
+      extent: [0, 0, 0, 0],
       minZoom: 0,
       maxZoom: 0
     };
@@ -50,18 +48,18 @@ class TileLayerExample extends React.Component<{}, TState> {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  generateBlankImage(width:number, height:number){
+  generateBlankImage(width: number, height: number) {
     const canvas = document.createElement('canvas')
     canvas.width = width
     canvas.height = height
-    
+
     const ctx = canvas.getContext('2d')
     ctx!.fillStyle = 'rgba(0, 0, 0, 0)'
     ctx!.fillRect(0, 0, width, height)
-  
+
     const img = new Image(width, height)
     img.src = canvas.toDataURL()
-  
+
     return img
   }
 
@@ -88,10 +86,10 @@ class TileLayerExample extends React.Component<{}, TState> {
     return closestIndex;
   }
 
-  unproject(input:number[]){
+  unproject(input: number[]) {
     const e = 40075000.0;
 
-    const cartesianPosition = [input[0] * (512/e), input[1] * (512/e)];
+    const cartesianPosition = [input[0] * (this.state.tileSize / e), input[1] * (this.state.tileSize / e)];
     const cartographicPosition = worldToLngLat(cartesianPosition);
     const cartographicPositionAdjusted = [cartographicPosition[0], - cartographicPosition[1]];
 
@@ -103,8 +101,8 @@ class TileLayerExample extends React.Component<{}, TState> {
     this.src = new SourceUrl(address);
     this.cog = await CogTiff.create(this.src);
     this.img = this.cog.getImage(this.cog.images.length - 1);
-    this.blankImg = this.generateBlankImage(this.state.tileSize,this.state.tileSize);
-    this.possibleResolutions = this.generatePossibleResolutions(this.state.tileSize,32);
+    this.blankImg = this.generateBlankImage(this.state.tileSize, this.state.tileSize);
+    this.possibleResolutions = this.generatePossibleResolutions(this.state.tileSize, 32);
 
     console.log(this.img.bbox);
 
@@ -121,19 +119,19 @@ class TileLayerExample extends React.Component<{}, TState> {
     let acy = -(e * 0.5 + (cy - e));
     let mpt = this.img.resolution[0] * this.img.tileSize.width;
 
-    let ox = Math.round(acx/mpt);
-    let oy = Math.round(acy/mpt);
+    let ox = Math.round(acx / mpt);
+    let oy = Math.round(acy / mpt);
 
     this.zoomLevelOffsets = new Map<number, Array<number>>;
-    this.zoomLevelOffsets.set(initialZoom, [ox,oy]);
+    this.zoomLevelOffsets.set(initialZoom, [ox, oy]);
 
     let px = ox;
     let py = oy;
 
-    for(let z = 1; z < this.cog.images.length; z++){
+    for (let z = 1; z < this.cog.images.length; z++) {
       px = px * 2;
       py = py * 2;
-      this.zoomLevelOffsets.set(initialZoom + z, [px,py]);
+      this.zoomLevelOffsets.set(initialZoom + (z), [px, py]);
     }
 
     let acxm = e * 0.5 + this.img.bbox[2];
@@ -144,21 +142,24 @@ class TileLayerExample extends React.Component<{}, TState> {
     const maxX = acxm;
     const maxY = acym;
 
-    const unprojectedMin = this.unproject([minX,maxY]);
-    const unprojectedMax = this.unproject([maxX,minY]);
+    const unprojectedMin = this.unproject([minX, maxY]);
+    const unprojectedMax = this.unproject([maxX, minY]);
 
-    const ext:number[] = [unprojectedMin[0], unprojectedMin[1], unprojectedMax[0], unprojectedMax[1]];
+    const ext: number[] = [unprojectedMin[0], unprojectedMin[1], unprojectedMax[0], unprojectedMax[1]];
 
-    this.setState({tileSize:this.img.tileSize.width, extent: ext, minZoom: initialZoom, maxZoom: finalZoom});
+    console.log(ext);
+
+    this.setState({ tileSize: this.img.tileSize.width, extent: ext, minZoom: initialZoom+1, maxZoom: finalZoom });
   }
 
   async initLayer(z: number) {
     this.img = this.cog.getImageByResolution(this.possibleResolutions[z]);
+    console.log(this.img);
   }
 
   async getTileAt(x: number, y: number, z: number) {
     const {
-      img: {tileSize, tileCount, resolution, origin},
+      img: { tileSize, tileCount, resolution },
     } = this;
 
     const wantedMpp = this.possibleResolutions[z];
@@ -174,32 +175,30 @@ class TileLayerExample extends React.Component<{}, TState> {
 
     let decompressed: unknown;
 
-    const offset:number[] = this.zoomLevelOffsets.get(z) as number[];
+    console.log("tileIndex: " + [x,y]);
+
+    const offset: number[] = this.zoomLevelOffsets.get(z) as number[];
+
+    console.log("offset: " + offset);
 
     const ox = offset[0];
     const oy = offset[1];
 
-    if (x >= ox + tilesX || y >= oy + tilesY) {
-      decompressed = this.blankImg;
-    }else if(x < ox || y < oy){
-      decompressed = this.blankImg;
-    } else {
+    console.log("getting tile: " + [x - ox, y - oy]);
+
+    if (x - ox >= 0 && y - oy >= 0) {
       const tile = await this.img.getTile(x - ox, y - oy);
       const data = tile!.bytes;
 
+      console.log(tile)
+
       if (this.img.compression === 'image/jpeg') {
         decompressed = jpeg.decode(data, { useTArray: true });
-      } else if (this.img.compression === 'application/deflate') {
-        decompressed = pako.inflate(data);
-        decompressed = await this.geo.getBitmap({
-          rasters: [decompressed],
-          width: tileWidth,
-          height: tileWidth,
-        });
+        console.log("good");
       }
     }
 
-    return new Promise( (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       resolve(decompressed);
       reject('Cannot retrieve tile ');
     });
@@ -211,7 +210,6 @@ class TileLayerExample extends React.Component<{}, TState> {
     await this.initLayer(this.indexOfClosestTo(this.possibleResolutions, 9999999));
 
     this.setState({
-      depth: imageCount,
       tileSize: this.img.tileSize.width,
       loaded: true,
     });
@@ -234,7 +232,7 @@ class TileLayerExample extends React.Component<{}, TState> {
       latitude: 0,
       zoom: 0,
     };
-    const { depth, loaded, zoomOffset, tileSize } = this.state;
+    const { loaded, zoomOffset, tileSize } = this.state;
     const labelStyle: CSSProperties = {
       position: 'absolute',
       right: '100px',
@@ -249,7 +247,7 @@ class TileLayerExample extends React.Component<{}, TState> {
         return this.getTileAt(
           tileData.x,
           tileData.y,
-          tileData.z
+          tileData.z-1
         );
       },
 
@@ -298,10 +296,10 @@ class TileLayerExample extends React.Component<{}, TState> {
               }),
             ]}
           >
-          <StaticMap mapboxApiAccessToken='pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg'/>
+            <StaticMap mapboxApiAccessToken='pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg' />
           </DeckGL>
         )},
-        
+
       </>
     );
   }
