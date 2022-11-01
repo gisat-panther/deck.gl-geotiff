@@ -21,6 +21,7 @@ class GeoImage implements IGeoImage {
   imageWidth = 0;
   imageHeight = 0;
   options = {};
+  useChannel = -1;
 
   scale = (
     num: number,
@@ -70,7 +71,12 @@ class GeoImage implements IGeoImage {
     this.imageWidth = width;
     this.imageHeight = height;
 
-    const channel = rasters[0];
+    let channel;
+    if (this.useChannel === -1) {
+      channel = rasters[0];
+    } else {
+      channel = rasters[this.useChannel];
+    }
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -210,38 +216,90 @@ class GeoImage implements IGeoImage {
         }
       }
     }
-    if (channels === 3) {
-      // RGB
-      let pixel = 0;
-      for (let i = 0; i < s; i += 4) {
-        r = rasters[0][pixel];
-        g = rasters[1][pixel];
-        b = rasters[2][pixel];
-        a = this.alpha;
+    if (this.useChannel === -1) {
+      if (channels === 3) {
+        // RGB
+        let pixel = 0;
+        for (let i = 0; i < s; i += 4) {
+          r = rasters[0][pixel];
+          g = rasters[1][pixel];
+          b = rasters[2][pixel];
+          a = this.alpha;
 
-        imageData.data[i] = r;
-        imageData.data[i + 1] = g;
-        imageData.data[i + 2] = b;
-        imageData.data[i + 3] = a;
+          imageData.data[i] = r;
+          imageData.data[i + 1] = g;
+          imageData.data[i + 2] = b;
+          imageData.data[i + 3] = a;
 
-        pixel++;
+          pixel++;
+        }
       }
-    }
-    if (channels === 4) {
-      // RGBA
-      let pixel = 0;
-      for (let i = 0; i < width * height * 4; i += 4) {
-        r = rasters[0][pixel];
-        g = rasters[1][pixel];
-        b = rasters[2][pixel];
-        a = this.alpha;
+      if (channels === 4) {
+        // RGBA
+        let pixel = 0;
+        for (let i = 0; i < width * height * 4; i += 4) {
+          r = rasters[0][pixel];
+          g = rasters[1][pixel];
+          b = rasters[2][pixel];
+          a = this.alpha;
 
-        imageData.data[i] = r;
-        imageData.data[i + 1] = g;
-        imageData.data[i + 2] = b;
-        imageData.data[i + 3] = a;
+          imageData.data[i] = r;
+          imageData.data[i + 1] = g;
+          imageData.data[i + 2] = b;
+          imageData.data[i + 3] = a;
 
-        pixel++;
+          pixel++;
+        }
+      }
+    }else{
+      if (rasters[this.useChannel].length / (width * height) === 1) {
+        const channel = rasters[this.useChannel];
+        // AUTO RANGE
+        if (this.useAutoRange) {
+          let highest = Number.MIN_VALUE;
+          let lowest = Number.MAX_VALUE;
+          let value: number;
+          for (let i = 0; i < channel.length; i++) {
+            value = channel[i];
+            if (value > highest) highest = value;
+            if (value < lowest) lowest = value;
+          }
+          this.rangeMin = lowest;
+          this.rangeMax = highest;
+          //console.log('data min: ' + this.rangeMin +', max: ' + this.rangeMax);
+        }
+        // SINGLE CHANNEL
+        let ratio = 0;
+
+        let pixel = 0;
+        for (let i = 0; i < s; i += 4) {
+          if (this.useHeatMap) {
+            ratio = (2 * (channel[pixel] - this.rangeMin)) / (this.rangeMax - this.rangeMin);
+            this.color[2] = 0 > 255 * (1 - ratio) ? 0 : 255 * (1 - ratio);
+            this.color[0] = 0 > 255 * (ratio - 1) ? 0 : 255 * (ratio - 1);
+            this.color[1] = 255 - this.color[2] - this.color[0];
+          }
+
+          r = this.color[0];
+          g = this.color[1];
+          b = this.color[2];
+
+          a = this.alpha;
+
+          if (this.useClip === true && (channel[pixel] < this.clipLow || channel[pixel] > this.clipHigh)) {
+            a = 0;
+          }
+          if (this.useDataForOpacity) {
+            a = this.scale(channel[pixel], this.rangeMin, this.rangeMax, 0, 255);
+          }
+
+          imageData.data[i] = r;
+          imageData.data[i + 1] = g;
+          imageData.data[i + 2] = b;
+          imageData.data[i + 3] = a;
+
+          pixel++;
+        }
       }
     }
     //console.timeEnd('bitmap-generated-in');
