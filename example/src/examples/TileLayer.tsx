@@ -6,7 +6,7 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { SourceUrl } from '@chunkd/source-url';
 import { CogTiff, CogTiffImage } from '@cogeotiff/core';
-import pako from 'pako';
+//import pako from 'pako';
 import jpeg from 'jpeg-js';
 import { CSSProperties } from 'styled-components';
 import { StaticMap } from 'react-map-gl';
@@ -27,7 +27,6 @@ interface TState {
 class TileLayerExample extends React.Component<{}, TState> {
   cog: CogTiff;
   img: CogTiffImage;
-  blankImg: HTMLImageElement;
   src: SourceUrl;
   possibleResolutions: number[];
   zoomLevelOffsets: Map<number, Array<number>>;
@@ -46,21 +45,6 @@ class TileLayerExample extends React.Component<{}, TState> {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  generateBlankImage(width: number, height: number) {
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-
-    const ctx = canvas.getContext('2d')
-    ctx!.fillStyle = 'rgba(0, 0, 0, 0)'
-    ctx!.fillRect(0, 0, width, height)
-
-    const img = new Image(width, height)
-    img.src = canvas.toDataURL()
-
-    return img
   }
 
   generatePossibleResolutions(tileSize: number, maxZoomLevel: number) {
@@ -101,7 +85,6 @@ class TileLayerExample extends React.Component<{}, TState> {
     this.src = new SourceUrl(address);
     this.cog = await CogTiff.create(this.src);
     this.img = this.cog.getImage(this.cog.images.length - 1);
-    this.blankImg = this.generateBlankImage(this.state.tileSize, this.state.tileSize);
     this.possibleResolutions = this.generatePossibleResolutions(this.state.tileSize, 32);
 
     console.log(this.img.bbox);
