@@ -6,6 +6,8 @@ import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import jpeg from 'jpeg-js';
 import { worldToLngLat } from '@math.gl/web-mercator';
 
+type vct = { x: number, y: number };
+
 let cog: CogTiff;
 let img: CogTiffImage;
 let blankImg: HTMLImageElement;
@@ -18,15 +20,52 @@ let extent = [0, 0, 0, 0];
 let tileSize = 0;
 let minZoom = 0;
 let maxZoom = 0;
-let tileCount = 0;
-let resolution = 0;
+let tileCount: vct;
+let resolution: any[] = [];
 
 class CogTileLayer extends CompositeLayer {
     static layerName = 'CogTileLayer';
 
-    async initializeState(){
-        await this.loadCog();
-        await this.generatePossibleResolutions(tileSize, 32);
+    initializeState() {
+        this.loadCog();
+        this.generatePossibleResolutions(tileSize, 32);
+    }
+
+    updateState() {
+
+    }
+
+    renderLayers() {
+        const layer = new TileLayer({
+            getTileData: (tileData: any) => {
+                console.log(tileData);
+                return this.getTileAt(
+                    tileData.x,
+                    tileData.y,
+                    tileData.z
+                );
+            },
+
+            minZoom: minZoom,
+            maxZoom: maxZoom,
+            tileSize: tileSize,
+            maxRequests: 5,
+            extent: extent,
+
+            renderSubLayers: (props: any) => {
+                const {
+                    bbox: { west, south, east, north },
+                } = props.tile;
+
+                return new BitmapLayer(props, {
+                    data: null,
+                    image: props.data,
+                    bounds: [west, south, east, north],
+                });
+            },
+        });
+
+        return [layer];
     }
 
     generatePossibleResolutions(tileSize: number, maxZoomLevel: number) {
@@ -37,6 +76,7 @@ class CogTileLayer extends CompositeLayer {
         for (let i = 0; i < maxZoomLevel; i++) {
             resolutions[i] = metersPerPixelAtEquator / (Math.pow(2, i));
         }
+
         return resolutions;
     }
 
@@ -68,6 +108,9 @@ class CogTileLayer extends CompositeLayer {
         await this.initLayer(this.indexOfClosestTo(possibleResolutions, 9999999));
 
         tileSize = img.tileSize.width;
+        tileCount = img.tileCount;
+        resolution = img.resolution;
+        //console.log(tileSize);
         loaded = true;
     }
 
@@ -132,86 +175,46 @@ class CogTileLayer extends CompositeLayer {
     }
 
     async getTileAt(x: number, y: number, z: number) {
-        const tileSize = img.tileSize;
-        const tileCount = img.tileCount;
-        const resolution = img.resolution;
-
         const wantedMpp = possibleResolutions[z];
         const currentMpp = resolution[0];
-    
+
         if (z !== this.indexOfClosestTo(possibleResolutions, currentMpp)) {
-          await this.initLayer(this.indexOfClosestTo(possibleResolutions, wantedMpp));
+            await this.initLayer(this.indexOfClosestTo(possibleResolutions, wantedMpp));
         }
-    
-        const tileWidth = tileSize.width;
+
+        const tileWidth = tileSize;
         const tilesX = tileCount.x;
         const tilesY = tileCount.y;
-    
+
         let decompressed: unknown;
-    
-        console.log("tileIndex: " + [x,y]);
-    
+
+        console.log("tileIndex: " + [x, y]);
+
         const offset: number[] = zoomLevelOffsets.get(z) as number[];
-    
+
         console.log("offset: " + offset);
-    
+
         const ox = offset[0];
         const oy = offset[1];
-    
+
         console.log("getting tile: " + [x - ox, y - oy]);
-    
+
         if (x - ox >= 0 && y - oy >= 0) {
-          const tile = await img.getTile(x - ox, y - oy);
-          const data = tile!.bytes;
-    
-          console.log(tile)
-    
-          if (img.compression === 'image/jpeg') {
-            decompressed = jpeg.decode(data, { useTArray: true });
-            console.log("good");
-          }
+            const tile = await img.getTile(x - ox, y - oy);
+            const data = tile!.bytes;
+
+            console.log(tile)
+
+            if (img.compression === 'image/jpeg') {
+                decompressed = jpeg.decode(data, { useTArray: true });
+                console.log("good");
+            }
         }
-    
+
         return new Promise((resolve, reject) => {
-          resolve(decompressed);
-          reject('Cannot retrieve tile ');
+            resolve(decompressed);
+            reject('Cannot retrieve tile ');
         });
-      }
-
-    renderLayers() {
-        
-        //this.initLayer(0);
-
-        const layer = new TileLayer({
-            getTileData: (tileData: any) => {
-                console.log(tileData);
-                return this.getTileAt(
-                    tileData.x,
-                    tileData.y,
-                    tileData.z
-                );
-            },
-
-            minZoom: minZoom,
-            maxZoom: maxZoom,
-            tileSize: tileSize,
-            maxRequests: 5,
-            extent: extent,
-
-            renderSubLayers: (props: any) => {
-                const {
-                    bbox: { west, south, east, north },
-                } = props.tile;
-
-                return new BitmapLayer(props, {
-                    data: null,
-                    image: props.data,
-                    bounds: [west, south, east, north],
-                });
-            },
-        });
-
-        return [layer];
     }
 }
 
