@@ -10,32 +10,67 @@ type vct = { x: number, y: number };
 
 let cog: CogTiff;
 let img: CogTiffImage;
+let url: string;
 let blankImg: HTMLImageElement;
 let src: SourceUrl;
 let possibleResolutions: number[];
 let zoomLevelOffsets: Map<number, Array<number>>;
-let loaded = false;
-let url = 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif';
 let extent = [0, 0, 0, 0];
 let tileSize = 0;
 let minZoom = 0;
 let maxZoom = 0;
 let tileCount: vct;
 let resolution: any[] = [];
+let loaded: boolean;
+
+interface CogTileLayerProps extends LayerProps {
+    url: string,
+    loaded?: boolean;
+}
 
 class CogTileLayer extends CompositeLayer {
     static layerName = 'CogTileLayer';
 
-    initializeState() {
-        this.loadCog();
-        this.generatePossibleResolutions(tileSize, 32);
+    static defaultProps = {
+        address : {type:"accessor", value: ""},
     }
 
-    updateState() {
+    constructor(props: CogTileLayerProps){
+        super(props);
+        url = props.url;   
+    }
 
+    async initializeState() {
+        console.log("LAYER INITIALIZE STATE");
+        await this.loadCog();
+    }
+
+    updateState(){
+        console.log("LAYER UPDATE STATE");
+    }
+    shouldUpdateState(status:{props:CogTileLayerProps, oldProps:CogTileLayerProps}){
+        console.log("LAYER SHOULD UPDATE STATE");
+        console.log(status.oldProps);
+        console.log(status.props);
+
+        if(url.length > 1){
+            return true;
+        }
+
+        /*
+        if(status.props != status.oldProps){
+            console.log("PROP CHANGE");
+            return true;
+        }else{
+            console.log("NO PROP CHANGE");
+            return false;
+        }
+        */
     }
 
     renderLayers() {
+        console.log("LAYER RENDER");
+        console.log(loaded);
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
                 console.log(tileData);
@@ -44,6 +79,10 @@ class CogTileLayer extends CompositeLayer {
                     tileData.y,
                     tileData.z
                 );
+            },
+
+            updateTriggers: {
+            
             },
 
             minZoom: minZoom,
@@ -105,13 +144,14 @@ class CogTileLayer extends CompositeLayer {
 
     async loadCog() {
         await this.initImage(url);
-        await this.initLayer(this.indexOfClosestTo(possibleResolutions, 9999999));
 
         tileSize = img.tileSize.width;
         tileCount = img.tileCount;
         resolution = img.resolution;
         //console.log(tileSize);
         loaded = true;
+        this.updateState();
+        //this.renderLayers();
     }
 
     async initImage(address: string) {
@@ -167,13 +207,16 @@ class CogTileLayer extends CompositeLayer {
         extent = ext;
         minZoom = initialZoom;
         maxZoom = finalZoom;
+
+        this.generatePossibleResolutions(tileSize, 32);
+        await this.initLayer(this.indexOfClosestTo(possibleResolutions, 9999999));
     }
 
     async initLayer(z: number) {
         img = cog.getImageByResolution(possibleResolutions[z]);
         console.log(img);
     }
-
+    
     async getTileAt(x: number, y: number, z: number) {
         const wantedMpp = possibleResolutions[z];
         const currentMpp = resolution[0];
@@ -198,16 +241,13 @@ class CogTileLayer extends CompositeLayer {
         const oy = offset[1];
 
         console.log("getting tile: " + [x - ox, y - oy]);
-
+        
         if (x - ox >= 0 && y - oy >= 0) {
             const tile = await img.getTile(x - ox, y - oy);
             const data = tile!.bytes;
 
-            console.log(tile)
-
             if (img.compression === 'image/jpeg') {
                 decompressed = jpeg.decode(data, { useTArray: true });
-                console.log("good");
             }
         }
 

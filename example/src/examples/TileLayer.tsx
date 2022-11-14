@@ -226,7 +226,7 @@ class TileLayerExample extends React.Component<{}, TState> {
     console.log(this.state.extent);
 
     const layer = new TileLayer({
-      getTileData: (tileData) => {
+      getTileData: (tileData: { x: number; y: number; z: number; }) => {
         return this.getTileAt(
           tileData.x,
           tileData.y,
@@ -242,7 +242,7 @@ class TileLayerExample extends React.Component<{}, TState> {
       refinementStrategy: 'best-available',
       extent: this.state.extent,
 
-      renderSubLayers: (props) => {
+      renderSubLayers: (props: { tile: { bbox: { west: any; south: any; east: any; north: any; }; }; data: any; }) => {
         const {
           bbox: { west, south, east, north },
         } = props.tile;

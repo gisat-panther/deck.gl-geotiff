@@ -7,25 +7,17 @@ import { StaticMap } from 'react-map-gl';
 
 // const url = 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif';
 
-interface TState {
-  url: string;
-}
-
-class CogLayerExample extends React.Component<{}, TState> {
-
-  constructor(props: {}) {
-    super(props);
-  }
+class CogLayerExample extends React.Component<{}> {
 
   render() {
-    const layer = new CogTileLayer();
+    console.log("REACT RENDER");
+    const layer = new CogTileLayer({url: 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif'});
 
     const initialViewState: InitialViewStateProps = {
       longitude: 0,
       latitude: 0,
       zoom: 0,
     };
-
     return (
       <>
         {(
