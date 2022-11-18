@@ -73,7 +73,7 @@ class CogTileLayer extends CompositeLayer {
         console.log(loaded);
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
-                console.log(tileData);
+                //console.log(tileData);
                 return this.getTileAt(
                     tileData.x,
                     tileData.y,
