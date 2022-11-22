@@ -1,17 +1,14 @@
 import React from 'react';
 import DeckGL from '@deck.gl/react';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
-import { CogTileLayer } from '../layers/CogTileLayer/CogTileLayer';
+import { LiveTerrainLayer } from '../layers/LiveTerrainLayer/LiveTerrainLayer';
 import { MapView } from '@deck.gl/core';
 import { StaticMap } from 'react-map-gl';
 
-// const url = 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif';
-
-class CogLayerExample extends React.Component<{}> {
+class TestLayerExample extends React.Component<{}> {
 
   render() {
-    console.log("REACT RENDER");
-    const layer = new CogTileLayer({url: 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif'});
+    const layer = new LiveTerrainLayer();
 
     const initialViewState: InitialViewStateProps = {
       longitude: 0,
@@ -35,7 +32,7 @@ class CogLayerExample extends React.Component<{}> {
               }),
             ]}
           >
-          <StaticMap mapboxApiAccessToken='pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg'/>
+          
           </DeckGL>
         )}
       </>
@@ -43,4 +40,4 @@ class CogLayerExample extends React.Component<{}> {
   }
 }
 
-export { CogLayerExample };
+export { TestLayerExample };
