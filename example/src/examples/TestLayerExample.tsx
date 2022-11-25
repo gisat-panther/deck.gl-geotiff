@@ -13,7 +13,7 @@ class TestLayerExample extends React.Component<{}> {
     const initialViewState: InitialViewStateProps = {
       longitude: 0,
       latitude: 0,
-      zoom: 0,
+      zoom: 15,
     };
     return (
       <>
