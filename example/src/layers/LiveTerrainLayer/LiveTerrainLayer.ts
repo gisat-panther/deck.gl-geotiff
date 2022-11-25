@@ -8,11 +8,11 @@ import { hasFeature, FEATURES } from '@luma.gl/webgl';
 import vertex from './vertex.glsl';
 import fragment from './fragment.glsl';
 
-import { generatePlaneMesh } from "src/utilities/generators";
+//import { generatePlaneMesh } from "src/utilities/generators";
 
 class LiveTerrainLayer extends SimpleMeshLayer {
-  draw({ uniforms }) {
 
+  draw({ uniforms }) {
     super.draw({
       uniforms: Object.assign({}, uniforms, {
         alpha: 1.0

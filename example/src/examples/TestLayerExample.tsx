@@ -5,10 +5,25 @@ import { LiveTerrainLayer } from '../layers/LiveTerrainLayer/LiveTerrainLayer';
 import { MapView } from '@deck.gl/core';
 import { StaticMap } from 'react-map-gl';
 
+import { generatePlaneMesh } from "./../utilities/generators";
+
 class TestLayerExample extends React.Component<{}> {
 
   render() {
-    const layer = new LiveTerrainLayer();
+    const g = new GeoImage();
+    const heightmap = g.getHeightMap('dsm.tif');
+    const mesh = generatePlaneMesh(512, 512, 10, 10) //2199, 1712, 10, 10
+
+    const layer = new LiveTerrainLayer({
+      id: 'mesh-layer',
+      data,
+      mesh: mesh,
+      texture: heightmap,
+      getPosition: d => d.position,
+      getColor: d => d.color,
+      getOrientation: d => [0, d.angle, 0],
+      getScale: d => [250, 250, 250]
+    });
 
     const initialViewState: InitialViewStateProps = {
       longitude: 0,
@@ -32,7 +47,7 @@ class TestLayerExample extends React.Component<{}> {
               }),
             ]}
           >
-          
+
           </DeckGL>
         )}
       </>

@@ -1,4 +1,4 @@
-export function generatePlaneMesh(width: number, height: number, sizeX: number, sizeY: number){
+function generatePlaneMesh(width: number, height: number, sizeX: number, sizeY: number){
     let cellSize = (1 / width);
     let positions = [];
     let normals = [];
@@ -70,3 +70,5 @@ export function generatePlaneMesh(width: number, height: number, sizeX: number, 
 
     return { positions: Float32Array.from(positions), normals: Float32Array.from(normals), texCoords: Float32Array.from(texCoords) };
   }
+
+  export {generatePlaneMesh}
