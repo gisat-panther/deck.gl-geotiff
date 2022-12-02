@@ -4,12 +4,15 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { SourceUrl } from '@chunkd/source-url';
 import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import jpeg from 'jpeg-js';
+import { inflate } from "deflate-js";
 import { worldToLngLat } from '@math.gl/web-mercator';
+import { GeoImage } from "geolib";
 
 type vct = { x: number, y: number };
 
 let cog: CogTiff;
 let img: CogTiffImage;
+let geo: GeoImage;
 let url: string;
 let blankImg: HTMLImageElement;
 let src: SourceUrl;
@@ -32,28 +35,29 @@ class CogTileLayer extends CompositeLayer {
     static layerName = 'CogTileLayer';
 
     static defaultProps = {
-        address : {type:"accessor", value: ""},
+        address: { type: "accessor", value: "" },
     }
 
-    constructor(props: CogTileLayerProps){
+    constructor(props: CogTileLayerProps) {
         super(props);
-        url = props.url;   
+        url = props.url;
     }
 
     async initializeState() {
         console.log("LAYER INITIALIZE STATE");
         await this.loadCog();
+        geo = new GeoImage();
     }
 
-    updateState(){
+    updateState() {
         console.log("LAYER UPDATE STATE");
     }
-    shouldUpdateState(status:{props:CogTileLayerProps, oldProps:CogTileLayerProps}){
+    shouldUpdateState(status: { props: CogTileLayerProps, oldProps: CogTileLayerProps }) {
         console.log("LAYER SHOULD UPDATE STATE");
         console.log(status.oldProps);
         console.log(status.props);
 
-        if(url.length > 1){
+        if (url.length > 1) {
             return true;
         }
     }
@@ -72,7 +76,7 @@ class CogTileLayer extends CompositeLayer {
             },
 
             updateTriggers: {
-            
+
             },
 
             minZoom: minZoom,
@@ -206,7 +210,7 @@ class CogTileLayer extends CompositeLayer {
         img = cog.getImageByResolution(possibleResolutions[z]);
         console.log(img);
     }
-    
+
     async getTileAt(x: number, y: number, z: number) {
         const wantedMpp = possibleResolutions[z];
         const currentMpp = resolution[0];
@@ -231,13 +235,20 @@ class CogTileLayer extends CompositeLayer {
         const oy = offset[1];
 
         console.log("getting tile: " + [x - ox, y - oy]);
-        
+
         if (x - ox >= 0 && y - oy >= 0) {
-            const tile = await img.getTile(x - ox, y - oy);
+            const tile = await img.getTile((x - ox), (y - oy));
             const data = tile!.bytes;
 
             if (img.compression === 'image/jpeg') {
                 decompressed = jpeg.decode(data, { useTArray: true });
+            } else if (img.compression === 'application/deflate') {
+                decompressed = await inflate(data);
+                decompressed = await geo.getBitmap({
+                    rasters: [decompressed],
+                    width: tileWidth,
+                    height: tileWidth,
+                });
             }
         }
 

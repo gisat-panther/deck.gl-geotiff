@@ -6,12 +6,13 @@ import { MapView } from '@deck.gl/core';
 import { StaticMap } from 'react-map-gl';
 
 // const url = 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif';
+//const url = "https://gisat-gis.eu-central-1.linodeobjects.com/eman/DEMs/Copernicus_DSM_10_merged_Mercator_COG.tif"
 
 class CogLayerExample extends React.Component<{}> {
 
   render() {
     console.log("REACT RENDER");
-    const layer = new CogTileLayer({url: 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif'});
+    const layer = new CogTileLayer({url: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/DEMs/Copernicus_DSM_10_merged_Mercator_COG.tif'});
 
     const initialViewState: InitialViewStateProps = {
       longitude: 0,

@@ -11,10 +11,19 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
 import { CubeGeometry } from "@luma.gl/core";
 import { GeoImage } from "geolib";
+import { CogTiff, CogTiffImage } from '@cogeotiff/core';
+import { getCog, getImageByIndex, getTile } from '../utilities/cogtools';
 
 class TestLayerExample extends React.Component<{}> {
-
+  g = new GeoImage();
   planeMesh = generatePlaneMesh(128, 128, 1, 1);
+  cog:CogTiff;
+  cogImage:CogTiffImage;
+  
+
+  async componentDidMount(){
+    console.log("TEST LAYER INIT");
+  }
 
   render() {
     //LiveTerrainLayer

@@ -43,7 +43,6 @@ class LiveTerrainLayer extends SimpleMeshLayer{
         }
     })
 
-    console.log(this.props.data);
   }
   
   getShaders() {
