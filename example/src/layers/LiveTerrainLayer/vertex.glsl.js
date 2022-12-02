@@ -14,17 +14,16 @@ in vec4 instanceColors;
 in vec3 instancePickingColors;
 in mat3 instanceModelMatrix;
 in vec3 instanceTranslation;
+
 // Outputs to fragment shader
 out vec2 vTexCoord;
 out vec4 position_commonspace;
 out vec4 vColor;
 
+uniform sampler2D sampler;
 uniform sampler2D startTexture;
 uniform sampler2D endTexture;
 uniform float alpha;
-uniform float scale;
-
-uniform sampler2D albedo;
 
 float height;
 varying vec3 c;
@@ -35,6 +34,7 @@ float getHeightOf(sampler2D tex, vec2 uv){
 }
 
 void main() {
+  
   geometry.worldPosition = instancePositions;
   geometry.uv = texCoords * 2.0;
   geometry.pickingColor = instancePickingColors;
@@ -53,15 +53,13 @@ void main() {
     geometry.position = position_commonspace;
   }
 
-  vec4 color = texture2D(startTexture, texCoords);
-
   vec3 off = vec3(0.0015, 0.0015, 0.0);
   vec2 P = vTexCoord;
 
-  float hL = getHeightOf(startTexture, P.xy - off.xz)*100.0;
-  float hR = getHeightOf(startTexture, P.xy + off.xz)*100.0;
-  float hD = getHeightOf(startTexture, P.xy - off.zy)*100.0;
-  float hU = getHeightOf(startTexture, P.xy + off.zy)*100.0;
+  float hL = mix(getHeightOf(startTexture, P.xy - off.xz)*100.0, getHeightOf(endTexture, P.xy - off.xz)*100.0, alpha);
+  float hR = mix(getHeightOf(startTexture, P.xy + off.xz)*100.0, getHeightOf(endTexture, P.xy + off.xz)*100.0, alpha);
+  float hD = mix(getHeightOf(startTexture, P.xy - off.zy)*100.0, getHeightOf(endTexture, P.xy - off.zy)*100.0, alpha);
+  float hU = mix(getHeightOf(startTexture, P.xy + off.zy)*100.0, getHeightOf(endTexture, P.xy + off.zy)*100.0, alpha);
 
   vec3 N;
   N.x = hL - hR;
@@ -72,7 +70,7 @@ void main() {
   float s = dot(N,normalize(vec3(0.8,1.0,0.8)));
   c = vec3(s,s,s);
 
-  height = mix(getHeightOf(startTexture, vTexCoord),getHeightOf(startTexture, vTexCoord),alpha);
+  height = mix(getHeightOf(startTexture, vTexCoord),getHeightOf(endTexture, vTexCoord),alpha);
   gl_Position += project_common_position_to_clipspace(vec4(0.0,0.0,height*1.0,1.0));
 }
 `;

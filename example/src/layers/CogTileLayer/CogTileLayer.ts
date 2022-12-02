@@ -56,16 +56,6 @@ class CogTileLayer extends CompositeLayer {
         if(url.length > 1){
             return true;
         }
-
-        /*
-        if(status.props != status.oldProps){
-            console.log("PROP CHANGE");
-            return true;
-        }else{
-            console.log("NO PROP CHANGE");
-            return false;
-        }
-        */
     }
 
     renderLayers() {

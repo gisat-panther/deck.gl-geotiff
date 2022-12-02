@@ -10,38 +10,57 @@ import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
 import { CubeGeometry } from "@luma.gl/core";
-//import {OBJLoader} from "@loaders.gl/obj";
+import { GeoImage } from "geolib";
 
 class TestLayerExample extends React.Component<{}> {
 
+  planeMesh = generatePlaneMesh(128, 128, 1, 1);
+
   render() {
-
-    const img = new Image;
-    img.src = "shrek.png";
-
-    /*//LiveTerrainLayer
-    const g = new GeoImage();
-    const heightmap = g.getHeightMap('dsm.tif');
-    const mesh = generatePlaneMesh(512, 512, 10, 10) //2199, 1712, 10, 10
-
+    //LiveTerrainLayer
+    const mesh = this.planeMesh
+    
+    /*
     const layer = new LiveTerrainLayer({
-      id: 'mesh-layer',
-      data,
+      id: 'live-terrain-layer',
+      data: {alpha: 0.5},
       mesh: mesh,
-      texture: heightmap,
-      getPosition: d => d.position,
-      getColor: d => d.color,
-      getOrientation: d => [0, d.angle, 0],
-      getScale: d => [250, 250, 250]
+      texture: "terrain.png",
+      getPosition: [0,0,100],
+      getColor: [0,255,0],
+      getScale: [1000, 1000, 1]
     });
     */
+    
+    
+    //TileLayer+LiveTerrainLayer
+    let index = 0;
+    const layer = new TileLayer({
+      getTileData: (tileData: any) => {
+        //const image = 
 
-    //TileLayer
+        return {zoomLevel : 10000, heightmap: 0}
+      },
+
+      maxRequests: 5,
+      refinementStrategy: 'best-available',
+      tileSize: 512,
+
+      renderSubLayers: (props: any) => {
+        return new LiveTerrainLayer({
+          id: 'live-terrain-layer' + index++,
+          data: {alpha: 0.5},
+          mesh: mesh,
+          texture: "terrain.png",
+          getPosition: [props.tile.bbox.west,props.tile.bbox.south],
+          getScale: [(props.tile.bbox.east - props.tile.bbox.west) * 111211, (props.tile.bbox.south - props.tile.bbox.north) * 111211]
+        });
+      },
+    });
+    
+
     /*
-    const teapotLayer = new SimpleMeshLayer({
-      id: 'teapot-layer',
-      mesh: generatePlaneMesh(256,256,1,1),
-    });*/
+    //TileLayer+SimpleMeshLayer
 
     let index = 0;
     const layer = new TileLayer({
@@ -60,24 +79,14 @@ class TestLayerExample extends React.Component<{}> {
         return new SimpleMeshLayer({
           data: [{}],
           id: "SimpleMeshLayer " + index++,
-          mesh: generatePlaneMesh(1, 1, 610, 610),
-          getPosition: [west,north,0],
+          mesh: this.planeMesh,
+          getPosition: [west,north,100],
           getColor: [0, 255, 0],
-          getScale: [100, 100, 0]
+          getScale: [1000, 1000, 0]
         });
       },
     });
-
-    /*
-    const layer = new SimpleMeshLayer({
-      id: "meshLayer",
-      data : [{}],
-      mesh: generatePlaneMesh(32,32,100,100),
-      getPosition: [0,0],
-      getColor: [0,255,0],
-      getScale: [1,1,1]
-    });*/
-
+    */
     const initialViewState: InitialViewStateProps = {
       longitude: 0,
       latitude: 0,
@@ -96,11 +105,11 @@ class TestLayerExample extends React.Component<{}> {
                 id: 'map',
                 height: '100%',
                 top: '100px',
-                width: '100%',
+                width: '100%'
               }),
             ]}
           >
-
+          <StaticMap mapboxApiAccessToken='pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg'/>
           </DeckGL>
         )}
       </>
