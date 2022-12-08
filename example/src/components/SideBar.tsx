@@ -13,9 +13,9 @@ const SideBar = () => {
     <SideNav>
       <NavLink to="/terrain-layer-example">Terrain Layer</NavLink>
       <NavLink to="/bitmap-layer-example">Bitmap Layer</NavLink>
-      <NavLink to="/tile-layer-example">Tile Layer</NavLink>
       <NavLink to="/cog-layer-example">COG Tile Layer</NavLink>
       <NavLink to="/test-layer-example">Test Layer</NavLink>
+      
       <Divider />
       <HStack>
         <p>Opacity</p>

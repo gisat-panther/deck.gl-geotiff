@@ -24,7 +24,6 @@ const useGeoData = (url: string, useHeightMap = false, opacity: number) => {
   const [geoObject, setGeoObject] = useState<IGeo>(defaultObject);
 
   const setData = async () => {
-
     const image = await g.getBitmap(url);
     const bbox = g.getBoundingBox() as ExtentsLeftBottomRightTop;
     console.log(bbox)

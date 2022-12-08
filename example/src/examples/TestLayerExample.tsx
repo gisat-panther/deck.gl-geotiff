@@ -15,14 +15,16 @@ import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import { getCog, getImageByIndex, getTile } from '../utilities/cogtools';
 
 class TestLayerExample extends React.Component<{}> {
-  g = new GeoImage();
   planeMesh = generatePlaneMesh(128, 128, 1, 1);
-  cog:CogTiff;
-  cogImage:CogTiffImage;
-  
+  interval:any;
 
-  async componentDidMount(){
-    console.log("TEST LAYER INIT");
+  componentDidMount(){
+    //console.log("TEST LAYER INIT");
+    //this.interval = setInterval(() => this.setState({ time: Date.now() }), 50);
+  }
+
+  componentWillUnmount() {
+    //clearInterval(this.interval);
   }
 
   render() {
@@ -47,7 +49,6 @@ class TestLayerExample extends React.Component<{}> {
     const layer = new TileLayer({
       getTileData: (tileData: any) => {
         //const image = 
-
         return {zoomLevel : 10000, heightmap: 0}
       },
 
@@ -58,7 +59,7 @@ class TestLayerExample extends React.Component<{}> {
       renderSubLayers: (props: any) => {
         return new LiveTerrainLayer({
           id: 'live-terrain-layer' + index++,
-          data: {alpha: 0.5},
+          data: {alpha: 0.5, heightMultiplier: 5.0},
           mesh: mesh,
           texture: "terrain.png",
           getPosition: [props.tile.bbox.west,props.tile.bbox.south],

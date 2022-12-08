@@ -22,10 +22,10 @@ const TerrainLayerExample: React.FC<BitmapLayerProps> = () => {
           rScaler: 6553.6,
           gScaler: 25.6,
           bScaler: 0.1,
-          offset: -10000,
+          offset: -10230,
         },
         material: { diffuse: 1 },
-        meshMaxError: 5, // SET TO 1 FOR MAX QUALITY.
+        meshMaxError: 3, // SET TO 1 FOR MAX QUALITY.
         bounds: geoObject.bbox,
         elevationData: geoObject.heightMap,
         texture: geoObject.image,

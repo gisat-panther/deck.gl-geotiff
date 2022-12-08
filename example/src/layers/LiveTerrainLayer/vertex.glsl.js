@@ -20,10 +20,11 @@ out vec2 vTexCoord;
 out vec4 position_commonspace;
 out vec4 vColor;
 
-uniform sampler2D sampler;
+//uniform sampler2D sampler;
 uniform sampler2D startTexture;
 uniform sampler2D endTexture;
 uniform float alpha;
+uniform float heightMultiplier;
 
 float height;
 varying vec3 c;
@@ -70,7 +71,8 @@ void main() {
   float s = dot(N,normalize(vec3(0.8,1.0,0.8)));
   c = vec3(s,s,s);
 
-  height = mix(getHeightOf(startTexture, vTexCoord),getHeightOf(endTexture, vTexCoord),alpha);
+  height = mix(getHeightOf(startTexture, vTexCoord),getHeightOf(endTexture, vTexCoord),alpha) * heightMultiplier;
+  //height = 0.0;
   gl_Position += project_common_position_to_clipspace(vec4(0.0,0.0,height*1.0,1.0));
 }
 `;

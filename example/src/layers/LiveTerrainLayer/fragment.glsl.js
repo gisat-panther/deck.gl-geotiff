@@ -18,7 +18,7 @@ void main() {
   vec3 col = texture(sampler, vTexCoord).rgb;
   //vec3 col = texture(startTexture, vTexCoord).rgb;
 
-  fragColor = vec4(mix(c,col,0.5),1.0);
+  fragColor = vec4(mix(c,col,0.3),1.0);
   //fragColor = vec4(col,1.0);
   //fragColor = vec4(1.0,1.0,0.0,1.0);
 }
