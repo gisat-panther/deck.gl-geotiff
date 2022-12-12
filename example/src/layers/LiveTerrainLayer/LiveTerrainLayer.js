@@ -30,11 +30,12 @@ class LiveTerrainLayer extends SimpleMeshLayer{
   //}
 
   draw({uniforms}){
-    const {gl} = this.context;
-    const image = loadTexture(gl, "terrain.png");
+    //const {gl} = this.context;
+    //const image = loadTexture(gl, "terrain.png");
 
     //this.props.data.startTexture = image;
     //this.props.data.endTexture = image;
+    
     this.setState()
 
     super.draw({

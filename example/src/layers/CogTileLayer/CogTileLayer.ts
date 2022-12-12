@@ -4,7 +4,8 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { SourceUrl } from '@chunkd/source-url';
 import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import jpeg from 'jpeg-js';
-import { inflate } from "deflate-js";
+//import { inflate } from "deflate-js";
+import { inflate } from 'pako';
 import { worldToLngLat } from '@math.gl/web-mercator';
 import { GeoImage } from "geolib";
 
@@ -151,11 +152,13 @@ class CogTileLayer extends CompositeLayer {
     async initImage(address: string) {
         src = new SourceUrl(address);
         cog = await CogTiff.create(src);
+        console.log(cog);
         img = cog.getImage(cog.images.length - 1);
         tileSize = img.tileSize.width
         possibleResolutions = this.generatePossibleResolutions(tileSize, 32);
 
         console.log(img.bbox);
+        console.log(img)
 
         var initialZoom = this.indexOfClosestTo(possibleResolutions, img.resolution[0]);
         var finalZoom = initialZoom + cog.images.length;
@@ -211,6 +214,7 @@ class CogTileLayer extends CompositeLayer {
         console.log(img);
     }
 
+
     async getTileAt(x: number, y: number, z: number) {
         const wantedMpp = possibleResolutions[z];
         const currentMpp = resolution[0];
@@ -222,6 +226,8 @@ class CogTileLayer extends CompositeLayer {
         const tileWidth = tileSize;
         const tilesX = tileCount.x;
         const tilesY = tileCount.y;
+
+        console.log("Current image tiles: " + tilesX + ", " + tilesY)
 
         let decompressed: unknown;
 
@@ -243,12 +249,16 @@ class CogTileLayer extends CompositeLayer {
             if (img.compression === 'image/jpeg') {
                 decompressed = jpeg.decode(data, { useTArray: true });
             } else if (img.compression === 'application/deflate') {
+                console.log("deflate here")
                 decompressed = await inflate(data);
                 decompressed = await geo.getBitmap({
                     rasters: [decompressed],
                     width: tileWidth,
                     height: tileWidth,
                 });
+                
+            }else{
+                console.log("Unexpected compression method: " + img.compression)
             }
         }
 
