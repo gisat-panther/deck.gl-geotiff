@@ -4241,7 +4241,7 @@ d3-array@2, d3-array@^2.3.0, d3-array@^2.8.0:
 
 d3-dsv@^1.0.8:
   version "1.2.0"
-  resolved "https://registry.yarnpkg.com/d3-dsv/-/d3-dsv-1.2.0.tgz#9d5f75c3a5f8abd611f74d3f5847b0d4338b885c"
+  resolved "https://registry.npmjs.org/d3-dsv/-/d3-dsv-1.2.0.tgz"
   integrity sha512-9yVlqvZcSOMhCYzniHE7EVUws7Fa1zgw+/EAV2BxJoG3ME19V6BQFBwI855XQDsxyOuG7NibqRMTtiF/Qup46g==
   dependencies:
     commander "2"
@@ -4400,7 +4400,7 @@ defined@^1.0.0:
 
 deflate-js@^0.2.3:
   version "0.2.3"
-  resolved "https://registry.yarnpkg.com/deflate-js/-/deflate-js-0.2.3.tgz#f85abb58ebc5151a306147473d57c3e4f7e4426b"
+  resolved "https://registry.npmjs.org/deflate-js/-/deflate-js-0.2.3.tgz"
   integrity sha512-r5KgHJ/yTiWQs23nVeQz5dSL/kmW0MBszsssNyEqDCjjFDj4XG/c6QUN/I0JtY3ZHwwcaNBtGE8s+oV33acTfQ==
 
 del@^6.0.0:
