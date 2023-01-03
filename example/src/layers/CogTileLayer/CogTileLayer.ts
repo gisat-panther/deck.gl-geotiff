@@ -50,7 +50,7 @@ class CogTileLayer extends CompositeLayer {
         console.log("LAYER INITIALIZE STATE");
         await this.loadCog();
         geo = new GeoImage();
-        await this.testTile(0,0,256);
+        await this.testTile(Math.floor(img.tileCount.x*0.5),Math.floor(img.tileCount.y*0.5), Math.floor(cog.images.length*0.5), img.tileSize.width);
         //CONFIGURE OUTPUT HERE
     }
 
@@ -106,8 +106,8 @@ class CogTileLayer extends CompositeLayer {
         return [layer];
     }
 
-    async testTile(x:number, y:number, tileWidth:number){
-        this.initLayer(2)
+    async testTile(x:number, y:number,z:number, tileWidth:number){
+        this.initLayer(4)
         const tile = await img.getTile(x,y);
         const data = tile!.bytes;
         let decompressed:any;
