@@ -9,6 +9,7 @@ import { inflate } from 'pako';
 import { worldToLngLat } from '@math.gl/web-mercator';
 import { GeoImage } from "geolib";
 import GeoTIFF, { fromUrl, fromUrls, fromArrayBuffer, fromBlob } from 'geotiff';
+import lzwCompress from "lzwcompress";
 
 type vct = { x: number, y: number };
 
@@ -49,6 +50,7 @@ class CogTileLayer extends CompositeLayer {
         console.log("LAYER INITIALIZE STATE");
         await this.loadCog();
         geo = new GeoImage();
+        await this.testTile(0,0,256);
         //CONFIGURE OUTPUT HERE
     }
 
@@ -102,6 +104,49 @@ class CogTileLayer extends CompositeLayer {
         });
 
         return [layer];
+    }
+
+    async testTile(x:number, y:number, tileWidth:number){
+        this.initLayer(2)
+        const tile = await img.getTile(x,y);
+        const data = tile!.bytes;
+        let decompressed:any;
+
+        console.log("-------------------------------------Processing new tile --------------------------------------------");
+
+        if (img.compression === 'image/jpeg') {
+            decompressed = jpeg.decode(data, { useTArray: true });
+            console.log("jpeg")
+        } else if (img.compression === 'application/deflate') {
+            decompressed = await inflate(data);
+            decompressed = await geo.getBitmap({
+                rasters: [decompressed],
+                width: tileWidth,
+                height: tileWidth,
+            });
+            console.log("deflate")
+        } else if (img.compression === 'application/lzw') {
+            console.log(data);
+            console.log(lzwCompress.unpack(data));
+            /*
+            decompressed = fromArrayBuffer(data.buffer);
+            console.log({"data type:":"LZW", decompressed});
+            decompressed = await geo.getBitmap({
+                rasters: [decompressed],
+                width: tileWidth,
+                height: tileWidth,
+            });
+            */
+            console.log("LZW");
+        }else{
+            console.log("Unexpected compression method: " + img.compression)
+        }
+
+        console.log(decompressed);
+
+        //let testElement:HTMLImageElement = document.createElement("img")
+        //testElement.src = decompressed;
+        //document.body.appendChild(testElement);
     }
 
     generatePossibleResolutions(tileSize: number, maxZoomLevel: number) {
@@ -261,6 +306,7 @@ class CogTileLayer extends CompositeLayer {
                 console.log("deflate")
             } else if (img.compression === 'application/lzw') {
                 decompressed = fromArrayBuffer(data);
+                console.log({"data type:":"LZW", decompressed});
                 decompressed = await geo.getBitmap({
                     rasters: [decompressed],
                     width: tileWidth,
