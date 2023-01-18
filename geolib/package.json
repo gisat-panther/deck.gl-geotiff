@@ -1,11 +1,13 @@
 {
-  "name": "geolib",
-  "version": "1.1.0",
+  "name": "@gisatcz/deckgl-geolib",
+  "homepage": "https://github.com/gisat-panther/deck.gl-geotiff",
+  "version": "0.0.0",
   "description": "geoimage lib",
   "private": false,
   "scripts": {
     "rollup": "rollup -c",
-    "test": "jest"
+    "test": "jest",
+    "publish": "npm publish --access public"
   },
   "author": "Filip Micanek",
   "license": "ISC",
@@ -40,9 +42,6 @@
     "dist"
   ],
   "types": "dist/index.d.ts",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/filipmicanek"
-  },
   "dependencies": {
     "jpeg-js": "^0.4.4",
     "pako": "^2.0.4"
