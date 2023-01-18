@@ -1,7 +1,7 @@
 {
   "name": "@gisatcz/deckgl-geolib",
   "homepage": "https://github.com/gisat-panther/deck.gl-geotiff",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "geoimage lib",
   "private": false,
   "scripts": {
