@@ -8,6 +8,10 @@ import jpeg from 'jpeg-js';
 import { inflate } from 'pako';
 import { worldToLngLat } from '@math.gl/web-mercator';
 import { GeoImage } from "geolib";
+import GeoTIFF, { fromUrl, fromUrls, fromArrayBuffer, fromBlob } from 'geotiff';
+import LZWDecoder from "../../utilities/lzw"
+import { homedir } from 'os';
+//import lzwCompress from "lzwcompress";
 
 type vct = { x: number, y: number };
 
@@ -26,6 +30,8 @@ let maxZoom = 0;
 let tileCount: vct;
 let resolution: any[] = [];
 let loaded: boolean;
+
+const decoder = new LZWDecoder();
 
 interface CogTileLayerProps extends LayerProps {
     url: string,
@@ -48,6 +54,11 @@ class CogTileLayer extends CompositeLayer {
         console.log("LAYER INITIALIZE STATE");
         await this.loadCog();
         geo = new GeoImage();
+        geo.setAutoRange(true)
+        geo.setOpacity(128)
+        geo.setHeatMap(true)
+        await this.testTile(Math.floor(img.tileCount.x * 0.5), Math.floor(img.tileCount.y * 0.5), Math.floor(cog.images.length * 0.5), img.tileSize.width);
+        //CONFIGURE OUTPUT HERE
     }
 
     updateState() {
@@ -100,6 +111,49 @@ class CogTileLayer extends CompositeLayer {
         });
 
         return [layer];
+    }
+
+    async testTile(x: number, y: number, z: number, tileWidth: number) {
+        this.initLayer(z)
+        const tile = await img.getTile(x, y);
+        const data = tile!.bytes;
+        let decompressed: any;
+
+        console.log("-------------------------------------Testing a tile --------------------------------------------");
+        if (img.compression === 'image/jpeg') {
+            decompressed = jpeg.decode(data, { useTArray: true });
+            console.log("compression: jpeg")
+        } else if (img.compression === 'application/deflate') {
+            decompressed = await inflate(data);
+            decompressed = await geo.getBitmap({
+                rasters: [decompressed],
+                width: tileWidth,
+                height: tileWidth,
+            });
+            console.log("compression: deflate")
+        } else if (img.compression === 'application/lzw') {
+            console.log("RAW BUFFER-------------")
+            console.log(data.buffer);
+            console.log("DECOMPRESSED BUFFER----")
+            decompressed = decoder.decodeBlock(data.buffer);
+            console.log(decompressed);
+            console.log({ "data type:": "LZW", decompressed });
+            decompressed = await geo.getBitmap({
+                rasters: [new Uint16Array(decompressed)],
+                width: tileWidth,
+                height: tileWidth,
+            });
+
+            console.log("compression: LZW");
+        } else {
+            console.log("Unexpected compression method: " + img.compression)
+        }
+
+        console.log(decompressed);
+
+        //let testElement:HTMLImageElement = document.createElement("img")
+        //testElement.src = decompressed;
+        //document.body.appendChild(testElement);
     }
 
     generatePossibleResolutions(tileSize: number, maxZoomLevel: number) {
@@ -242,22 +296,31 @@ class CogTileLayer extends CompositeLayer {
 
         console.log("getting tile: " + [x - ox, y - oy]);
 
-        if (x - ox >= 0 && y - oy >= 0) {
+        if (x - ox > 0 && y - oy > 0) {
             const tile = await img.getTile((x - ox), (y - oy));
             const data = tile!.bytes;
 
             if (img.compression === 'image/jpeg') {
                 decompressed = jpeg.decode(data, { useTArray: true });
+                console.log("jpeg")
             } else if (img.compression === 'application/deflate') {
-                console.log("deflate here")
                 decompressed = await inflate(data);
                 decompressed = await geo.getBitmap({
                     rasters: [decompressed],
                     width: tileWidth,
                     height: tileWidth,
                 });
-                
-            }else{
+                console.log("deflate")
+            } else if (img.compression === 'application/lzw') {
+                decompressed = decoder.decodeBlock(data.buffer);
+                console.log({ "data type:": "LZW", decompressed });
+                decompressed = await geo.getBitmap({
+                    rasters: [decompressed],
+                    width: tileWidth,
+                    height: tileWidth,
+                });
+                console.log("LZW tile at: " + [x - ox, y - oy] + "--------------------------------------------");
+            } else {
                 console.log("Unexpected compression method: " + img.compression)
             }
         }

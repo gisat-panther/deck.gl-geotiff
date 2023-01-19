@@ -5,15 +5,16 @@ import { CogTileLayer } from '../layers/CogTileLayer/CogTileLayer';
 import { MapView } from '@deck.gl/core';
 import { StaticMap } from 'react-map-gl';
 
-// const url = 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif';
-// const url = "https://gisat-gis.eu-central-1.linodeobjects.com/eman/DEMs/Copernicus_DSM_10_merged_Mercator_COG.tif"
+// 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif';
+// "https://gisat-gis.eu-central-1.linodeobjects.com/eman/DEMs/Copernicus_DSM_10_merged_Mercator_COG.tif"
+// Manila_S2_Composite_2020022_Mercator_COG_tiled.tif
 
 
 class CogLayerExample extends React.Component<{}> {
 
   render() {
     console.log("REACT RENDER");
-    const layer = new CogTileLayer({url: 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif'});
+    const layer = new CogTileLayer({url: 'Manila_S2_Composite_2020022_Mercator_COG_tiled.tif'});
 
     const initialViewState: InitialViewStateProps = {
       longitude: 0,
@@ -24,6 +25,7 @@ class CogLayerExample extends React.Component<{}> {
       <>
         {(
           <DeckGL
+            getCursor={() => "inherit"}
             initialViewState={initialViewState}
             controller={true}
             layers={[layer]}
