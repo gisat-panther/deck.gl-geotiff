@@ -143,7 +143,6 @@ class CogTileLayer extends CompositeLayer {
                 width: tileWidth,
                 height: tileWidth,
             });
-
             console.log("compression: LZW");
         } else {
             console.log("Unexpected compression method: " + img.compression)
@@ -283,7 +282,7 @@ class CogTileLayer extends CompositeLayer {
 
         console.log("Current image tiles: " + tilesX + ", " + tilesY)
 
-        let decompressed: unknown;
+        let decompressed: any;
 
         console.log("tileIndex: " + [x, y]);
 
@@ -296,9 +295,10 @@ class CogTileLayer extends CompositeLayer {
 
         console.log("getting tile: " + [x - ox, y - oy]);
 
-        if (x - ox > 0 && y - oy > 0) {
+        if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
             const tile = await img.getTile((x - ox), (y - oy));
             const data = tile!.bytes;
+            console.log(tile);
 
             if (img.compression === 'image/jpeg') {
                 decompressed = jpeg.decode(data, { useTArray: true });
@@ -315,7 +315,7 @@ class CogTileLayer extends CompositeLayer {
                 decompressed = decoder.decodeBlock(data.buffer);
                 console.log({ "data type:": "LZW", decompressed });
                 decompressed = await geo.getBitmap({
-                    rasters: [decompressed],
+                    rasters: [new Uint16Array(decompressed)],
                     width: tileWidth,
                     height: tileWidth,
                 });
