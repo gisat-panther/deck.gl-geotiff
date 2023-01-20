@@ -1,15 +1,15 @@
 {
-  "name": "deckgl-geotiff",
+  "name": "gisatcz",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
     "example",
-    "geolib"
+    "deckgl-geolib"
   ],
   "scripts": {
     "start": "yarn && yarn rollup && yarn example",
     "example": "yarn workspace example dev",
-    "rollup": "yarn workspace geolib rollup"
+    "rollup": "yarn workspace @gisatcz/deckgl-geolib rollup"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.0",
