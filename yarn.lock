@@ -7149,6 +7149,11 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
+lzwcompress@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/lzwcompress/-/lzwcompress-1.1.0.tgz#e4dd0826dfd1e53fe1335163570e361634f39ca2"
+  integrity sha512-92sbAKG+fkTWPQ7cImKjD3p4elxyIc0+uWgXNLwk9OwzwCX7j6KXl/CJ0zpVsFPRyjuOFUcDuhGWRUAMjGMY7g==
+
 magic-string@^0.25.0, magic-string@^0.25.7:
   version "0.25.7"
   resolved "https://registry.npmjs.org/magic-string/-/magic-string-0.25.7.tgz"

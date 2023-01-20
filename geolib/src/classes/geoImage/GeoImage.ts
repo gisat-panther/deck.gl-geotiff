@@ -107,7 +107,7 @@ class GeoImage implements IGeoImage {
   }
 
   async getBitmap(input: any) {
-    //console.time('bitmap-generated-in');
+    console.time('bitmap-generated-in');
 
     let rasters = [];
     let channels: number;
@@ -146,6 +146,12 @@ class GeoImage implements IGeoImage {
     let r, g, b, a;
     let s = width * height * 4;
 
+    console.log("image width: " + width)
+    console.log("channels: " + channels)
+    console.log("format: " + rasters[0].length / (width * height))
+    console.log("rasters: ")
+    console.log(rasters)
+
     if (channels === 1) {
       if (rasters[0].length / (width * height) === 1) {
         const channel = rasters[0];
@@ -161,7 +167,7 @@ class GeoImage implements IGeoImage {
           }
           this.rangeMin = lowest;
           this.rangeMax = highest;
-          //console.log('data min: ' + this.rangeMin +', max: ' + this.rangeMax);
+          console.log('data min: ' + this.rangeMin +', max: ' + this.rangeMax);
         }
         // SINGLE CHANNEL
         let ratio = 0;
@@ -302,7 +308,7 @@ class GeoImage implements IGeoImage {
         }
       }
     }
-    //console.timeEnd('bitmap-generated-in');
+    console.timeEnd('bitmap-generated-in');
 
     c!.putImageData(imageData, 0, 0);
     const imageUrl = canvas.toDataURL('image/png');
