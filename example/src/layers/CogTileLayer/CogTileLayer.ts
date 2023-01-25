@@ -8,12 +8,14 @@ import jpeg from 'jpeg-js';
 import { inflate } from 'pako';
 import { worldToLngLat } from '@math.gl/web-mercator';
 import { GeoImage } from "geolib";
-import GeoTIFF, { fromUrl, fromUrls, fromArrayBuffer, fromBlob } from 'geotiff';
+import GeoTIFF, { fromUrl, fromUrls, fromArrayBuffer, fromBlob, GeoTIFFImage } from 'geotiff';
 import LZWDecoder from "../../utilities/lzw"
 import { homedir } from 'os';
 //import lzwCompress from "lzwcompress";
 
 type vct = { x: number, y: number };
+const decoder = new LZWDecoder();
+const EARTH_CIRCUMFERENCE = 40075000.0;
 
 let cog: CogTiff;
 let img: CogTiffImage;
@@ -31,7 +33,10 @@ let tileCount: vct;
 let resolution: any[] = [];
 let loaded: boolean;
 
-const decoder = new LZWDecoder();
+let currentZoomLevel = 0;
+
+let tiles = new Map<string, string>()
+let preloadTiles = true;
 
 interface CogTileLayerProps extends LayerProps {
     url: string,
@@ -40,10 +45,6 @@ interface CogTileLayerProps extends LayerProps {
 
 class CogTileLayer extends CompositeLayer {
     static layerName = 'CogTileLayer';
-
-    static defaultProps = {
-        address: { type: "accessor", value: "" },
-    }
 
     constructor(props: CogTileLayerProps) {
         super(props);
@@ -54,16 +55,31 @@ class CogTileLayer extends CompositeLayer {
         console.log("LAYER INITIALIZE STATE");
         await this.loadCog();
         geo = new GeoImage();
-        geo.setAutoRange(true)
-        geo.setOpacity(128)
-        geo.setHeatMap(true)
-        await this.testTile(Math.floor(img.tileCount.x * 0.5), Math.floor(img.tileCount.y * 0.5), Math.floor(cog.images.length * 0.5), img.tileSize.width);
+        
+        /*
+        let zl = 15
+        let rs = this.getResolutionFromZoomLevel(256, zl)
+        let rt = this.getZoomLevelFromResolution(256, rs)
+        console.log("resolution of z:" + zl + " is " + rs)
+        console.log("zoom level of " + rs + " is " + rt )
+        */
+
+        console.log(this.getZoomLevelFromResolution(256, 4.775))
+
+        //geo.setAutoRange(true)
+        //geo.setOpacity(0)
+        //geo.setHeatMap(true)
+        //geo.setDataOpacity(false)
+        //await this.testTile(Math.floor(img.tileCount.x * 0.5), Math.floor(img.tileCount.y * 0.5), Math.floor(cog.images.length * 0.5), img.tileSize.width);
         //CONFIGURE OUTPUT HERE
     }
 
     updateState() {
         console.log("LAYER UPDATE STATE");
+        console.log("current z index: " + currentZoomLevel)
+        console.log("converted to MPP: " + this.getResolutionFromZoomLevel(tileSize, currentZoomLevel))
     }
+
     shouldUpdateState(status: { props: CogTileLayerProps, oldProps: CogTileLayerProps }) {
         console.log("LAYER SHOULD UPDATE STATE");
         console.log(status.oldProps);
@@ -79,7 +95,7 @@ class CogTileLayer extends CompositeLayer {
         console.log(loaded);
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
-                //console.log(tileData);
+                currentZoomLevel = tileData.z;
                 return this.getTileAt(
                     tileData.x,
                     tileData.y,
@@ -95,7 +111,7 @@ class CogTileLayer extends CompositeLayer {
             maxZoom: maxZoom,
             tileSize: tileSize,
             maxRequests: 5,
-            extent: extent,
+            //extent: extent,
 
             renderSubLayers: (props: any) => {
                 const {
@@ -111,6 +127,10 @@ class CogTileLayer extends CompositeLayer {
         });
 
         return [layer];
+    }
+
+    preloadAllTiles() {
+
     }
 
     async testTile(x: number, y: number, z: number, tileWidth: number) {
@@ -156,8 +176,7 @@ class CogTileLayer extends CompositeLayer {
     }
 
     generatePossibleResolutions(tileSize: number, maxZoomLevel: number) {
-        const equatorC = 40075000;
-        const metersPerPixelAtEquator = equatorC / tileSize;
+        const metersPerPixelAtEquator = EARTH_CIRCUMFERENCE / tileSize;
         let resolutions: number[] = [];
 
         for (let i = 0; i < maxZoomLevel; i++) {
@@ -179,15 +198,67 @@ class CogTileLayer extends CompositeLayer {
         return closestIndex;
     }
 
-    unproject(input: number[]) {
-        const e = 40075000.0;
+    metersToTileIndex(x:number, y:number, img:CogTiffImage){
 
-        const cartesianPosition = [input[0] * (512 / e), input[1] * (512 / e)];
+        let ax = EARTH_CIRCUMFERENCE * 0.5 + x;
+        let ay = -(EARTH_CIRCUMFERENCE * 0.5 + (y - EARTH_CIRCUMFERENCE));
+        let mpt = img.resolution[0] * img.tileSize.width;
+
+        let ox = Math.round(ax / mpt);
+        let oy = Math.round(ay / mpt);
+
+        let oz = this.getZoomLevelFromResolution(img.tileSize.width, img.resolution[0])
+
+        return [ox,oy,oz]
+    }
+
+    unproject(input: number[]) {
+        const cartesianPosition = [input[0] * (512 / EARTH_CIRCUMFERENCE), input[1] * (512 / EARTH_CIRCUMFERENCE)];
         const cartographicPosition = worldToLngLat(cartesianPosition);
         const cartographicPositionAdjusted = [cartographicPosition[0], - cartographicPosition[1]];
 
         console.log(cartographicPositionAdjusted);
         return cartographicPositionAdjusted;
+    }
+
+    async getCogFromUrl(url: string) {
+        let src = new SourceUrl(url);
+        let cog = await CogTiff.create(src);
+        return cog;
+    }
+
+    async getImageFromCog(cog: CogTiff, resolution: number) {
+        //let img = await cog.getImage(index);
+        img = await cog.getImageByResolution(resolution)
+        return img;
+    }
+
+    async getTileFromImg(img: CogTiffImage, x: number, y: number) {
+        let tile = await img.getTile(x, y);
+        return tile;
+    }
+
+    getResolutionFromZoomLevel(tileSize: number, z: number) {
+        return (EARTH_CIRCUMFERENCE / tileSize) / (Math.pow(2, z));
+    }
+
+    getZoomLevelFromResolution(tileSize:number, resolution:number){
+        return  Math.round(Math.log2(EARTH_CIRCUMFERENCE / (resolution * tileSize)))
+    }
+
+    isSimmilar(number1:number, number2:number){
+        const simmilarity = ((number1 / number2) + (number2 / number1)) / 2
+
+        //If number is within cca 4% of the other number
+        if(simmilarity - 1 < 0.001) return true
+        return false
+    }
+
+    getTileFromIndex(tileSize:number, x: number, y: number, z: number) {
+
+        let neededResolution = this.getResolutionFromZoomLevel(tileSize, z)
+
+        //return this.getTileFromImg(img, finalX, finalY)
     }
 
     async loadCog() {
@@ -217,13 +288,12 @@ class CogTileLayer extends CompositeLayer {
         var finalZoom = initialZoom + cog.images.length;
 
         const origin = img.origin;
-        const e = 40075000.0;
 
         let cx = origin[0];
         let cy = origin[1];
 
-        let acx = e * 0.5 + cx;
-        let acy = -(e * 0.5 + (cy - e));
+        let acx = EARTH_CIRCUMFERENCE * 0.5 + cx;
+        let acy = -(EARTH_CIRCUMFERENCE * 0.5 + (cy - EARTH_CIRCUMFERENCE));
         let mpt = img.resolution[0] * img.tileSize.width;
 
         let ox = Math.round(acx / mpt);
@@ -241,8 +311,8 @@ class CogTileLayer extends CompositeLayer {
             zoomLevelOffsets.set(initialZoom + z, [px, py]);
         }
 
-        let acxm = e * 0.5 + img.bbox[2];
-        let acym = -(e * 0.5 + (img.bbox[1] - e));
+        let acxm = EARTH_CIRCUMFERENCE * 0.5 + img.bbox[2];
+        let acym = -(EARTH_CIRCUMFERENCE * 0.5 + (img.bbox[1] - EARTH_CIRCUMFERENCE));
 
         const minX = acx;
         const minY = acy;
@@ -258,7 +328,6 @@ class CogTileLayer extends CompositeLayer {
         minZoom = initialZoom;
         maxZoom = finalZoom;
 
-        this.generatePossibleResolutions(tileSize, 32);
         await this.initLayer(this.indexOfClosestTo(possibleResolutions, 9999999));
     }
 
@@ -274,6 +343,7 @@ class CogTileLayer extends CompositeLayer {
 
         if (z !== this.indexOfClosestTo(possibleResolutions, currentMpp)) {
             await this.initLayer(this.indexOfClosestTo(possibleResolutions, wantedMpp));
+            console.log("Initializing layer: " + this.indexOfClosestTo(possibleResolutions, wantedMpp))
         }
 
         const tileWidth = tileSize;
