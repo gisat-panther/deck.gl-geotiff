@@ -25,7 +25,6 @@ class CogLayerExample extends React.Component<{}> {
       <>
         {(
           <DeckGL
-            getCursor={() => "inherit"}
             initialViewState={initialViewState}
             controller={true}
             layers={[layer]}
