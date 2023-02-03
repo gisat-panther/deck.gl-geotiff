@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import DeckGL from '@deck.gl/react';
-import { useGeoData } from 'geolib';
+import { useGeoData } from '@gisatcz/deckgl-geolib';
 import { StaticMap } from 'react-map-gl';
 import { MAPBOX_ACCESS_TOKEN } from '../constants';
 import { TerrainLayer } from '@deck.gl/geo-layers';

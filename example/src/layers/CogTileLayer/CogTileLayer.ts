@@ -7,8 +7,8 @@ import jpeg from 'jpeg-js';
 //import { inflate } from "deflate-js";
 import { inflate } from 'pako';
 import { worldToLngLat } from '@math.gl/web-mercator';
-import { GeoImage } from "geolib";
 import GeoTIFF, { fromUrl, fromUrls, fromArrayBuffer, fromBlob, GeoTIFFImage } from 'geotiff';
+import { GeoImage } from "@gisatcz/deckgl-geolib";
 import LZWDecoder from "../../utilities/lzw"
 import { homedir } from 'os';
 //import lzwCompress from "lzwcompress";

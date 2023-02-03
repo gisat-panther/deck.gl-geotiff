@@ -1,11 +1,11 @@
-import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
+// import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff';
 import { IGeoImage } from './interface';
 
 class GeoImage implements IGeoImage {
   url = '';
   origin = [0, 0];
-  boundingBox = [0, 0, 1, 1] as ExtentsLeftBottomRightTop;
+  boundingBox = [0, 0, 1, 1] as number[];
   data: GeoTIFFImage | undefined;
   useHeatMap = true;
   useAutoRange = true;
@@ -42,7 +42,7 @@ class GeoImage implements IGeoImage {
 
     const data = await tiff.getImage(0);
     const origin = data.getOrigin();
-    const bbox = data.getBoundingBox() as ExtentsLeftBottomRightTop;
+    const bbox = data.getBoundingBox() as number[];
 
     this.data = data;
     this.origin = origin;

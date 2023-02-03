@@ -9,7 +9,7 @@ import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
 import { CubeGeometry } from "@luma.gl/core";
-import { GeoImage } from "geolib";
+import { GeoImage } from "@gisatcz/deckgl-geolib";
 import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import { getCog, getImageByIndex, getTile } from '../utilities/cogtools';
 
