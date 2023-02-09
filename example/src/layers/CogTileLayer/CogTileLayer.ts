@@ -15,6 +15,7 @@ import { homedir } from 'os';
 
 type vec2 = { x: number, y: number };
 type vec3 = { x: number, y: number, z: number};
+
 const decoder = new LZWDecoder();
 const EARTH_CIRCUMFERENCE = 40075000.0;
 
@@ -26,7 +27,8 @@ let geo: GeoImage;
 let cog: CogTiff;
 let img: CogTiffImage;
 let tileSize:number;
-let extent: Uint8Array;
+let defaultOrigin = [null,null];
+let extent = [null,null,null,null];
 let minZoom:number;
 let maxZoom:number;
 let url: string;
