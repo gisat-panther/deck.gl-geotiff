@@ -86,8 +86,13 @@ class CogTileLayer extends CompositeLayer {
 
     shouldUpdateState(status: { props: CogTileLayerProps, oldProps: CogTileLayerProps }) {
         console.log("LAYER SHOULD UPDATE STATE");
-        console.log(status.oldProps);
-        console.log(status.props);
+        //console.log(status.oldProps);
+        //console.log(status.props);
+
+        if(status.props != status.oldProps){
+            console.log(status.props)
+            console.log(status.oldProps)
+        }
 
         if (url.length > 1) {
             return true;
@@ -131,33 +136,6 @@ class CogTileLayer extends CompositeLayer {
         });
 
         return [layer];
-    }
-
-    preloadAllTiles() {
-
-    }
-
-    generatePossibleResolutions(tileSize: number, maxZoomLevel: number) {
-        const metersPerPixelAtEquator = EARTH_CIRCUMFERENCE / tileSize;
-        let resolutions: number[] = [];
-
-        for (let i = 0; i < maxZoomLevel; i++) {
-            resolutions[i] = metersPerPixelAtEquator / (Math.pow(2, i));
-        }
-
-        return resolutions;
-    }
-
-    indexOfClosestTo(array: number[], value: number) {
-        let closest = array[0];
-        let closestIndex = 0;
-        for (let i = 0; i < array.length; i++) {
-            if (Math.abs(array[i] - value) < Math.abs(closest - value)) {
-                closest = array[i];
-                closestIndex = i;
-            }
-        }
-        return closestIndex;
     }
 
     metersToTileIndex(x:number, y:number, img:CogTiffImage){
@@ -218,13 +196,6 @@ class CogTileLayer extends CompositeLayer {
         //If number is within cca 4% of the other number
         if(simmilarity - 1 < 0.001) return true
         return false
-    }
-
-    getTileFromIndex(tileSize:number, x: number, y: number, z: number) {
-
-        let neededResolution = this.getResolutionFromZoomLevel(tileSize, z)
-
-        //return this.getTileFromImg(img, finalX, finalY)
     }
 
     async getTileAt(x: number, y: number, z: number) {
