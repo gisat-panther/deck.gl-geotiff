@@ -19,6 +19,7 @@ type vec3 = { x: number, y: number, z: number};
 const decoder = new LZWDecoder();
 const EARTH_CIRCUMFERENCE = 40075000.0;
 
+let geo: GeoImage;
 let cog: CogTiff;
 let img: CogTiffImage;
 let tileSize:number;
@@ -31,11 +32,6 @@ let blankImg: HTMLImageElement;
 let src: SourceUrl;
 let possibleResolutions: number[];
 let zoomLevelOffsets: Map<number, Array<number>>;
-let extent = [0, 0, 0, 0];
-let tileSize = 0;
-let minZoom = 0;
-let maxZoom = 0;
-let tileCount: vct;
 let resolution: any[] = [];
 let loaded: boolean;
 
@@ -271,7 +267,6 @@ class CogTileLayer extends CompositeLayer {
         await this.initImage(url);
 
         tileSize = img.tileSize.width;
-        tileCount = img.tileCount;
         resolution = img.resolution;
         //console.log(tileSize);
         loaded = true;
@@ -353,8 +348,8 @@ class CogTileLayer extends CompositeLayer {
         }
 
         const tileWidth = tileSize;
-        const tilesX = tileCount.x;
-        const tilesY = tileCount.y;
+        const tilesX = img.tileCount.x;
+        const tilesY = img.tileCount.y;
 
         console.log("Current image tiles: " + tilesX + ", " + tilesY)
 
