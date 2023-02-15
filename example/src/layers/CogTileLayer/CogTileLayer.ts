@@ -53,15 +53,28 @@ class CogTileLayer extends CompositeLayer {
 
     async initializeState() {
         console.log("LAYER INITIALIZE STATE");
-        await this.loadCog();
+        src = new SourceUrl(url);
+        cog = await CogTiff.create(src);
+        console.log(cog);
+        img = cog.getImage(cog.images.length - 1);
+        console.log(img)
+        tileSize = img.tileSize.width
+
+        console.log(img.bbox);
+
+        minZoom = this.getZoomLevelFromResolution(tileSize, img.resolution[0]);
+        maxZoom = minZoom + cog.images.length;
+
+        tileSize = img.tileSize.width;
+        resolution = img.resolution;
+
+        loaded = true;
         geo = new GeoImage();
 
-        console.log(this.getZoomLevelFromResolution(256, 4.775))
-
         //geo.setAutoRange(true)
-        //geo.setOpacity(0)
+        //geo.setOpacity(100)
         //geo.setHeatMap(true)
-        //geo.setDataOpacity(false)
+        //geo.setDataOpacity(true)
         //await this.testTile(Math.floor(img.tileCount.x * 0.5), Math.floor(img.tileCount.y * 0.5), Math.floor(cog.images.length * 0.5), img.tileSize.width);
         //CONFIGURE OUTPUT HERE
     }
@@ -212,62 +225,6 @@ class CogTileLayer extends CompositeLayer {
         let neededResolution = this.getResolutionFromZoomLevel(tileSize, z)
 
         //return this.getTileFromImg(img, finalX, finalY)
-    }
-
-    async loadCog() {
-        await this.initImage(url);
-
-        tileSize = img.tileSize.width;
-        resolution = img.resolution;
-        //console.log(tileSize);
-        loaded = true;
-        this.updateState();
-        //this.renderLayers();
-    }
-
-    async initImage(address: string) {
-        src = new SourceUrl(address);
-        cog = await CogTiff.create(src);
-        console.log(cog);
-        img = cog.getImage(cog.images.length - 1);
-        tileSize = img.tileSize.width
-
-        console.log(img.bbox);
-        console.log(img)
-
-        var initialZoom = this.getZoomLevelFromResolution(tileSize, img.resolution[0]);
-        var finalZoom = initialZoom + cog.images.length;
-
-        const origin = img.origin;
-
-        let cx = origin[0];
-        let cy = origin[1];
-
-        let acx = EARTH_CIRCUMFERENCE * 0.5 + cx;
-        let acy = -(EARTH_CIRCUMFERENCE * 0.5 + (cy - EARTH_CIRCUMFERENCE));
-        let mpt = img.resolution[0] * img.tileSize.width;
-
-        let ox = Math.round(acx / mpt);
-        let oy = Math.round(acy / mpt);
-
-        let acxm = EARTH_CIRCUMFERENCE * 0.5 + img.bbox[2];
-        let acym = -(EARTH_CIRCUMFERENCE * 0.5 + (img.bbox[1] - EARTH_CIRCUMFERENCE));
-
-        const minX = acx;
-        const minY = acy;
-        const maxX = acxm;
-        const maxY = acym;
-
-        const unprojectedMin = this.unproject([minX, maxY]);
-        const unprojectedMax = this.unproject([maxX, minY]);
-
-        const ext: number[] = [unprojectedMin[0], unprojectedMin[1], unprojectedMax[0], unprojectedMax[1]];
-
-        extent = ext;
-        minZoom = initialZoom;
-        maxZoom = finalZoom;
-
-        //await this.initLayer();
     }
 
     async getTileAt(x: number, y: number, z: number) {
