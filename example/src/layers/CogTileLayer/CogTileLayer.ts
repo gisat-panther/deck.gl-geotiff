@@ -24,7 +24,8 @@ let cog: CogTiff;
 let img: CogTiffImage;
 let tileSize: number;
 let defaultOriginMeters = [0, 0];
-let defaultOriginTileOffset = [0, 0];
+let bestDetailOriginTileOffset = [0, 0];
+let currentOriginTileOffset = [0, 0];
 let extent = [0, 0, 0, 0];
 let minZoom: number;
 let maxZoom: number;
@@ -56,6 +57,8 @@ class CogTileLayer extends CompositeLayer {
         img = cog.getImage(cog.images.length - 1);
         console.log(img)
         tileSize = img.tileSize.width
+        defaultOriginMeters = [img.origin[0], img.origin[1]]
+        //bestDetailOriginTileOffset = this.metersToTileIndex()
 
         console.log(img.bbox);
 
@@ -144,15 +147,11 @@ class CogTileLayer extends CompositeLayer {
         return [layer];
     }
 
-    metersToTileIndex(x: number, y: number, img: CogTiffImage) {
+    getImageTileIndex(img: CogTiffImage) {
 
-        let ax = EARTH_CIRCUMFERENCE * 0.5 + x;
-        let ay = -(EARTH_CIRCUMFERENCE * 0.5 + (y - EARTH_CIRCUMFERENCE));
-        let mpt = this.getResolutionFromZoomLevel(img.tileSize.width, currentZoomLevel) * img.tileSize.width
-
-        //console.log("-------------------------Tile mpt vs current zoom mpt--------------------------------")
-        //console.log(mpt)
-        //console.log(this.getResolutionFromZoomLevel(img.tileSize.width, currentZoomLevel) * img.tileSize.width)
+        let ax = EARTH_CIRCUMFERENCE * 0.5 + img.origin[0];
+        let ay = -(EARTH_CIRCUMFERENCE * 0.5 + (img.origin[1] - EARTH_CIRCUMFERENCE));
+        let mpt = this.getResolutionFromZoomLevel(img.tileSize.width, currentZoomLevel) * img.tileSize.width;
 
         let ox = Math.round(ax / mpt);
         let oy = Math.round(ay / mpt);
@@ -205,31 +204,26 @@ class CogTileLayer extends CompositeLayer {
     }
 
     async getTileAt(x: number, y: number, z: number) {
-        const tileWidth = tileSize;
+
+        let offset: number[] = this.getImageTileIndex(img)
+
+
         const tilesX = img.tileCount.x;
         const tilesY = img.tileCount.y;
 
-        console.log("Current image tiles: " + tilesX + ", " + tilesY)
-
-        let decompressed: any;
-
-        console.log("tileIndex: " + [x, y]);
-
-        //const offset: number[] = zoomLevelOffsets.get(z) as number[];
-
-        let offset: number[] = this.metersToTileIndex(img.origin[0], img.origin[1], img)
-        offset = [offset[0], offset[1]]
-
         console.log("offset: " + offset);
+        console.log("Image tileCount: " + tilesX + ", " + tilesY)
+        console.log("tileIndex: " + [x, y]);
 
         const ox = offset[0];
         const oy = offset[1];
+        let decompressed: any;
 
         if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
             console.log("getting tile: " + [x - ox, y - oy]);
             const tile = await img.getTile((x - ox), (y - oy));
             const data = tile!.bytes;
-            console.log(tile);
+            //console.log(tile);
 
             if (img.compression === 'image/jpeg') {
                 decompressed = jpeg.decode(data, { useTArray: true });
@@ -238,17 +232,17 @@ class CogTileLayer extends CompositeLayer {
                 decompressed = await inflate(data);
                 decompressed = await geo.getBitmap({
                     rasters: [decompressed],
-                    width: tileWidth,
-                    height: tileWidth,
+                    width: tileSize,
+                    height: tileSize,
                 });
                 console.log("deflate")
             } else if (img.compression === 'application/lzw') {
                 decompressed = decoder.decodeBlock(data.buffer);
-                console.log({ "data type:": "LZW", decompressed });
+                //console.log({ "data type:": "LZW", decompressed });
                 decompressed = await geo.getBitmap({
                     rasters: [new Uint16Array(decompressed)],
-                    width: tileWidth,
-                    height: tileWidth,
+                    width: tileSize,
+                    height: tileSize,
                 });
                 console.log("LZW tile at: " + [x - ox, y - oy] + "--------------------------------------------");
             } else {
