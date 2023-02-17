@@ -18,6 +18,7 @@ type vec3 = { x: number, y: number, z: number };
 
 const decoder = new LZWDecoder();
 const EARTH_CIRCUMFERENCE = 40075000.0;
+const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
 
 let geo: GeoImage;
 let cog: CogTiff;
@@ -58,9 +59,10 @@ class CogTileLayer extends CompositeLayer {
         console.log(img)
         tileSize = img.tileSize.width
         defaultOriginMeters = [img.origin[0], img.origin[1]]
-        //bestDetailOriginTileOffset = this.metersToTileIndex()
+        bestDetailOriginTileOffset = this.getImageTileIndex(img)
 
         console.log(img.bbox);
+        console.log(bestDetailOriginTileOffset);
 
         minZoom = this.getZoomLevelFromResolution(tileSize, img.resolution[0]);
         maxZoom = minZoom + cog.images.length;
@@ -149,12 +151,12 @@ class CogTileLayer extends CompositeLayer {
 
     getImageTileIndex(img: CogTiffImage) {
 
-        let ax = EARTH_CIRCUMFERENCE * 0.5 + img.origin[0];
-        let ay = -(EARTH_CIRCUMFERENCE * 0.5 + (img.origin[1] - EARTH_CIRCUMFERENCE));
-        let mpt = this.getResolutionFromZoomLevel(img.tileSize.width, currentZoomLevel) * img.tileSize.width;
+        let ax = EARTH_HALF_CIRCUMFERENCE + img.origin[0];
+        let ay = -(EARTH_HALF_CIRCUMFERENCE + (img.origin[1] - EARTH_CIRCUMFERENCE));
+        let mpt = img.resolution[0] * img.tileSize.width;
 
-        let ox = Math.round(ax / mpt);
-        let oy = Math.round(ay / mpt);
+        let ox = Math.floor(ax / mpt);
+        let oy = Math.floor(ay / mpt);
 
         let oz = this.getZoomLevelFromResolution(img.tileSize.width, img.resolution[0])
 
