@@ -13,6 +13,8 @@ import LZWDecoder from "../../utilities/lzw"
 import { homedir } from 'os';
 //import lzwCompress from "lzwcompress";
 
+console.clear();
+
 type vec2 = { x: number, y: number };
 type vec3 = { x: number, y: number, z: number };
 
@@ -26,6 +28,7 @@ let img: CogTiffImage;
 let tileSize: number;
 let defaultOriginMeters = [0, 0];
 let bestDetailOriginTileOffset = [0, 0];
+let worstDetailOriginTileOffset = [0, 0];
 let currentOriginTileOffset = [0, 0];
 let extent = [0, 0, 0, 0];
 let minZoom: number;
@@ -55,20 +58,23 @@ class CogTileLayer extends CompositeLayer {
         src = new SourceUrl(url);
         cog = await CogTiff.create(src);
         console.log(cog);
-        img = cog.getImage(cog.images.length - 1);
+        img = cog.getImage(cog.images.length-1); //Lowest zoom image
         console.log(img)
         tileSize = img.tileSize.width
         defaultOriginMeters = [img.origin[0], img.origin[1]]
-        bestDetailOriginTileOffset = this.getImageTileIndex(img)
-
+        worstDetailOriginTileOffset = this.getImageTileIndex(img)
+        
+        console.log(img.origin)
         console.log(img.bbox);
-        console.log(bestDetailOriginTileOffset);
+        //console.log(worstDetailOriginTileOffset);
 
         minZoom = this.getZoomLevelFromResolution(tileSize, img.resolution[0]);
-        maxZoom = minZoom + cog.images.length;
+        maxZoom = minZoom + (cog.images.length-1);
 
         tileSize = img.tileSize.width;
         resolution = img.resolution;
+
+        console.log(tileSize)
 
         loaded = true;
         geo = new GeoImage();
@@ -82,21 +88,20 @@ class CogTileLayer extends CompositeLayer {
 
     updateState() {
         console.log("LAYER UPDATE STATE");
-        console.log("current z index: " + currentZoomLevel)
 
         if (img) {
             const wantedMpp = this.getResolutionFromZoomLevel(tileSize, currentZoomLevel);
             const currentMpp = img.resolution[0];
-
-            if (currentZoomLevel != this.getZoomLevelFromResolution(tileSize, currentMpp)) {
+            if (currentZoomLevel !== this.getZoomLevelFromResolution(tileSize, currentMpp)) {
                 img = cog.getImageByResolution(wantedMpp);
-                console.log("Initializing layer for zoom level: " + this.getZoomLevelFromResolution(tileSize, wantedMpp))
+                console.log("Initializing image for zoom level: " + this.getZoomLevelFromResolution(tileSize, wantedMpp))
             }
         }
     }
 
     shouldUpdateState(status: { props: CogTileLayerProps, oldProps: CogTileLayerProps }) {
         console.log("LAYER SHOULD UPDATE STATE");
+        //currentZoomLevel = Math.round(this.context.deck.viewState.map.zoom);
         //console.log(status.oldProps);
         //console.log(status.props);
 
@@ -155,8 +160,8 @@ class CogTileLayer extends CompositeLayer {
         let ay = -(EARTH_HALF_CIRCUMFERENCE + (img.origin[1] - EARTH_CIRCUMFERENCE));
         let mpt = img.resolution[0] * img.tileSize.width;
 
-        let ox = Math.floor(ax / mpt);
-        let oy = Math.floor(ay / mpt);
+        let ox = Math.round(ax / mpt);
+        let oy = Math.round(ay / mpt);
 
         let oz = this.getZoomLevelFromResolution(img.tileSize.width, img.resolution[0])
 
@@ -207,15 +212,21 @@ class CogTileLayer extends CompositeLayer {
 
     async getTileAt(x: number, y: number, z: number) {
 
-        let offset: number[] = this.getImageTileIndex(img)
+        //let offset: number[] = this.getImageTileIndex(img)
+        let offset: number[] = [0,0]
 
-
+        if(z == minZoom){
+            offset = worstDetailOriginTileOffset
+        }else{
+            offset[0] = Math.floor(worstDetailOriginTileOffset[0] * Math.pow(2,z-minZoom))
+            offset[1] = Math.floor(worstDetailOriginTileOffset[1] * Math.pow(2,z-minZoom))
+        }
         const tilesX = img.tileCount.x;
         const tilesY = img.tileCount.y;
 
-        console.log("offset: " + offset);
-        console.log("Image tileCount: " + tilesX + ", " + tilesY)
-        console.log("tileIndex: " + [x, y]);
+
+        console.log("------OFFSET IS------  " + offset[0])
+
 
         const ox = offset[0];
         const oy = offset[1];
@@ -246,7 +257,6 @@ class CogTileLayer extends CompositeLayer {
                     width: tileSize,
                     height: tileSize,
                 });
-                console.log("LZW tile at: " + [x - ox, y - oy] + "--------------------------------------------");
             } else {
                 console.log("Unexpected compression method: " + img.compression)
             }
