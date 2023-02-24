@@ -13,18 +13,23 @@ import LZWDecoder from "../../utilities/lzw"
 import { homedir } from 'os';
 //import lzwCompress from "lzwcompress";
 
+console.clear();
+
 type vec2 = { x: number, y: number };
 type vec3 = { x: number, y: number, z: number };
 
 const decoder = new LZWDecoder();
 const EARTH_CIRCUMFERENCE = 40075000.0;
+const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
 
 let geo: GeoImage;
 let cog: CogTiff;
 let img: CogTiffImage;
 let tileSize: number;
 let defaultOriginMeters = [0, 0];
-let defaultOriginTileOffset = [0, 0];
+let bestDetailOriginTileOffset = [0, 0];
+let worstDetailOriginTileOffset = [0, 0];
+let currentOriginTileOffset = [0, 0];
 let extent = [0, 0, 0, 0];
 let minZoom: number;
 let maxZoom: number;
@@ -53,17 +58,23 @@ class CogTileLayer extends CompositeLayer {
         src = new SourceUrl(url);
         cog = await CogTiff.create(src);
         console.log(cog);
-        img = cog.getImage(cog.images.length - 1);
+        img = cog.getImage(cog.images.length-1); //Lowest zoom image
         console.log(img)
         tileSize = img.tileSize.width
-
+        defaultOriginMeters = [img.origin[0], img.origin[1]]
+        worstDetailOriginTileOffset = this.getImageTileIndex(img)
+        
+        console.log(img.origin)
         console.log(img.bbox);
+        //console.log(worstDetailOriginTileOffset);
 
         minZoom = this.getZoomLevelFromResolution(tileSize, img.resolution[0]);
-        maxZoom = minZoom + cog.images.length;
+        maxZoom = minZoom + (cog.images.length-1);
 
         tileSize = img.tileSize.width;
         resolution = img.resolution;
+
+        console.log(tileSize)
 
         loaded = true;
         geo = new GeoImage();
@@ -77,21 +88,20 @@ class CogTileLayer extends CompositeLayer {
 
     updateState() {
         console.log("LAYER UPDATE STATE");
-        console.log("current z index: " + currentZoomLevel)
 
         if (img) {
             const wantedMpp = this.getResolutionFromZoomLevel(tileSize, currentZoomLevel);
             const currentMpp = img.resolution[0];
-
-            if (currentZoomLevel != this.getZoomLevelFromResolution(tileSize, currentMpp)) {
+            if (currentZoomLevel !== this.getZoomLevelFromResolution(tileSize, currentMpp)) {
                 img = cog.getImageByResolution(wantedMpp);
-                console.log("Initializing layer for zoom level: " + this.getZoomLevelFromResolution(tileSize, wantedMpp))
+                console.log("Initializing image for zoom level: " + this.getZoomLevelFromResolution(tileSize, wantedMpp))
             }
         }
     }
 
     shouldUpdateState(status: { props: CogTileLayerProps, oldProps: CogTileLayerProps }) {
         console.log("LAYER SHOULD UPDATE STATE");
+        //currentZoomLevel = Math.round(this.context.deck.viewState.map.zoom);
         //console.log(status.oldProps);
         //console.log(status.props);
 
@@ -144,15 +154,11 @@ class CogTileLayer extends CompositeLayer {
         return [layer];
     }
 
-    metersToTileIndex(x: number, y: number, img: CogTiffImage) {
+    getImageTileIndex(img: CogTiffImage) {
 
-        let ax = EARTH_CIRCUMFERENCE * 0.5 + x;
-        let ay = -(EARTH_CIRCUMFERENCE * 0.5 + (y - EARTH_CIRCUMFERENCE));
-        let mpt = this.getResolutionFromZoomLevel(img.tileSize.width, currentZoomLevel) * img.tileSize.width
-
-        //console.log("-------------------------Tile mpt vs current zoom mpt--------------------------------")
-        //console.log(mpt)
-        //console.log(this.getResolutionFromZoomLevel(img.tileSize.width, currentZoomLevel) * img.tileSize.width)
+        let ax = EARTH_HALF_CIRCUMFERENCE + img.origin[0];
+        let ay = -(EARTH_HALF_CIRCUMFERENCE + (img.origin[1] - EARTH_CIRCUMFERENCE));
+        let mpt = img.resolution[0] * img.tileSize.width;
 
         let ox = Math.round(ax / mpt);
         let oy = Math.round(ay / mpt);
@@ -205,31 +211,32 @@ class CogTileLayer extends CompositeLayer {
     }
 
     async getTileAt(x: number, y: number, z: number) {
-        const tileWidth = tileSize;
+
+        //let offset: number[] = this.getImageTileIndex(img)
+        let offset: number[] = [0,0]
+
+        if(z == minZoom){
+            offset = worstDetailOriginTileOffset
+        }else{
+            offset[0] = Math.floor(worstDetailOriginTileOffset[0] * Math.pow(2,z-minZoom))
+            offset[1] = Math.floor(worstDetailOriginTileOffset[1] * Math.pow(2,z-minZoom))
+        }
         const tilesX = img.tileCount.x;
         const tilesY = img.tileCount.y;
 
-        console.log("Current image tiles: " + tilesX + ", " + tilesY)
 
-        let decompressed: any;
+        console.log("------OFFSET IS------  " + offset[0])
 
-        console.log("tileIndex: " + [x, y]);
-
-        //const offset: number[] = zoomLevelOffsets.get(z) as number[];
-
-        let offset: number[] = this.metersToTileIndex(img.origin[0], img.origin[1], img)
-        offset = [offset[0], offset[1]]
-
-        console.log("offset: " + offset);
 
         const ox = offset[0];
         const oy = offset[1];
+        let decompressed: any;
 
         if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
             console.log("getting tile: " + [x - ox, y - oy]);
             const tile = await img.getTile((x - ox), (y - oy));
             const data = tile!.bytes;
-            console.log(tile);
+            //console.log(tile);
 
             if (img.compression === 'image/jpeg') {
                 decompressed = jpeg.decode(data, { useTArray: true });
@@ -238,19 +245,18 @@ class CogTileLayer extends CompositeLayer {
                 decompressed = await inflate(data);
                 decompressed = await geo.getBitmap({
                     rasters: [decompressed],
-                    width: tileWidth,
-                    height: tileWidth,
+                    width: tileSize,
+                    height: tileSize,
                 });
                 console.log("deflate")
             } else if (img.compression === 'application/lzw') {
                 decompressed = decoder.decodeBlock(data.buffer);
-                console.log({ "data type:": "LZW", decompressed });
+                //console.log({ "data type:": "LZW", decompressed });
                 decompressed = await geo.getBitmap({
                     rasters: [new Uint16Array(decompressed)],
-                    width: tileWidth,
-                    height: tileWidth,
+                    width: tileSize,
+                    height: tileSize,
                 });
-                console.log("LZW tile at: " + [x - ox, y - oy] + "--------------------------------------------");
             } else {
                 console.log("Unexpected compression method: " + img.compression)
             }
