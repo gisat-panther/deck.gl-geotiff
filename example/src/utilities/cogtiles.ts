@@ -13,7 +13,7 @@ import { GeoImage } from "../../../geolib/dist/esm"; //Will need standard loadin
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
 
-class CogTiles{
+class CogTiles {
 
     cog: CogTiff;
     minZoom: number;
@@ -25,21 +25,21 @@ class CogTiles{
     geo: GeoImage = new GeoImage();
     lzw: LZWDecoder = new LZWDecoder();
 
-    constructor(url:string){
+    constructor(url: string) {
         console.log("Initializing CogTiles...")
         const src = new SourceUrl(url);
         this.initializeCog(src)
     }
 
-    async initializeCog(src:SourceUrl){
+    async initializeCog(src: SourceUrl) {
         this.cog = await CogTiff.create(src);
-        let img = this.cog.images[this.cog.images.length-1]; //Lowest zoom image
+        let img = this.cog.images[this.cog.images.length - 1]; //Lowest zoom image
         this.tileSize = img.tileSize.width
 
-        this.lowestOriginTileOffset = this.getImageTileIndex(this.cog.images[this.cog.images.length-1])
+        this.lowestOriginTileOffset = this.getImageTileIndex(this.cog.images[this.cog.images.length - 1])
 
         this.minZoom = this.getZoomLevelFromResolution(this.tileSize, img.resolution[0]);
-        this.maxZoom = this.minZoom + (this.cog.images.length-1);
+        this.maxZoom = this.minZoom + (this.cog.images.length - 1);
 
         console.log("CogTiles initialized.")
     }
@@ -65,18 +65,18 @@ class CogTiles{
     getZoomLevelFromResolution(tileSize: number, resolution: number) {
         return Math.round(Math.log2(EARTH_CIRCUMFERENCE / (resolution * tileSize)))
     }
-    
-    async getTile(x:number, y:number, z:number){
+
+    async getTile(x: number, y: number, z: number) {
         const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
         const img = this.cog.getImageByResolution(wantedMpp);
 
-        let offset: number[] = [0,0]
+        let offset: number[] = [0, 0]
 
-        if(z == this.minZoom){
+        if (z == this.minZoom) {
             offset = this.lowestOriginTileOffset
-        }else{
-            offset[0] = Math.floor(this.lowestOriginTileOffset[0] * Math.pow(2,z-this.minZoom))
-            offset[1] = Math.floor(this.lowestOriginTileOffset[1] * Math.pow(2,z-this.minZoom))
+        } else {
+            offset[0] = Math.floor(this.lowestOriginTileOffset[0] * Math.pow(2, z - this.minZoom))
+            offset[1] = Math.floor(this.lowestOriginTileOffset[1] * Math.pow(2, z - this.minZoom))
         }
         const tilesX = img.tileCount.x;
         const tilesY = img.tileCount.y;
@@ -125,4 +125,4 @@ class CogTiles{
 
 }
 
-export {CogTiles}
+export { CogTiles }
