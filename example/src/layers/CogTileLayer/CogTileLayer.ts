@@ -61,11 +61,26 @@ class CogTileLayer extends CompositeLayer {
         img = cog.getImage(cog.images.length-1); //Lowest zoom image
         console.log(img)
         tileSize = img.tileSize.width
-        defaultOriginMeters = [img.origin[0], img.origin[1]]
-        worstDetailOriginTileOffset = this.getImageTileIndex(img)
+
+
+        for(let i = cog.images.length-1; i > -1; i--){
+            console.log(i)
+
+            if(cog.images[i].isGeoLocated){
+                
+                console.log("Current origin is: " + cog.images[i].origin)
+                worstDetailOriginTileOffset = this.getImageTileIndex(cog.images[i])
+
+                worstDetailOriginTileOffset[0] = Math.round(worstDetailOriginTileOffset[0] / Math.pow(2,cog.images.length-i))
+                worstDetailOriginTileOffset[1] = Math.round(worstDetailOriginTileOffset[1] / Math.pow(2,cog.images.length-i))
+
+                console.log(worstDetailOriginTileOffset);
+
+                break
+            }
+        }
         
-        console.log(img.origin)
-        console.log(img.bbox);
+
         //console.log(worstDetailOriginTileOffset);
 
         minZoom = this.getZoomLevelFromResolution(tileSize, img.resolution[0]);
@@ -92,7 +107,7 @@ class CogTileLayer extends CompositeLayer {
         if (img) {
             const wantedMpp = this.getResolutionFromZoomLevel(tileSize, currentZoomLevel);
             const currentMpp = img.resolution[0];
-            if (currentZoomLevel !== this.getZoomLevelFromResolution(tileSize, currentMpp)) {
+            if (currentZoomLevel != this.getZoomLevelFromResolution(tileSize, currentMpp)) {
                 img = cog.getImageByResolution(wantedMpp);
                 console.log("Initializing image for zoom level: " + this.getZoomLevelFromResolution(tileSize, wantedMpp))
             }
@@ -224,9 +239,7 @@ class CogTileLayer extends CompositeLayer {
         const tilesX = img.tileCount.x;
         const tilesY = img.tileCount.y;
 
-
-        console.log("------OFFSET IS------  " + offset[0])
-
+        console.log("------OFFSET IS------  " + offset[0] + " ; " + offset[1])
 
         const ox = offset[0];
         const oy = offset[1];
