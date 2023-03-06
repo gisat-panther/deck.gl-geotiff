@@ -80,7 +80,6 @@ class CogTileLayer extends CompositeLayer {
             }
         }
         
-        
         //console.log(worstDetailOriginTileOffset);
 
         minZoom = this.getZoomLevelFromResolution(tileSize, img.resolution[0]);
