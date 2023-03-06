@@ -14,7 +14,7 @@ class CogLayerExample extends React.Component<{}> {
 
   render() {
     console.log("REACT RENDER");
-    const layer = new CogTileLayer({url: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v1/quadrants/Q2_LT05_19950507_mosaic_clip_RGB_jpeg_cog.tif'});
+    const layer = new CogTileLayer({url: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v1/quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_DEFLATE.tif'});
 
     const initialViewState: InitialViewStateProps = {
       longitude: 0,

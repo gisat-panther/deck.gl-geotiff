@@ -14,24 +14,20 @@ const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
 
 class CogTiles {
-    
+
     cog: CogTiff;
     zoomRange = [0,0]
     tileSize: number;
     lowestOriginTileOffset = [0, 0];
+    lowestOriginTileSize = 0;
 
     loaded: boolean = false;
     geo: GeoImage = new GeoImage();
     lzw: LZWDecoder = new LZWDecoder();
 
-    constructor(url: string) {
-        console.log("Initializing CogTiles...")
-        const src = new SourceUrl(url);
-        this.initializeCog(src)
-    }
+    async initializeCog(url:string) {
 
-    async initializeCog(src: SourceUrl) {
-        this.cog = await CogTiff.create(src);
+        this.cog = await CogTiff.create(new SourceUrl(url));
 
         this.tileSize = this.getTileSize(this.cog)
 
@@ -40,17 +36,20 @@ class CogTiles {
         this.zoomRange = this.getZoomRange(this.cog)
 
         console.log("CogTiles initialized.")
+        console.log(this.cog)
+
+        return this.cog
     }
 
     getTileSize(cog:CogTiff){
-        return cog.images[0].size.width
+        return cog.images[cog.images.length-1].tileSize.width
     }
 
     getZoomRange(cog:CogTiff){
-        const img = this.cog.images[this.cog.images.length - 1];
+        const img = this.cog.images[cog.images.length - 1];
 
-        const minZoom = this.getZoomLevelFromResolution(this.tileSize, img.resolution[0]);
-        const maxZoom = this.zoomRange[0] + (this.cog.images.length - 1);
+        const minZoom = this.getZoomLevelFromResolution(cog.images[cog.images.length-1].tileSize.width, img.resolution[0]);
+        const maxZoom = minZoom + (cog.images.length - 1);
 
         return [minZoom, maxZoom]
     }
@@ -59,7 +58,8 @@ class CogTiles {
 
         let ax = EARTH_HALF_CIRCUMFERENCE + img.origin[0];
         let ay = -(EARTH_HALF_CIRCUMFERENCE + (img.origin[1] - EARTH_CIRCUMFERENCE));
-        let mpt = img.resolution[0] * img.tileSize.width;
+        //let mpt = img.resolution[0] * img.tileSize.width;
+        let mpt = this.getResolutionFromZoomLevel(img.tileSize.width,this.getZoomLevelFromResolution(img.tileSize.width,img.resolution[0])) * img.tileSize.width
 
         let ox = Math.round(ax / mpt);
         let oy = Math.round(ay / mpt);
@@ -81,6 +81,8 @@ class CogTiles {
         const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
         const img = this.cog.getImageByResolution(wantedMpp);
 
+        console.log(img.id)
+
         let offset: number[] = [0, 0]
 
         if (z == this.zoomRange[0]) {
@@ -93,9 +95,12 @@ class CogTiles {
         const tilesY = img.tileCount.y;
 
         console.log("------OFFSET IS------  " + offset[0] + " ; " + offset[1])
-
+        //console.log(img.compression)
         const ox = offset[0];
         const oy = offset[1];
+
+        console.log("Asking for " + (x - ox) + " : " + (y - oy))
+
         let decompressed: any;
 
         if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
@@ -103,14 +108,15 @@ class CogTiles {
             const tile = await img.getTile((x - ox), (y - oy));
             const data = tile!.bytes;
             //console.log(tile);
-
+            
             if (img.compression === 'image/jpeg') {
+                console.log("decompressing jpeg image...")
                 decompressed = jpeg.decode(data, { useTArray: true });
                 console.log("jpeg")
             } else if (img.compression === 'application/deflate') {
                 decompressed = await inflate(data);
                 decompressed = await this.geo.getBitmap({
-                    rasters: [decompressed],
+                    rasters: [new Uint16Array(decompressed)],
                     width: this.tileSize,
                     height: this.tileSize,
                 });
@@ -128,9 +134,11 @@ class CogTiles {
             }
         }
 
+        //console.log(decompressed)
+
         return new Promise((resolve, reject) => {
             resolve(decompressed);
-            reject(console.log('Cannot retrieve tile '));
+            //reject(console.log('Cannot retrieve tile '));
         });
     }
 
