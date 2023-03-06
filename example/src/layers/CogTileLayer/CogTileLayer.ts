@@ -142,11 +142,6 @@ class CogTileLayer extends CompositeLayer {
                     tileData.z
                 );
             },
-
-            updateTriggers: {
-
-            },
-
             minZoom: minZoom,
             maxZoom: maxZoom,
             tileSize: tileSize,

@@ -119,7 +119,7 @@ class CogTiles {
 
         return new Promise((resolve, reject) => {
             resolve(decompressed);
-            reject('Cannot retrieve tile ');
+            reject(console.log('Cannot retrieve tile '));
         });
     }
 
