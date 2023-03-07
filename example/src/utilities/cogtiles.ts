@@ -6,9 +6,10 @@ import { SourceUrl } from '@chunkd/source-url';
 import { inflate } from 'pako';
 import jpeg from 'jpeg-js';
 import LZWDecoder from "./lzw.js" //TODO: remove absolute path
+import { worldToLngLat } from '@math.gl/web-mercator';
 
 //Bitmap styling
-import { GeoImage } from "../../../geolib/dist/esm"; //TODO: remove absolute path
+import { GeoImage } from "../../../deckgl-geolib"; //TODO: remove absolute path
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
@@ -77,6 +78,18 @@ class CogTiles {
         return Math.round(Math.log2(EARTH_CIRCUMFERENCE / (resolution * tileSize)))
     }
 
+    getLatLon(input: number[]) {
+        let ax = EARTH_HALF_CIRCUMFERENCE + input[0];
+        let ay = -(EARTH_HALF_CIRCUMFERENCE + (input[1] - EARTH_CIRCUMFERENCE));
+
+        const cartesianPosition = [ax * (512 / EARTH_CIRCUMFERENCE), ay * (512 / EARTH_CIRCUMFERENCE)];
+        const cartographicPosition = worldToLngLat(cartesianPosition);
+        const cartographicPositionAdjusted = [cartographicPosition[0], - cartographicPosition[1]];
+
+        //console.log(cartographicPositionAdjusted);
+        return cartographicPositionAdjusted;
+    }
+
     async getTile(x: number, y: number, z: number) {
         const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
         const img = this.cog.getImageByResolution(wantedMpp);
@@ -106,12 +119,23 @@ class CogTiles {
         if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
             console.log("getting tile: " + [x - ox, y - oy]);
             const tile = await img.getTile((x - ox), (y - oy));
+
             const data = tile!.bytes;
             //console.log(tile);
             
             if (img.compression === 'image/jpeg') {
                 console.log("decompressing jpeg image...")
-                decompressed = jpeg.decode(data, { useTArray: true });
+                decompressed = jpeg.decode(data, {useTArray:true});
+                /*//not needed for raw images
+                //this.geo.setOpacity(120)
+                //this.geo.useChannel = 2;
+                //this.geo.setDataOpacity(true);
+                decompressed = await this.geo.getBitmap({
+                    rasters: [new Uint8Array(decompressed.data)],
+                    width: this.tileSize,
+                    height: this.tileSize,
+                });
+                */
                 console.log("jpeg")
             } else if (img.compression === 'application/deflate') {
                 decompressed = await inflate(data);
