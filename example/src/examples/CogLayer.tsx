@@ -2,6 +2,8 @@ import React from 'react';
 import DeckGL from '@deck.gl/react';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
 import { CogTileLayer } from '../layers/CogTileLayer/CogTileLayer';
+import { TileLayer } from '@deck.gl/geo-layers';
+import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { StaticMap } from 'react-map-gl';
 
@@ -9,12 +11,33 @@ import { StaticMap } from 'react-map-gl';
 // "https://gisat-gis.eu-central-1.linodeobjects.com/eman/DEMs/Copernicus_DSM_10_merged_Mercator_COG.tif"
 // Manila_S2_Composite_2020022_Mercator_COG_tiled.tif
 
-
 class CogLayerExample extends React.Component<{}> {
 
   render() {
     console.log("REACT RENDER");
-    const layer = new CogTileLayer({url: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v1/quadrants/Q2_LT05_19950507_mosaic_clip_RGB_jpeg_cog.tif'});
+    const layer = new CogTileLayer({
+      url:'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_DEFLATE.tif'
+    });
+    const tileLayer = new TileLayer({
+      // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Tile_servers
+      data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      id: "standard-tile-layer",
+      minZoom: 0,
+      maxZoom: 19,
+      tileSize: 256,
+  
+      renderSubLayers: props => {
+        const {
+          bbox: {west, south, east, north}
+        } = props.tile;
+  
+        return new BitmapLayer(props, {
+          data: null,
+          image: props.data,
+          bounds: [west, south, east, north]
+        });
+      }
+    });
 
     const initialViewState: InitialViewStateProps = {
       longitude: 0,
@@ -28,7 +51,7 @@ class CogLayerExample extends React.Component<{}> {
             getCursor={() => "inherit"}
             initialViewState={initialViewState}
             controller={true}
-            layers={[layer]}
+            layers={[tileLayer, layer]}
             views={[
               new MapView({
                 controller: true,
@@ -39,7 +62,6 @@ class CogLayerExample extends React.Component<{}> {
               }),
             ]}
           >
-          <StaticMap mapboxApiAccessToken='pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg'/>
           </DeckGL>
         )}
       </>

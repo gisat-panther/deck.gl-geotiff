@@ -149,8 +149,8 @@ class GeoImage implements IGeoImage {
     console.log("image width: " + width)
     console.log("channels: " + channels)
     console.log("format: " + rasters[0].length / (width * height))
-    console.log("rasters: ")
-    console.log(rasters)
+    //console.log("rasters: ")
+    //console.log(rasters)
 
     if (channels === 1) {
       if (rasters[0].length / (width * height) === 1) {

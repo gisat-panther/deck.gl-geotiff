@@ -24,11 +24,7 @@ const MAPBOX_TOKEN = 'pk.eyJ1IjoibWlrb3RhbGlrIiwiYSI6ImNsZXJmdTV2NzB2eGw0MW8xZnh
 class TestLayerExample extends React.Component<{}> {
 
   componentDidMount() {
-    console.clear()
-  }
-
-  componentWillUnmount() {
-    //clearInterval(this.interval);
+    
   }
 
   render() {
@@ -58,7 +54,7 @@ class TestLayerExample extends React.Component<{}> {
     const initialViewState: InitialViewStateProps = {
       latitude: 46.24,
       longitude: -122.18,
-      zoom: 11.5,
+      zoom: 11,
       bearing: 140,
       pitch: 60,
       maxPitch: 89
