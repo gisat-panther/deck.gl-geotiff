@@ -7,19 +7,16 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { StaticMap } from 'react-map-gl';
 
-// 'http://gisat-gis.eu-central-1.linodeobjects.com/eman/export_cog_1.tif';
-// "https://gisat-gis.eu-central-1.linodeobjects.com/eman/DEMs/Copernicus_DSM_10_merged_Mercator_COG.tif"
-// Manila_S2_Composite_2020022_Mercator_COG_tiled.tif
-
 class CogLayerExample extends React.Component<{}> {
 
   render() {
     console.log("REACT RENDER");
-    const layer = new CogTileLayer({
+
+    const cogLayer = new CogTileLayer({
       url:'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_DEFLATE.tif'
     });
+
     const tileLayer = new TileLayer({
-      // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Tile_servers
       data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
       id: "standard-tile-layer",
       minZoom: 0,
@@ -51,7 +48,7 @@ class CogLayerExample extends React.Component<{}> {
             getCursor={() => "inherit"}
             initialViewState={initialViewState}
             controller={true}
-            layers={[tileLayer, layer]}
+            layers={[tileLayer, cogLayer]}
             views={[
               new MapView({
                 controller: true,
