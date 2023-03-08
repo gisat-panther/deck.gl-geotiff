@@ -112,7 +112,7 @@ class CogTileLayer extends CompositeLayer {
                     data: null,
                     image: props.data,
                     bounds: [west, south, east, north],
-                    opacity: 0.3
+                    opacity: 0.6
                 });
             },
         });

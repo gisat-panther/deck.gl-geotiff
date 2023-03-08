@@ -27,8 +27,9 @@ class CogTiles {
     lzw: LZWDecoder = new LZWDecoder();
 
     async initializeCog(url:string) {
-
+        console.log("Initializing CogTiles...")
         this.cog = await CogTiff.create(new SourceUrl(url));
+        console.log(this.cog)
 
         this.tileSize = this.getTileSize(this.cog)
 
@@ -37,7 +38,7 @@ class CogTiles {
         this.zoomRange = this.getZoomRange(this.cog)
 
         console.log("CogTiles initialized.")
-        console.log(this.cog)
+        
 
         return this.cog
     }
@@ -139,6 +140,7 @@ class CogTiles {
                 console.log("jpeg")
             } else if (img.compression === 'application/deflate') {
                 decompressed = await inflate(data);
+                //console.log(decompressed)
                 decompressed = await this.geo.getBitmap({
                     rasters: [new Uint16Array(decompressed)],
                     width: this.tileSize,
@@ -149,7 +151,7 @@ class CogTiles {
                 decompressed = this.lzw.decodeBlock(data.buffer);
                 //console.log({ "data type:": "LZW", decompressed });
                 decompressed = await this.geo.getBitmap({
-                    rasters: [new Uint16Array(decompressed)],
+                    rasters: [new Uint8Array(decompressed)],
                     width: this.tileSize,
                     height: this.tileSize,
                 });
@@ -158,7 +160,7 @@ class CogTiles {
             }
         }
 
-        //console.log(decompressed)
+        
 
         return new Promise((resolve, reject) => {
             resolve(decompressed);

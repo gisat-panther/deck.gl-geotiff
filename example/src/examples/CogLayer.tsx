@@ -11,17 +11,17 @@ import { StaticMap } from 'react-map-gl';
 // "https://gisat-gis.eu-central-1.linodeobjects.com/eman/DEMs/Copernicus_DSM_10_merged_Mercator_COG.tif"
 // Manila_S2_Composite_2020022_Mercator_COG_tiled.tif
 
-
 class CogLayerExample extends React.Component<{}> {
 
   render() {
     console.log("REACT RENDER");
-    const layer = new CogTileLayer({url: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v1/quadrants/Q3_Bolivia_ASTER_2002_RGB_JPEG_COG_8.tif'});
-
+    const layer = new CogTileLayer({
+      url:'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_DEFLATE.tif'
+    });
     const tileLayer = new TileLayer({
       // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Tile_servers
       data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      id: "aasd",
+      id: "standard-tile-layer",
       minZoom: 0,
       maxZoom: 19,
       tileSize: 256,
@@ -62,7 +62,6 @@ class CogLayerExample extends React.Component<{}> {
               }),
             ]}
           >
-          <StaticMap mapboxApiAccessToken='pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg'/>
           </DeckGL>
         )}
       </>
