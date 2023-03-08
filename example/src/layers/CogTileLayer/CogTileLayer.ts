@@ -6,8 +6,6 @@ import { CogTiles } from '../../utilities/cogtiles';
 
 import { homedir } from 'os';
 
-//console.clear();
-
 let cogTiles: CogTiles;
 
 let tileSize: number;
@@ -37,26 +35,6 @@ class CogTileLayer extends CompositeLayer {
 
         const cog = await cogTiles.initializeCog(url)
         tileSize = cogTiles.getTileSize(cog)
-
-        //const bbox = cog.images[cog.images.length-1].bbox
-        //console.log(bbox)
-
-        //const a = cogTiles.getLatLon([bbox[0], bbox[3]])
-        //const b = cogTiles.getLatLon([bbox[2], bbox[1]])
-
-        //extent = [a[0], a[1] , b[0], b[1]]
-        //extent = [b[1], b[0] , a[1], a[0]]
-        //extent = [a[0], a[1] , b[0], b[1]]
-        //extent = [a[1], a[0] , b[1], b[0]]
-        //console.log(extent)
-
-        //console.log(cogTiles.getLatLon(bbox))
-
-        /*
-        cog.images.forEach(image => {
-            image.loadGeoTiffTags(1)
-        });
-        */
 
         const zoomRange = cogTiles.getZoomRange(cog)
         minZoom = zoomRange[0]
