@@ -56,6 +56,27 @@ class CogTiles {
         return [minZoom, maxZoom]
     }
 
+    getBoundsAsLatLon(cog:CogTiff){
+        let bbox = cog.images[cog.images.length-1].bbox
+
+        console.log(bbox)
+
+        let minX = Math.min(bbox[0], bbox[2])
+        let maxX = Math.max(bbox[0], bbox[2])
+        let minY = Math.min(bbox[1], bbox[3])
+        let maxY = Math.max(bbox[1], bbox[3])
+
+        let minXYDeg = this.getLatLon([minX,minY])
+        let maxXYDeg = this.getLatLon([maxX,maxY])
+
+        return [...minXYDeg,...maxXYDeg]
+    }
+
+    getOriginAsLatLon(cog:CogTiff){
+        let origin = cog.images[cog.images.length-1].origin
+        return this.getLatLon(origin)
+    }
+
     getImageTileIndex(img: CogTiffImage) {
 
         let ax = EARTH_HALF_CIRCUMFERENCE + img.origin[0];

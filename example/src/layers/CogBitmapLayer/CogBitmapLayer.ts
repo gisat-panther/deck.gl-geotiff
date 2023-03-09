@@ -1,6 +1,5 @@
 import { LayerProps, CompositeLayer } from '@deck.gl/core'
 import { TileLayer } from '@deck.gl/geo-layers'
-import { LineLayer } from '@deck.gl/layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { CogTiles } from '../../utilities/cogtiles';
 
@@ -15,22 +14,27 @@ let url: string;
 let needsRerender: boolean = false;
 let extent = [0, 0, 0, 0]
 
-interface CogTileLayerProps extends LayerProps {
+interface CogBitmapLayerProps extends LayerProps {
     url: string,
     loaded?: boolean;
 }
 
-class CogTileLayer extends CompositeLayer {
-    static layerName = 'CogTileLayer';
+class CogBitmapLayer extends CompositeLayer {
+    static layerName = 'CogBitmapLayer';
 
-    constructor(props: CogTileLayerProps) {
+    constructor(props: CogBitmapLayerProps) {
         super(props);
         url = props.url;
 
         cogTiles = new CogTiles()
+        this.init()
     }
 
     async initializeState() {
+
+    }
+
+    async init(){
         console.log("LAYER INITIALIZE STATE");
 
         const cog = await cogTiles.initializeCog(url)
@@ -40,6 +44,14 @@ class CogTileLayer extends CompositeLayer {
         minZoom = zoomRange[0]
         maxZoom = zoomRange[1]
 
+        console.log(zoomRange)
+
+        extent = cogTiles.getBoundsAsLatLon(cog)
+
+        extent = extent
+
+        console.log(extent)
+
         needsRerender = true;
     }
 
@@ -47,7 +59,7 @@ class CogTileLayer extends CompositeLayer {
         //console.log("LAYER UPDATE STATE")
     }
 
-    shouldUpdateState(status: { props: CogTileLayerProps, oldProps: CogTileLayerProps }) {
+    shouldUpdateState(status: { props: CogBitmapLayerProps, oldProps: CogBitmapLayerProps }) {
         //console.log("LAYER SHOULD UPDATE STATE");
         //currentZoomLevel = Math.round(this.context.deck.viewState.map.zoom);
         //console.log(status.oldProps);
@@ -75,10 +87,10 @@ class CogTileLayer extends CompositeLayer {
                     tileData.z
                 );
             },
-            minZoom: minZoom,
+            //minZoom: minZoom,
             maxZoom: maxZoom,
             tileSize: tileSize,
-            maxRequests: 4,
+            maxRequests: 6,
             //extent: extent,
 
             renderSubLayers: (props: any) => {
@@ -98,4 +110,4 @@ class CogTileLayer extends CompositeLayer {
     }
 }
 
-export { CogTileLayer }
+export { CogBitmapLayer }

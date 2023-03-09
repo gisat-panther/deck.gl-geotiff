@@ -1,19 +1,18 @@
 import React from 'react';
 import DeckGL from '@deck.gl/react';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
-import { CogTileLayer } from '../layers/CogTileLayer/CogTileLayer';
+import { CogTerrainLayer } from '../layers/CogTerrainLayer/CogTerrainLayer';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
-import { StaticMap } from 'react-map-gl';
 
-class CogLayerExample extends React.Component<{}> {
+class CogTerrainLayerExample extends React.Component<{}> {
 
   render() {
     console.log("REACT RENDER");
 
-    const cogLayer = new CogTileLayer({
-      url:'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_DEFLATE.tif'
+    const cogLayer = new CogTerrainLayer({
+      url:'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_DEFLATE.tif'
     });
 
     const tileLayer = new TileLayer({
@@ -37,10 +36,11 @@ class CogLayerExample extends React.Component<{}> {
     });
 
     const initialViewState: InitialViewStateProps = {
-      longitude: 0,
-      latitude: 0,
-      zoom: 0,
+      longitude: -67.5,
+      latitude: -22,
+      zoom: 4,
     };
+
     return (
       <>
         {(
@@ -66,4 +66,4 @@ class CogLayerExample extends React.Component<{}> {
   }
 }
 
-export { CogLayerExample };
+export { CogTerrainLayerExample };

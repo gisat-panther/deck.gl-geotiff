@@ -11,11 +11,13 @@ const SideBar = () => {
   };
   return (
     <SideNav>
-      <NavLink to="/terrain-layer-example">Terrain Layer</NavLink>
       <NavLink to="/bitmap-layer-example">Bitmap Layer</NavLink>
-      <NavLink to="/cog-layer-example">COG Tile Layer</NavLink>
-      <NavLink to="/test-layer-example">Test Layer</NavLink>
-      
+      <NavLink to="/terrain-layer-example">Terrain Layer</NavLink>
+      <NavLink to="/cog-bitmap-layer-example">COG Bitmap Layer</NavLink>
+      <NavLink to="/cog-terrain-layer-example">COG Terrain Layer</NavLink>
+      {
+      //<NavLink to="/test-layer-example">Test Layer</NavLink>
+      }
       <Divider />
       <HStack>
         <p>Opacity</p>
