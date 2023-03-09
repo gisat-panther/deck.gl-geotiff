@@ -5,9 +5,9 @@ import App from './App';
 import UploadImage from './components/UploadImage';
 import {
   BitmapLayerExample,
-  TileLayerExample,
   TerrainLayerExample,
-  CogLayerExample,
+  CogBitmapLayerExample,
+  CogTerrainLayerExample,
 } from './examples';
 import { TestLayerExample } from './examples/TestLayerExample';
 
@@ -19,13 +19,10 @@ const Routing: React.FC<RoutesProps> = () => (
     <UploadImage />
     <Routes>
       <Route path={'/'} element={<App />} />
-      <Route
-        path={'/terrain-layer-example'}
-        element={<TerrainLayerExample />}
-      />
       <Route path={'/bitmap-layer-example'} element={<BitmapLayerExample />} />
-      <Route path={'/tile-layer-example'} element={<TileLayerExample />} />
-      <Route path={'/cog-layer-example'} element={<CogLayerExample />} />
+      <Route path={'/terrain-layer-example'}element={<TerrainLayerExample />}/>
+      <Route path={'/cog-bitmap-layer-example'} element={<CogBitmapLayerExample />} />
+      <Route path={'/cog-terrain-layer-example'} element={<CogTerrainLayerExample />} />
       <Route path={'/test-layer-example'} element={<TestLayerExample />} />
     </Routes>
   </BrowserRouter>

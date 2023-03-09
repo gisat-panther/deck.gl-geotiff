@@ -1,4 +1,5 @@
-export { BitmapLayerExample } from './BitmapLayer';
-export { TileLayerExample } from './TileLayer';
-export { CogLayerExample } from './CogLayer';
-export { TerrainLayerExample } from './TerrainLayer';
+export { BitmapLayerExample } from './BitmapLayerExample';
+export { TerrainLayerExample } from './TerrainLayerExample';
+export { TestLayerExample } from './TestLayerExample';
+export { CogBitmapLayerExample } from './CogBitmapLayerExample';
+export { CogTerrainLayerExample } from "./CogTerrainLayerExample";
