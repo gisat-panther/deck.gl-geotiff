@@ -1,6 +1,6 @@
 // import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff';
-import { IGeoImage } from './interface';
+import { IGeoImage } from '@gisatcz/deckgl-geolib/src/classes/geoImage/interface';
 
 class GeoImage implements IGeoImage {
   url = '';
@@ -357,4 +357,4 @@ class GeoImage implements IGeoImage {
     this.alpha = alpha;
   }
 }
-export default GeoImage;
+export { GeoImage }

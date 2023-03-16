@@ -5,7 +5,6 @@
   "description": "geoimage lib",
   "private": false,
   "scripts": {
-    "rollup": "rollup -c",
     "test": "jest",
     "publish": "npm publish --access public"
   },

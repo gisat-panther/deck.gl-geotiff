@@ -102,7 +102,7 @@ class CogBitmapLayer extends CompositeLayer {
                     data: null,
                     image: props.data,
                     bounds: [west, south, east, north],
-                    opacity: 0.6
+                    opacity: 1//0.6
                 });
             },
         });

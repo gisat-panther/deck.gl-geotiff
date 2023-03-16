@@ -1,7 +1,7 @@
 // import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 /* eslint-disable import/no-unresolved */
 import { useState, useEffect } from 'react';
-import GeoImage from '../../classes/geoImage';
+import {GeoImage} from '../../classes/geoImage';
 
 interface IGeo {
   image: string;

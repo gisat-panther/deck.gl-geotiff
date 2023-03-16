@@ -99,12 +99,18 @@ class CogTerrainLayer extends CompositeLayer {
                 if (props.data && (props.tile.x != undefined)) {
                     return new TerrainLayer({
                         id: ("terrain-" + props.tile.x + "-" + props.tile.y + "-" + props.tile.z),
-                        elevationDecoder: {
+                        /*elevationDecoder: {
                             rScaler: 1,
                             gScaler: 1,
                             bScaler: 1,
                             offset: 0
                         },
+                        elevationDecoder: {
+                            rScaler: 6553.6,
+                            gScaler: 25.6,
+                            bScaler: 0.1,
+                            offset: -10000
+                        },*/
                         elevationData: props.data,
                         texture: props.data,
                         bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north],

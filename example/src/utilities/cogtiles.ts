@@ -9,7 +9,7 @@ import LZWDecoder from "./lzw.js" //TODO: remove absolute path
 import { worldToLngLat } from '@math.gl/web-mercator';
 
 //Bitmap styling
-import { GeoImage } from "../../../deckgl-geolib"; //TODO: remove absolute path
+import { GeoImage } from "./geoimage"; //TODO: remove absolute path
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
@@ -162,11 +162,15 @@ class CogTiles {
             } else if (img.compression === 'application/deflate') {
                 decompressed = await inflate(data);
                 //console.log(decompressed)
+                //this.geo.useChannel = 0
+                //this.geo.setAutoRange(false)
+                //this.geo.setDataRange(-10000,10000)
                 decompressed = await this.geo.getBitmap({
                     rasters: [new Uint16Array(decompressed)],
                     width: this.tileSize,
                     height: this.tileSize,
                 });
+                //console.log(decompressed)
                 console.log("deflate")
             } else if (img.compression === 'application/lzw') {
                 decompressed = this.lzw.decodeBlock(data.buffer);

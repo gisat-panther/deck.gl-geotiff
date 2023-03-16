@@ -12,7 +12,8 @@ class CogTerrainLayerExample extends React.Component<{}> {
     console.log("REACT RENDER");
 
     const cogLayer = new CogTerrainLayer({
-      url:'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_DEFLATE.tif'
+      //url:'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_DEFLATE.tif'
+      url: "https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif"
     });
 
     const tileLayer = new TileLayer({

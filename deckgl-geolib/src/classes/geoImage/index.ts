@@ -1,1 +1,1 @@
-export { default } from './GeoImage';
+export { GeoImage } from '../../../../example/src/utilities/geoimage';
