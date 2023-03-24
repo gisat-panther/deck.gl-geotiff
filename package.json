@@ -8,8 +8,7 @@
   ],
   "scripts": {
     "start": "yarn && yarn rollup && yarn example",
-    "example": "yarn workspace example dev",
-    "rollup": "yarn workspace @gisatcz/deckgl-geolib rollup"
+    "example": "yarn workspace example dev"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.0",

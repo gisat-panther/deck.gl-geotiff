@@ -1,8 +1,7 @@
 // import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff';
-import { IGeoImage } from './interface';
 
-class GeoImage implements IGeoImage {
+class GeoImage{
   url = '';
   origin = [0, 0];
   boundingBox = [0, 0, 1, 1] as number[];
@@ -49,7 +48,7 @@ class GeoImage implements IGeoImage {
     this.boundingBox = bbox;
   }
 
-  async getHeightMap(input: any) {
+  async getHeightmap(input: any) {
     let rasters;
     let width: number;
     let height: number;
@@ -77,6 +76,26 @@ class GeoImage implements IGeoImage {
     } else {
       channel = rasters[this.useChannel];
     }
+
+    let temporary = [...channel];
+    channel = new Uint32Array(width*height)
+
+    let j = 0
+    for(let i = 0; i < temporary.length; i+=4){
+      let v = 0
+
+      v += ~~temporary[i] << 0
+      v += ~~temporary[i+1] << 8
+      v += ~~temporary[i+2] << 16
+      v += ~~temporary[i+3] << 24
+
+      channel[j] = ~~v
+
+      j++
+    }
+    
+    //console.log(temporary)
+    //console.log(channel)
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -357,4 +376,4 @@ class GeoImage implements IGeoImage {
     this.alpha = alpha;
   }
 }
-export default GeoImage;
+export { GeoImage }

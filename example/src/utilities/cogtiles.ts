@@ -9,7 +9,7 @@ import LZWDecoder from "./lzw.js" //TODO: remove absolute path
 import { worldToLngLat } from '@math.gl/web-mercator';
 
 //Bitmap styling
-import { GeoImage } from "../../../deckgl-geolib"; //TODO: remove absolute path
+import { GeoImage } from "./geoimage"; //TODO: remove absolute path
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
@@ -28,6 +28,7 @@ class CogTiles {
 
     async initializeCog(url:string) {
         console.log("Initializing CogTiles...")
+        
         this.cog = await CogTiff.create(new SourceUrl(url));
         console.log(this.cog)
 
@@ -37,8 +38,9 @@ class CogTiles {
 
         this.zoomRange = this.getZoomRange(this.cog)
 
+        this.geo.setOpacity(255)
+
         console.log("CogTiles initialized.")
-        
 
         return this.cog
     }
@@ -82,6 +84,7 @@ class CogTiles {
         let ax = EARTH_HALF_CIRCUMFERENCE + img.origin[0];
         let ay = -(EARTH_HALF_CIRCUMFERENCE + (img.origin[1] - EARTH_CIRCUMFERENCE));
         //let mpt = img.resolution[0] * img.tileSize.width;
+        
         let mpt = this.getResolutionFromZoomLevel(img.tileSize.width,this.getZoomLevelFromResolution(img.tileSize.width,img.resolution[0])) * img.tileSize.width
 
         let ox = Math.round(ax / mpt);
@@ -113,11 +116,10 @@ class CogTiles {
     }
 
     async getTile(x: number, y: number, z: number) {
+
         const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
         const img = this.cog.getImageByResolution(wantedMpp);
-
-        console.log(img.id)
-
+        await img.loadGeoTiffTags(2)
         let offset: number[] = [0, 0]
 
         if (z == this.zoomRange[0]) {
@@ -128,13 +130,12 @@ class CogTiles {
         }
         const tilesX = img.tileCount.x;
         const tilesY = img.tileCount.y;
-
         console.log("------OFFSET IS------  " + offset[0] + " ; " + offset[1])
         //console.log(img.compression)
         const ox = offset[0];
         const oy = offset[1];
 
-        console.log("Asking for " + (x - ox) + " : " + (y - oy))
+        console.log("Asking for " + Math.floor(x - ox) + " : " + Math.floor(y - oy))
 
         let decompressed: any;
 
@@ -162,11 +163,15 @@ class CogTiles {
             } else if (img.compression === 'application/deflate') {
                 decompressed = await inflate(data);
                 //console.log(decompressed)
+                //this.geo.useChannel = 0
+                //this.geo.setAutoRange(false)
+                //this.geo.setDataRange(-10000,10000)
                 decompressed = await this.geo.getBitmap({
                     rasters: [new Uint16Array(decompressed)],
                     width: this.tileSize,
                     height: this.tileSize,
                 });
+                //console.log(decompressed)
                 console.log("deflate")
             } else if (img.compression === 'application/lzw') {
                 decompressed = this.lzw.decodeBlock(data.buffer);
@@ -181,9 +186,7 @@ class CogTiles {
             }
         }
 
-        
-
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve(decompressed);
             //reject(console.log('Cannot retrieve tile '));
         });

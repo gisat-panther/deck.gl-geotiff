@@ -1,4 +1,4 @@
-import { LayerProps, CompositeLayer } from '@deck.gl/core'
+import { CompositeLayer } from '@deck.gl/core'
 import { TileLayer } from '@deck.gl/geo-layers'
 import { BitmapLayer } from '@deck.gl/layers';
 import { CogTiles } from '../../utilities/cogtiles';
@@ -14,15 +14,10 @@ let url: string;
 let needsRerender: boolean = false;
 let extent = [0, 0, 0, 0]
 
-interface CogBitmapLayerProps extends LayerProps {
-    url: string,
-    loaded?: boolean;
-}
-
-class CogBitmapLayer extends CompositeLayer {
+class CogBitmapLayer extends CompositeLayer<any> {
     static layerName = 'CogBitmapLayer';
 
-    constructor(props: CogBitmapLayerProps) {
+    constructor(props:any) {
         super(props);
         url = props.url;
 
@@ -59,9 +54,9 @@ class CogBitmapLayer extends CompositeLayer {
         //console.log("LAYER UPDATE STATE")
     }
 
-    shouldUpdateState(status: { props: CogBitmapLayerProps, oldProps: CogBitmapLayerProps }) {
+    shouldUpdateState() {
         //console.log("LAYER SHOULD UPDATE STATE");
-        //currentZoomLevel = Math.round(this.context.deck.viewState.map.zoom);
+
         //console.log(status.oldProps);
         //console.log(status.props);
 
@@ -82,9 +77,9 @@ class CogBitmapLayer extends CompositeLayer {
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
                 return cogTiles.getTile(
-                    tileData.x,
-                    tileData.y,
-                    tileData.z
+                    tileData.index.x,
+                    tileData.index.y,
+                    tileData.index.z
                 );
             },
             //minZoom: minZoom,
@@ -102,7 +97,7 @@ class CogBitmapLayer extends CompositeLayer {
                     data: null,
                     image: props.data,
                     bounds: [west, south, east, north],
-                    opacity: 0.6
+                    opacity: 1//0.6
                 });
             },
         });
