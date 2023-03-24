@@ -82,9 +82,9 @@ class CogBitmapLayer extends CompositeLayer {
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
                 return cogTiles.getTile(
-                    tileData.x,
-                    tileData.y,
-                    tileData.z
+                    tileData.index.x,
+                    tileData.index.y,
+                    tileData.index.z
                 );
             },
             //minZoom: minZoom,

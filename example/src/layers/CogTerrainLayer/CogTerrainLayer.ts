@@ -82,11 +82,12 @@ class CogTerrainLayer extends CompositeLayer {
         //console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
-                //console.log(tileData)
+               //console.log(tileData)
+               
                 return cogTiles.getTile(
-                    tileData.x,
-                    tileData.y,
-                    tileData.z
+                    tileData.index.x,
+                    tileData.index.y,
+                    tileData.index.z
                 );
             },
             //minZoom: minZoom,

@@ -83,6 +83,7 @@ class CogTiles {
         let ax = EARTH_HALF_CIRCUMFERENCE + img.origin[0];
         let ay = -(EARTH_HALF_CIRCUMFERENCE + (img.origin[1] - EARTH_CIRCUMFERENCE));
         //let mpt = img.resolution[0] * img.tileSize.width;
+        
         let mpt = this.getResolutionFromZoomLevel(img.tileSize.width,this.getZoomLevelFromResolution(img.tileSize.width,img.resolution[0])) * img.tileSize.width
 
         let ox = Math.round(ax / mpt);
@@ -114,10 +115,10 @@ class CogTiles {
     }
 
     async getTile(x: number, y: number, z: number) {
+
         const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
         const img = this.cog.getImageByResolution(wantedMpp);
         await img.loadGeoTiffTags(2)
-
         let offset: number[] = [0, 0]
 
         if (z == this.zoomRange[0]) {
@@ -128,13 +129,12 @@ class CogTiles {
         }
         const tilesX = img.tileCount.x;
         const tilesY = img.tileCount.y;
-
         console.log("------OFFSET IS------  " + offset[0] + " ; " + offset[1])
         //console.log(img.compression)
         const ox = offset[0];
         const oy = offset[1];
 
-        console.log("Asking for " + (x - ox) + " : " + (y - oy))
+        console.log("Asking for " + Math.floor(x - ox) + " : " + Math.floor(y - oy))
 
         let decompressed: any;
 
