@@ -28,6 +28,7 @@ class CogTiles {
 
     async initializeCog(url:string) {
         console.log("Initializing CogTiles...")
+        
         this.cog = await CogTiff.create(new SourceUrl(url));
         console.log(this.cog)
 
