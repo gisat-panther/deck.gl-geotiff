@@ -1,4 +1,4 @@
-import { LayerProps, CompositeLayer } from '@deck.gl/core'
+import { CompositeLayer } from '@deck.gl/core'
 import { TileLayer } from '@deck.gl/geo-layers'
 //import { BitmapLayer } from '@deck.gl/layers';
 import { TerrainLayer } from '@deck.gl/geo-layers'
@@ -15,15 +15,10 @@ let url: string;
 let needsRerender: boolean = false;
 let extent = [0, 0, 0, 0]
 
-interface CogTerrainLayerProps extends LayerProps {
-    url: string,
-    loaded?: boolean;
-}
-
-class CogTerrainLayer extends CompositeLayer {
+class CogTerrainLayer extends CompositeLayer<any> {
     static layerName = 'CogTerrainLayer';
 
-    constructor(props: CogTerrainLayerProps) {
+    constructor(props: any) {
         super(props);
         url = props.url;
 
@@ -60,7 +55,7 @@ class CogTerrainLayer extends CompositeLayer {
         //console.log("LAYER UPDATE STATE")
     }
 
-    shouldUpdateState(status: { props: CogTerrainLayerProps, oldProps: CogTerrainLayerProps }) {
+    shouldUpdateState() {
         //console.log("LAYER SHOULD UPDATE STATE");
         //currentZoomLevel = Math.round(this.context.deck.viewState.map.zoom);
         //console.log(status.oldProps);
@@ -70,7 +65,7 @@ class CogTerrainLayer extends CompositeLayer {
         //console.log(status.props)
         //console.log(status.oldProps)
         //}
-
+        
         if (needsRerender == true) {
             needsRerender = false;
             return true;
@@ -83,12 +78,12 @@ class CogTerrainLayer extends CompositeLayer {
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
                //console.log(tileData)
-               
                 return cogTiles.getTile(
                     tileData.index.x,
                     tileData.index.y,
                     tileData.index.z
-                );
+                )
+                
             },
             //minZoom: minZoom,
             maxZoom: maxZoom,
@@ -97,21 +92,21 @@ class CogTerrainLayer extends CompositeLayer {
             //extent: extent,
 
             renderSubLayers: (props: any) => {
-                if (props.data && (props.tile.x != undefined)) {
+                if (props.data && (props.tile.index.x != undefined)) {
                     return new TerrainLayer({
-                        id: ("terrain-" + props.tile.x + "-" + props.tile.y + "-" + props.tile.z),
-                        /*elevationDecoder: {
+                        id: ("terrain-" + props.tile.index.x + "-" + props.tile.index.y + "-" + props.tile.index.z),
+                        elevationDecoder: {
                             rScaler: 1,
                             gScaler: 1,
                             bScaler: 1,
                             offset: 0
-                        },*/
+                        },/*
                         elevationDecoder: {
                             rScaler: 6553.6,
                             gScaler: 25.6,
                             bScaler: 0.1,
                             offset: -10000
-                        },
+                        },*/
                         elevationData: props.data,
                         texture: props.data,
                         bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north],
