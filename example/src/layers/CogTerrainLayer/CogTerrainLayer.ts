@@ -104,13 +104,13 @@ class CogTerrainLayer extends CompositeLayer {
                             gScaler: 1,
                             bScaler: 1,
                             offset: 0
-                        },
+                        },*/
                         elevationDecoder: {
                             rScaler: 6553.6,
                             gScaler: 25.6,
                             bScaler: 0.1,
                             offset: -10000
-                        },*/
+                        },
                         elevationData: props.data,
                         texture: props.data,
                         bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north],

@@ -37,8 +37,9 @@ class CogTiles {
 
         this.zoomRange = this.getZoomRange(this.cog)
 
+        this.geo.setOpacity(255)
+
         console.log("CogTiles initialized.")
-        
 
         return this.cog
     }
@@ -115,8 +116,7 @@ class CogTiles {
     async getTile(x: number, y: number, z: number) {
         const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
         const img = this.cog.getImageByResolution(wantedMpp);
-
-        console.log(img.id)
+        await img.loadGeoTiffTags(2)
 
         let offset: number[] = [0, 0]
 
@@ -184,8 +184,6 @@ class CogTiles {
                 console.log("Unexpected compression method: " + img.compression)
             }
         }
-
-        
 
         return new Promise((resolve, reject) => {
             resolve(decompressed);

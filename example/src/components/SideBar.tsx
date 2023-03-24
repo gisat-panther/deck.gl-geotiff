@@ -11,23 +11,12 @@ const SideBar = () => {
   };
   return (
     <SideNav>
-      <NavLink to="/bitmap-layer-example">Bitmap Layer</NavLink>
-      <NavLink to="/terrain-layer-example">Terrain Layer</NavLink>
       <NavLink to="/cog-bitmap-layer-example">COG Bitmap Layer</NavLink>
       <NavLink to="/cog-terrain-layer-example">COG Terrain Layer</NavLink>
       {
       //<NavLink to="/test-layer-example">Test Layer</NavLink>
       }
       <Divider />
-      <HStack>
-        <p>Opacity</p>
-        <Input
-          type="text"
-          value={opacity}
-          onChange={(e) => setOpacity(e.target.value)}
-        ></Input>
-        <Button onClick={submitOpacity}>Submit</Button>
-      </HStack>
     </SideNav>
   );
 };
