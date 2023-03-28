@@ -76,7 +76,7 @@ class GeoImage{
     } else {
       channel = rasters[this.useChannel];
     }
-
+    /*
     let temporary = [...channel];
     channel = new Uint32Array(width*height)
 
@@ -93,7 +93,7 @@ class GeoImage{
 
       j++
     }
-    
+    */
     //console.log(temporary)
     //console.log(channel)
 
