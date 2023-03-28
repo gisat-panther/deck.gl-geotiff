@@ -162,12 +162,8 @@ class CogTiles {
                 console.log("jpeg")
             } else if (img.compression === 'application/deflate') {
                 decompressed = await inflate(data);
-                //console.log(decompressed)
-                //this.geo.useChannel = 0
-                //this.geo.setAutoRange(false)
-                //this.geo.setDataRange(-10000,10000)
                 decompressed = await this.geo.getBitmap({
-                    rasters: [new Uint16Array(decompressed)],
+                    rasters: [new Float32Array(decompressed)],
                     width: this.tileSize,
                     height: this.tileSize,
                 });

@@ -83,7 +83,6 @@ class CogTerrainLayer extends CompositeLayer<any> {
                     tileData.index.y,
                     tileData.index.z
                 )
-                
             },
             //minZoom: minZoom,
             maxZoom: maxZoom,
