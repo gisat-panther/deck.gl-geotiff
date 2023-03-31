@@ -1,26 +1,57 @@
 // import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff';
 
-class GeoImage{
+interface Props {
+  url?: string,
+  useHeatMap?: boolean,
+  useAutoRange?: boolean,
+  useDataForOpacity?: boolean,
+  rangeMin?: number | null,
+  rangeMax?: number | null,
+  clipLow?: number | null,
+  clipHigh?: number | null,
+  multiplier?: number,
+  color?: [number,number,number],
+  alpha?: number,
+  useChannel?: number | null
+}
+
+enum Type { IMAGE, TERRAIN }
+
+class GeoImage {
   url = '';
-  origin = [0, 0];
-  boundingBox = [0, 0, 1, 1] as number[];
-  data: GeoTIFFImage | undefined;
   useHeatMap = true;
-  useAutoRange = true;
-  useClip = false;
+  useAutoRange = false;
   useDataForOpacity = false;
   rangeMin = 0;
   rangeMax = 255;
-  clipLow = 0;
-  clipHigh = 255;
+  clipLow = null;
+  clipHigh = null;
   multiplier = 1.0;
   color = [255, 0, 255];
   alpha = 150;
+  useChannel = null;
+/*
+  constructor(props: Props) {
+
+    this.url = props.url?
+    this.useHeatMap = props.useHeatMap?
+    this.useAutoRange = props.useAutoRange?
+    this.useDataForOpacity = props.useDataForOpacity?
+    this.rangeMin = props.rangeMin?
+    this.rangeMax = props.rangeMax?
+    this.clipLow = props.clipLow?
+    this.clipHigh = props.clipHigh?
+    this.multiplier = props.multiplier?
+    this.color = props.color?
+    this.alpha = props.alpha?
+    this.useChannel = props.useChannel?
+
+  }
+*/
+  data: GeoTIFFImage | undefined;
   imageWidth = 0;
   imageHeight = 0;
-  options = {};
-  useChannel = -1;
 
   scale = (
     num: number,
@@ -30,26 +61,29 @@ class GeoImage{
     outMax: number,
   ) => ((num - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 
-  getOrigin = () => this.origin;
-
-  getBoundingBox = () => this.boundingBox;
-
   async setUrl(url: string) {
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     const tiff = await fromArrayBuffer(arrayBuffer);
 
     const data = await tiff.getImage(0);
-    const origin = data.getOrigin();
-    const bbox = data.getBoundingBox() as number[];
 
     this.data = data;
-    this.origin = origin;
-    this.boundingBox = bbox;
   }
 
-  async getHeightmap(input: any) {
-    let rasters;
+  async getMap(type: Type, input: string | { width: number, height: number, rasters: any[] }, options?: { opacity?:number }) {
+    switch (type) {
+      case Type.IMAGE:
+        this.getBitmap(input)
+        break
+      case Type.TERRAIN:
+        this.getHeightmap(input)
+        break
+    }
+  }
+
+  async getHeightmap(input: string | { width: number, height: number, rasters: any[] }) {
+    let rasters = [];
     let width: number;
     let height: number;
 
@@ -71,31 +105,11 @@ class GeoImage{
     this.imageHeight = height;
 
     let channel;
-    if (this.useChannel === -1) {
+    if (this.useChannel === null) {
       channel = rasters[0];
     } else {
       channel = rasters[this.useChannel];
     }
-    /*
-    let temporary = [...channel];
-    channel = new Uint32Array(width*height)
-
-    let j = 0
-    for(let i = 0; i < temporary.length; i+=4){
-      let v = 0
-
-      v += ~~temporary[i] << 0
-      v += ~~temporary[i+1] << 8
-      v += ~~temporary[i+2] << 16
-      v += ~~temporary[i+3] << 24
-
-      channel[j] = ~~v
-
-      j++
-    }
-    */
-    //console.log(temporary)
-    //console.log(channel)
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -125,7 +139,7 @@ class GeoImage{
     return imageUrl;
   }
 
-  async getBitmap(input: any) {
+  async getBitmap(input: string | { width: number, height: number, rasters: any[] }) {
     console.time('bitmap-generated-in');
 
     let rasters = [];
@@ -168,8 +182,6 @@ class GeoImage{
     console.log("image width: " + width)
     console.log("channels: " + channels)
     console.log("format: " + rasters[0].length / (width * height))
-    //console.log("rasters: ")
-    //console.log(rasters)
 
     if (channels === 1) {
       if (rasters[0].length / (width * height) === 1) {
@@ -186,7 +198,7 @@ class GeoImage{
           }
           this.rangeMin = lowest;
           this.rangeMax = highest;
-          console.log('data min: ' + this.rangeMin +', max: ' + this.rangeMax);
+          console.log('data min: ' + this.rangeMin + ', max: ' + this.rangeMax);
         }
         // SINGLE CHANNEL
         let ratio = 0;
@@ -206,7 +218,7 @@ class GeoImage{
 
           a = this.alpha;
 
-          if (this.useClip === true && (channel[pixel] < this.clipLow || channel[pixel] > this.clipHigh)) {
+          if (this.clipLow != null && this.clipHigh != null && (channel[pixel] < this.clipLow || channel[pixel] > this.clipHigh)) {
             a = 0;
           }
           if (this.useDataForOpacity) {
@@ -241,7 +253,7 @@ class GeoImage{
         }
       }
     }
-    if (this.useChannel === -1) {
+    if (this.useChannel === null) {
       if (channels === 3) {
         // RGB
         let pixel = 0;
@@ -276,7 +288,7 @@ class GeoImage{
           pixel++;
         }
       }
-    }else{
+    } else {
       if (rasters[this.useChannel].length / (width * height) === 1) {
         const channel = rasters[this.useChannel];
         // AUTO RANGE
@@ -311,7 +323,7 @@ class GeoImage{
 
           a = this.alpha;
 
-          if (this.useClip === true && (channel[pixel] < this.clipLow || channel[pixel] > this.clipHigh)) {
+          if (this.clipLow != null && this.clipHigh != null && (channel[pixel] < this.clipLow || channel[pixel] > this.clipHigh)) {
             a = 0;
           }
           if (this.useDataForOpacity) {
@@ -334,46 +346,6 @@ class GeoImage{
     //console.log('Bitmap generated.');
     return imageUrl;
   }
-
-  setDataOpacity(toggle = true) {
-    this.useDataForOpacity = toggle;
-  }
-
-  setHeatMap(heat = true) {
-    this.useHeatMap = heat;
-  }
-
-  setAutoRange(auto = true) {
-    this.useAutoRange = auto;
-  }
-
-  setDataClip(low = 0, high = 0) {
-    if (low === 0 && high === 0) {
-      this.useClip = false;
-      this.clipLow = low;
-      this.clipHigh = high;
-    } else {
-      this.useClip = true;
-      this.clipLow = low;
-      this.clipHigh = high;
-    }
-  }
-
-  setDataRange(min = 0, max = 255) {
-    this.rangeMin = min;
-    this.rangeMax = max;
-  }
-
-  setMultiplier(n = 1.0) {
-    this.multiplier = n;
-  }
-
-  setColor(r = 255, g = 0, b = 255) {
-    this.color = [r, g, b];
-  }
-
-  setOpacity(alpha = 150) {
-    this.alpha = alpha;
-  }
 }
+
 export { GeoImage }

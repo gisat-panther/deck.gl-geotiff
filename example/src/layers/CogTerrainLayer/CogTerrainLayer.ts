@@ -3,6 +3,7 @@ import { TileLayer } from '@deck.gl/geo-layers'
 //import { BitmapLayer } from '@deck.gl/layers';
 import { TerrainLayer } from '@deck.gl/geo-layers'
 import { CogTiles } from '../../utilities/cogtiles';
+import {TerrainLoader} from "@loaders.gl/terrain"
 
 import { homedir } from 'os';
 
@@ -95,20 +96,16 @@ class CogTerrainLayer extends CompositeLayer<any> {
                     return new TerrainLayer({
                         id: ("terrain-" + props.tile.index.x + "-" + props.tile.index.y + "-" + props.tile.index.z),
                         elevationDecoder: {
-                            rScaler: 1,
-                            gScaler: 1,
-                            bScaler: 1,
-                            offset: 0
-                        },/*
-                        elevationDecoder: {
                             rScaler: 6553.6,
                             gScaler: 25.6,
                             bScaler: 0.1,
                             offset: -10000
-                        },*/
+                        },
                         elevationData: props.data,
                         texture: props.data,
+                        //texture: "https://c.tile.openstreetmap.org/{" + props.tile.index.z + "}/{" + props.tile.index.x + "}/{" + props.tile.index.y + "}.png",
                         bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north],
+                        //meshMaxError:0
                     });
                 }
             },

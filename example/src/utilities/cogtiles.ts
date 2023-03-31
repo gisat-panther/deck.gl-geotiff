@@ -3,7 +3,7 @@ import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import { SourceUrl } from '@chunkd/source-url';
 
 //Image compression support
-import { inflate } from 'pako';
+import { inflate, inflateRaw, ungzip } from 'pako';
 import jpeg from 'jpeg-js';
 import LZWDecoder from "./lzw.js" //TODO: remove absolute path
 import { worldToLngLat } from '@math.gl/web-mercator';
@@ -24,12 +24,24 @@ class CogTiles {
 
     loaded: boolean = false;
     geo: GeoImage = new GeoImage();
+
     lzw: LZWDecoder = new LZWDecoder();
 
     async initializeCog(url:string) {
         console.log("Initializing CogTiles...")
         
         this.cog = await CogTiff.create(new SourceUrl(url));
+
+        this.cog.images.forEach((image) => {
+            image.loadGeoTiffTags(1)
+        })
+
+        this.cog.images[0].tags.forEach((tag) => {
+            //console.log(tag.value.name)
+            console.log(tag.name)
+            console.log(tag.value)
+        })
+
         console.log(this.cog)
 
         this.tileSize = this.getTileSize(this.cog)
@@ -111,7 +123,6 @@ class CogTiles {
         const cartographicPosition = worldToLngLat(cartesianPosition);
         const cartographicPositionAdjusted = [cartographicPosition[0], - cartographicPosition[1]];
 
-        //console.log(cartographicPositionAdjusted);
         return cartographicPositionAdjusted;
     }
 
@@ -119,7 +130,7 @@ class CogTiles {
 
         const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
         const img = this.cog.getImageByResolution(wantedMpp);
-        await img.loadGeoTiffTags(2)
+        //await img.loadGeoTiffTags(1)
         let offset: number[] = [0, 0]
 
         if (z == this.zoomRange[0]) {
@@ -139,12 +150,14 @@ class CogTiles {
 
         let decompressed: any;
 
+        const bitsPerSample = img.tags.get(258)!.value
+        const samplesPerPixel = img.tags.get(277)!.value
+
         if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
             console.log("getting tile: " + [x - ox, y - oy]);
             const tile = await img.getTile((x - ox), (y - oy));
 
             const data = tile!.bytes;
-            //console.log(tile);
             
             if (img.compression === 'image/jpeg') {
                 console.log("decompressing jpeg image...")
@@ -162,8 +175,19 @@ class CogTiles {
                 console.log("jpeg")
             } else if (img.compression === 'application/deflate') {
                 decompressed = await inflate(data);
-                decompressed = await this.geo.getBitmap({
-                    rasters: [new Float32Array(decompressed)],
+                //console.log(decompressed)
+                
+                let buffer = decompressed.buffer
+                //console.log(buffer)
+
+                const f32decompressed = new Float32Array(buffer);
+                //console.log(f32decompressed)
+
+                //this.geo.setAutoRange(false)
+                //this.geo.setDataRange(-50,1000)
+
+                decompressed = await this.geo.getHeightmap({
+                    rasters: [new Float32Array(f32decompressed)],
                     width: this.tileSize,
                     height: this.tileSize,
                 });
