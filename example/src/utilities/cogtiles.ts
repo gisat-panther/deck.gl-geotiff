@@ -50,7 +50,8 @@ class CogTiles {
 
         this.zoomRange = this.getZoomRange(this.cog)
 
-        this.geo.setOpacity(255)
+        console.log("---------------------------------")
+        this.geo.getMap( "image", {width:1,height:1,rasters:[]})
 
         console.log("CogTiles initialized.")
 
@@ -186,21 +187,22 @@ class CogTiles {
                 //this.geo.setAutoRange(false)
                 //this.geo.setDataRange(-50,1000)
 
-                decompressed = await this.geo.getHeightmap({
+                decompressed = await this.geo.getMap( "terrain", {
                     rasters: [new Float32Array(f32decompressed)],
                     width: this.tileSize,
                     height: this.tileSize,
-                });
+                }, {});
                 //console.log(decompressed)
                 console.log("deflate")
             } else if (img.compression === 'application/lzw') {
                 decompressed = this.lzw.decodeBlock(data.buffer);
                 //console.log({ "data type:": "LZW", decompressed });
+                /*
                 decompressed = await this.geo.getBitmap({
                     rasters: [new Uint8Array(decompressed)],
                     width: this.tileSize,
                     height: this.tileSize,
-                });
+                });*/
             } else {
                 console.log("Unexpected compression method: " + img.compression)
             }
