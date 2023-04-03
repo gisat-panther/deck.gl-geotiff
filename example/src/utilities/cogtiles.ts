@@ -43,11 +43,13 @@ class CogTiles {
             image.loadGeoTiffTags(1)
         })
 
+        console.log("---- START OF COG INFO DUMP ----")
         this.cog.images[0].tags.forEach((tag) => {
             //console.log(tag.value.name)
-            console.log(tag.name)
+            console.log(tag.name + ":")
             console.log(tag.value)
         })
+        console.log("---- END OF COG INFO DUMP ----")
 
         console.log(this.cog)
 
