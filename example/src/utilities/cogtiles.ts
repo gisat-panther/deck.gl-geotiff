@@ -3,13 +3,14 @@ import { CogTiff, CogTiffImage } from '@cogeotiff/core';
 import { SourceUrl } from '@chunkd/source-url';
 
 //Image compression support
-import { inflate, inflateRaw, ungzip } from 'pako';
+import { inflate } from 'pako';
 import jpeg from 'jpeg-js';
 import LZWDecoder from "./lzw.js" //TODO: remove absolute path
 import { worldToLngLat } from '@math.gl/web-mercator';
 
 //Bitmap styling
-import { GeoImage } from "./geoimage"; //TODO: remove absolute path
+import { GeoImage, GeoImageOptions } from "./geoimage"; //TODO: remove absolute path
+import { type } from 'os';
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
@@ -17,7 +18,7 @@ const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
 class CogTiles {
 
     cog: CogTiff;
-    zoomRange = [0,0]
+    zoomRange = [0, 0]
     tileSize: number;
     lowestOriginTileOffset = [0, 0];
     lowestOriginTileSize = 0;
@@ -27,9 +28,15 @@ class CogTiles {
 
     lzw: LZWDecoder = new LZWDecoder();
 
-    async initializeCog(url:string) {
+    options: GeoImageOptions
+
+    constructor(options: GeoImageOptions) {
+        this.options = options
+    }
+
+    async initializeCog(url: string) {
         console.log("Initializing CogTiles...")
-        
+
         this.cog = await CogTiff.create(new SourceUrl(url));
 
         this.cog.images.forEach((image) => {
@@ -51,28 +58,27 @@ class CogTiles {
         this.zoomRange = this.getZoomRange(this.cog)
 
         console.log("---------------------------------")
-        this.geo.getMap( "image", {width:1,height:1,rasters:[]})
 
         console.log("CogTiles initialized.")
 
         return this.cog
     }
 
-    getTileSize(cog:CogTiff){
-        return cog.images[cog.images.length-1].tileSize.width
+    getTileSize(cog: CogTiff) {
+        return cog.images[cog.images.length - 1].tileSize.width
     }
 
-    getZoomRange(cog:CogTiff){
+    getZoomRange(cog: CogTiff) {
         const img = this.cog.images[cog.images.length - 1];
 
-        const minZoom = this.getZoomLevelFromResolution(cog.images[cog.images.length-1].tileSize.width, img.resolution[0]);
+        const minZoom = this.getZoomLevelFromResolution(cog.images[cog.images.length - 1].tileSize.width, img.resolution[0]);
         const maxZoom = minZoom + (cog.images.length - 1);
 
         return [minZoom, maxZoom]
     }
 
-    getBoundsAsLatLon(cog:CogTiff){
-        let bbox = cog.images[cog.images.length-1].bbox
+    getBoundsAsLatLon(cog: CogTiff) {
+        let bbox = cog.images[cog.images.length - 1].bbox
 
         console.log(bbox)
 
@@ -81,14 +87,14 @@ class CogTiles {
         let minY = Math.min(bbox[1], bbox[3])
         let maxY = Math.max(bbox[1], bbox[3])
 
-        let minXYDeg = this.getLatLon([minX,minY])
-        let maxXYDeg = this.getLatLon([maxX,maxY])
+        let minXYDeg = this.getLatLon([minX, minY])
+        let maxXYDeg = this.getLatLon([maxX, maxY])
 
-        return [...minXYDeg,...maxXYDeg]
+        return [...minXYDeg, ...maxXYDeg]
     }
 
-    getOriginAsLatLon(cog:CogTiff){
-        let origin = cog.images[cog.images.length-1].origin
+    getOriginAsLatLon(cog: CogTiff) {
+        let origin = cog.images[cog.images.length - 1].origin
         return this.getLatLon(origin)
     }
 
@@ -97,8 +103,8 @@ class CogTiles {
         let ax = EARTH_HALF_CIRCUMFERENCE + img.origin[0];
         let ay = -(EARTH_HALF_CIRCUMFERENCE + (img.origin[1] - EARTH_CIRCUMFERENCE));
         //let mpt = img.resolution[0] * img.tileSize.width;
-        
-        let mpt = this.getResolutionFromZoomLevel(img.tileSize.width,this.getZoomLevelFromResolution(img.tileSize.width,img.resolution[0])) * img.tileSize.width
+
+        let mpt = this.getResolutionFromZoomLevel(img.tileSize.width, this.getZoomLevelFromResolution(img.tileSize.width, img.resolution[0])) * img.tileSize.width
 
         let ox = Math.round(ax / mpt);
         let oy = Math.round(ay / mpt);
@@ -142,70 +148,73 @@ class CogTiles {
         }
         const tilesX = img.tileCount.x;
         const tilesY = img.tileCount.y;
-        console.log("------OFFSET IS------  " + offset[0] + " ; " + offset[1])
-        //console.log(img.compression)
+        //console.log("------OFFSET IS------  " + offset[0] + " ; " + offset[1])
+
         const ox = offset[0];
         const oy = offset[1];
 
-        console.log("Asking for " + Math.floor(x - ox) + " : " + Math.floor(y - oy))
+        //console.log("Asking for " + Math.floor(x - ox) + " : " + Math.floor(y - oy))
 
         let decompressed: any;
 
-        const bitsPerSample = img.tags.get(258)!.value
+        let bitsPerSample = img.tags.get(258)!.value
+        if(Array.isArray(bitsPerSample)){
+            if(this.options.type == "terrain"){
+                let c = 0
+                bitsPerSample.forEach((sample) => {
+                    c+=sample
+                })
+                bitsPerSample = c
+            }else{
+                bitsPerSample = bitsPerSample[0]
+            }
+            
+        }
+
         const samplesPerPixel = img.tags.get(277)!.value
+        //console.log("Samples per pixel:" + samplesPerPixel)
 
         if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
-            console.log("getting tile: " + [x - ox, y - oy]);
+            //console.log("getting tile: " + [x - ox, y - oy]);
             const tile = await img.getTile((x - ox), (y - oy));
 
             const data = tile!.bytes;
-            
-            if (img.compression === 'image/jpeg') {
-                console.log("decompressing jpeg image...")
-                decompressed = jpeg.decode(data, {useTArray:true});
-                /*//not needed for raw images
-                //this.geo.setOpacity(120)
-                //this.geo.useChannel = 2;
-                //this.geo.setDataOpacity(true);
-                decompressed = await this.geo.getBitmap({
-                    rasters: [new Uint8Array(decompressed.data)],
-                    width: this.tileSize,
-                    height: this.tileSize,
-                });
-                */
-                console.log("jpeg")
-            } else if (img.compression === 'application/deflate') {
-                decompressed = await inflate(data);
-                //console.log(decompressed)
-                
-                let buffer = decompressed.buffer
-                //console.log(buffer)
 
-                const f32decompressed = new Float32Array(buffer);
-                //console.log(f32decompressed)
-
-                //this.geo.setAutoRange(false)
-                //this.geo.setDataRange(-50,1000)
-
-                decompressed = await this.geo.getMap( "terrain", {
-                    rasters: [new Float32Array(f32decompressed)],
-                    width: this.tileSize,
-                    height: this.tileSize,
-                }, {});
-                //console.log(decompressed)
-                console.log("deflate")
-            } else if (img.compression === 'application/lzw') {
-                decompressed = this.lzw.decodeBlock(data.buffer);
-                //console.log({ "data type:": "LZW", decompressed });
-                /*
-                decompressed = await this.geo.getBitmap({
-                    rasters: [new Uint8Array(decompressed)],
-                    width: this.tileSize,
-                    height: this.tileSize,
-                });*/
-            } else {
-                console.log("Unexpected compression method: " + img.compression)
+            switch (img.compression) {
+                case 'image/jpeg':
+                    decompressed = jpeg.decode(data, { useTArray: true });
+                    break
+                case 'application/deflate':
+                    decompressed = await inflate(data);
+                    break
+                case 'application/lzw':
+                    decompressed = this.lzw.decodeBlock(data.buffer);
+                    break
+                default:
+                    console.warn("Unexpected compression method: " + img.compression)
             }
+
+            let decompressedFormatted
+
+            switch (bitsPerSample) {
+                case 32:
+                    decompressedFormatted = new Float32Array(decompressed.buffer);
+                    console.log("32BIT FLOAT")
+                    break
+                case 16:
+                    decompressedFormatted = new Uint16Array(decompressed.buffer)
+                    console.log("16BIT INT")
+                    break
+                default:
+                    console.log("8BIT INT")
+                    decompressedFormatted = decompressed
+            }
+
+            decompressed = await this.geo.getMap({
+                rasters: [decompressedFormatted],
+                width: this.tileSize,
+                height: this.tileSize,
+            }, this.options);
         }
 
         return new Promise((resolve) => {

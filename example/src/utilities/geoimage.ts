@@ -1,7 +1,8 @@
 // import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff';
 
-type Options = {
+export type GeoImageOptions = {
+  type: "image" | "terrain",
   useHeatMap?: boolean,
   useAutoRange?: boolean,
   useDataForOpacity?: boolean,
@@ -15,7 +16,8 @@ type Options = {
   alpha?: number,
 }
 
-const defaultOptions:Options = {
+const DefaultGeoImageOptions:GeoImageOptions = {
+  type: "image",
   useHeatMap : true,
   useAutoRange: false,
   useDataForOpacity: false,
@@ -29,11 +31,9 @@ const defaultOptions:Options = {
   useChannel: null
 }
 
-class GeoImage {
+export class GeoImage {
 
   data: GeoTIFFImage | undefined;
-  imageWidth = 0;
-  imageHeight = 0;
 
   scale = (
     num: number,
@@ -53,14 +53,12 @@ class GeoImage {
     this.data = data;
   }
 
-  async getMap(type: "image" | "terrain",
-    input: string | { width: number, height: number, rasters: any[] }, options:Options) {
+  async getMap(input: string | { width: number, height: number, rasters: any[] }, options:GeoImageOptions) {
     
-    options = {...defaultOptions, ...options}
+    options = {...DefaultGeoImageOptions, ...options}
 
-    console.log(options)
 
-    switch (type) {
+    switch (options.type) {
       case "image":
         return this.getBitmap(input, options)
       case "terrain":
@@ -68,7 +66,8 @@ class GeoImage {
     }
   }
 
-  async getHeightmap(input: string | { width: number, height: number, rasters: any[] }, options: Options) {
+  //GetHeightmap uses only "useChannel" and "multiplier" options
+  async getHeightmap(input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
     let rasters = [];
     let width: number;
     let height: number;
@@ -85,9 +84,6 @@ class GeoImage {
       height = input.height;
     }
 
-    this.imageWidth = width;
-    this.imageHeight = height;
-
     let channel;
     if (options.useChannel == null) {
       channel = rasters[0];
@@ -101,6 +97,7 @@ class GeoImage {
     const c = canvas.getContext('2d');
     const imageData = c!.createImageData(width, height);
 
+    let channelCount = channel.length / (width * height)
     let s = width * height * 4;
     let pixel = 0;
 
@@ -112,7 +109,7 @@ class GeoImage {
       imageData.data[i + 2] = ~~(100000 + channel[pixel] * 10) - imageData.data[i] * 65536 - imageData.data[i + 1] * 256;
       imageData.data[i + 3] = 255;
 
-      pixel++;
+      pixel+=channelCount;
     }
 
     //console.timeEnd("heightmap generated in");
@@ -123,7 +120,7 @@ class GeoImage {
     return imageUrl;
   }
 
-  async getBitmap(input: string | { width: number, height: number, rasters: any[] }, options: Options) {
+  async getBitmap(input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
     console.time('bitmap-generated-in');
 
     let rasters = [];
@@ -143,9 +140,6 @@ class GeoImage {
       width = input.width;
       height = input.height;
     }
-
-    this.imageWidth = width;
-    this.imageHeight = height;
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -324,5 +318,3 @@ class GeoImage {
     return imageUrl;
   }
 }
-
-export { GeoImage }

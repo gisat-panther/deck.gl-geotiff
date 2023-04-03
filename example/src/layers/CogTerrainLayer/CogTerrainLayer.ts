@@ -6,32 +6,30 @@ import { CogTiles } from '../../utilities/cogtiles';
 import {TerrainLoader} from "@loaders.gl/terrain"
 
 import { homedir } from 'os';
+import { GeoImageOptions } from 'src/utilities/geoimage';
 
 let cogTiles: CogTiles;
 
 let tileSize: number;
 let minZoom: number;
 let maxZoom: number;
-let url: string;
 let needsRerender: boolean = false;
-let extent = [0, 0, 0, 0]
 
 class CogTerrainLayer extends CompositeLayer<any> {
     static layerName = 'CogTerrainLayer';
 
-    constructor(props: any) {
-        super(props);
-        url = props.url;
+    constructor(url:string, options: GeoImageOptions) {
+        super({});
 
-        cogTiles = new CogTiles()
-        this.init()
+        cogTiles = new CogTiles(options)
+        this.init(url)
     }
 
     async initializeState() {
 
     }
 
-    async init() {
+    async init(url:string) {
         console.log("LAYER INITIALIZE STATE");
 
         const cog = await cogTiles.initializeCog(url)
@@ -43,7 +41,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
 
         console.log(zoomRange)
 
-        extent = cogTiles.getBoundsAsLatLon(cog)
+        let extent = cogTiles.getBoundsAsLatLon(cog)
 
         extent = extent
 
