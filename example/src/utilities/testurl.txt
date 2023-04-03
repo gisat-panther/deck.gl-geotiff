@@ -1,0 +1,16 @@
+Bolivie
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_DEFLATE.tif
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_JPEG.tif
+
+Manila
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_LZW.tif
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_DEFLATE.tif
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_JPEG.tif
+
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif
+
+WSF (globální)
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/WSF/WSF2019_v11_500m_COG_LZW.tif
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/WSF/WSF2019_v11_500m_COG_DEFLATE.tif
+https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/WSF/WSF2019_v11_500m_COG_JPEG.tif

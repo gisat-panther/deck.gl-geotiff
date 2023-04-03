@@ -1,26 +1,39 @@
 // import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff';
 
-class GeoImage{
-  url = '';
-  origin = [0, 0];
-  boundingBox = [0, 0, 1, 1] as number[];
+export type GeoImageOptions = {
+  type: "image" | "terrain",
+  useHeatMap?: boolean,
+  useAutoRange?: boolean,
+  useDataForOpacity?: boolean,
+  useChannel?: number | null,
+  rangeMin?: number,
+  rangeMax?: number,
+  clipLow?: number | null,
+  clipHigh?: number | null,
+  multiplier?: number,
+  color?: [number, number, number],
+  alpha?: number,
+}
+
+const DefaultGeoImageOptions:GeoImageOptions = {
+  type: "image",
+  useHeatMap : true,
+  useAutoRange: false,
+  useDataForOpacity: false,
+  rangeMin: 0,
+  rangeMax: 255,
+  clipLow: null,
+  clipHigh: null,
+  multiplier: 1.0,
+  color: [255, 0, 255],
+  alpha: 255,
+  useChannel: null
+}
+
+export class GeoImage {
+
   data: GeoTIFFImage | undefined;
-  useHeatMap = true;
-  useAutoRange = true;
-  useClip = false;
-  useDataForOpacity = false;
-  rangeMin = 0;
-  rangeMax = 255;
-  clipLow = 0;
-  clipHigh = 255;
-  multiplier = 1.0;
-  color = [255, 0, 255];
-  alpha = 150;
-  imageWidth = 0;
-  imageHeight = 0;
-  options = {};
-  useChannel = -1;
 
   scale = (
     num: number,
@@ -30,34 +43,38 @@ class GeoImage{
     outMax: number,
   ) => ((num - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 
-  getOrigin = () => this.origin;
-
-  getBoundingBox = () => this.boundingBox;
-
   async setUrl(url: string) {
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     const tiff = await fromArrayBuffer(arrayBuffer);
 
     const data = await tiff.getImage(0);
-    const origin = data.getOrigin();
-    const bbox = data.getBoundingBox() as number[];
 
     this.data = data;
-    this.origin = origin;
-    this.boundingBox = bbox;
   }
 
-  async getHeightmap(input: any) {
-    let rasters;
+  async getMap(input: string | { width: number, height: number, rasters: any[] }, options:GeoImageOptions) {
+    
+    options = {...DefaultGeoImageOptions, ...options}
+
+
+    switch (options.type) {
+      case "image":
+        return this.getBitmap(input, options)
+      case "terrain":
+        return this.getHeightmap(input, options)
+    }
+  }
+
+  //GetHeightmap uses only "useChannel" and "multiplier" options
+  async getHeightmap(input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
+    let rasters = [];
     let width: number;
     let height: number;
 
     if (typeof (input) === 'string') {
-      if (input != this.url) {
-        this.url = input;
-        await this.setUrl(input);
-      }
+      await this.setUrl(input);
+
       rasters = (await this.data!.readRasters()) as TypedArray[];
       width = this.data!.getWidth();
       height = this.data!.getHeight();
@@ -67,35 +84,12 @@ class GeoImage{
       height = input.height;
     }
 
-    this.imageWidth = width;
-    this.imageHeight = height;
-
     let channel;
-    if (this.useChannel === -1) {
+    if (options.useChannel == null) {
       channel = rasters[0];
     } else {
-      channel = rasters[this.useChannel];
+      channel = rasters[options.useChannel];
     }
-
-    let temporary = [...channel];
-    channel = new Uint32Array(width*height)
-
-    let j = 0
-    for(let i = 0; i < temporary.length; i+=4){
-      let v = 0
-
-      v += ~~temporary[i] << 0
-      v += ~~temporary[i+1] << 8
-      v += ~~temporary[i+2] << 16
-      v += ~~temporary[i+3] << 24
-
-      channel[j] = ~~v
-
-      j++
-    }
-    
-    //console.log(temporary)
-    //console.log(channel)
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -103,18 +97,19 @@ class GeoImage{
     const c = canvas.getContext('2d');
     const imageData = c!.createImageData(width, height);
 
+    let channelCount = channel.length / (width * height)
     let s = width * height * 4;
     let pixel = 0;
 
     //console.time("heightmap generated in");
     for (let i = 0; i < s; i += 4) {
-      channel[pixel] *= this.multiplier;
+      channel[pixel] *= options.multiplier!;
       imageData.data[i] = ~~((100000 + channel[pixel] * 10) * 0.00001525878);
       imageData.data[i + 1] = ~~((100000 + channel[pixel] * 10) * 0.00390625) - imageData.data[i] * 256;
       imageData.data[i + 2] = ~~(100000 + channel[pixel] * 10) - imageData.data[i] * 65536 - imageData.data[i + 1] * 256;
       imageData.data[i + 3] = 255;
 
-      pixel++;
+      pixel+=channelCount;
     }
 
     //console.timeEnd("heightmap generated in");
@@ -125,7 +120,7 @@ class GeoImage{
     return imageUrl;
   }
 
-  async getBitmap(input: any) {
+  async getBitmap(input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
     console.time('bitmap-generated-in');
 
     let rasters = [];
@@ -134,33 +129,23 @@ class GeoImage{
     let height: number;
 
     if (typeof (input) === 'string') {
-
-      if (input != this.url) {
-        this.url = input;
-        await this.setUrl(input);
-      }
-
+      await this.setUrl(input);
       rasters = (await this.data!.readRasters()) as TypedArray[];
       channels = rasters.length;
       width = this.data!.getWidth();
       height = this.data!.getHeight();
-
     } else {
       rasters = input.rasters;
       channels = rasters.length;
       width = input.width;
       height = input.height;
-
     }
-
-    this.imageWidth = width;
-    this.imageHeight = height;
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const c = canvas.getContext('2d');
-    const imageData = c!.createImageData(width, height);
+    const imageData: ImageData = c!.createImageData(width, height);
 
     let r, g, b, a;
     let s = width * height * 4;
@@ -168,14 +153,12 @@ class GeoImage{
     console.log("image width: " + width)
     console.log("channels: " + channels)
     console.log("format: " + rasters[0].length / (width * height))
-    //console.log("rasters: ")
-    //console.log(rasters)
 
-    if (channels === 1) {
+    if (channels == 1) {
       if (rasters[0].length / (width * height) === 1) {
         const channel = rasters[0];
         // AUTO RANGE
-        if (this.useAutoRange) {
+        if (options.useAutoRange) {
           let highest = Number.MIN_VALUE;
           let lowest = Number.MAX_VALUE;
           let value: number;
@@ -184,33 +167,33 @@ class GeoImage{
             if (value > highest) highest = value;
             if (value < lowest) lowest = value;
           }
-          this.rangeMin = lowest;
-          this.rangeMax = highest;
-          console.log('data min: ' + this.rangeMin +', max: ' + this.rangeMax);
+          options.rangeMin = lowest;
+          options.rangeMax = highest;
+          console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
         }
         // SINGLE CHANNEL
         let ratio = 0;
 
         let pixel = 0;
         for (let i = 0; i < s; i += 4) {
-          if (this.useHeatMap) {
-            ratio = (2 * (channel[pixel] - this.rangeMin)) / (this.rangeMax - this.rangeMin);
-            this.color[2] = 0 > 255 * (1 - ratio) ? 0 : 255 * (1 - ratio);
-            this.color[0] = 0 > 255 * (ratio - 1) ? 0 : 255 * (ratio - 1);
-            this.color[1] = 255 - this.color[2] - this.color[0];
+          if (options.useHeatMap) {
+            ratio = (2 * (channel[pixel] - options.rangeMin!)) / (options.rangeMax! - options.rangeMin!);
+            options.color![2] = 0 > 255 * (1 - ratio) ? 0 : 255 * (1 - ratio);
+            options.color![0] = 0 > 255 * (ratio - 1) ? 0 : 255 * (ratio - 1);
+            options.color![1] = 255 - options.color![2] - options.color![0];
           }
 
-          r = this.color[0];
-          g = this.color[1];
-          b = this.color[2];
+          r = options.color![0];
+          g = options.color![1];
+          b = options.color![2];
 
-          a = this.alpha;
+          a = options.alpha!;
 
-          if (this.useClip === true && (channel[pixel] < this.clipLow || channel[pixel] > this.clipHigh)) {
+          if (options.clipLow != null && options.clipHigh != null && (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)) {
             a = 0;
           }
-          if (this.useDataForOpacity) {
-            a = this.scale(channel[pixel], this.rangeMin, this.rangeMax, 0, 255);
+          if (options.useDataForOpacity) {
+            a = this.scale(channel[pixel], options.rangeMin!, options.rangeMax!, 0, 255);
           }
 
           imageData.data[i] = r;
@@ -228,7 +211,7 @@ class GeoImage{
           imageData.data[i] = rasters[0][pixel++];
           imageData.data[i + 1] = rasters[0][pixel++];
           imageData.data[i + 2] = rasters[0][pixel++];
-          imageData.data[i + 3] = this.alpha;
+          imageData.data[i + 3] = options.alpha!;
         }
       }
       if (rasters[0].length / (width * height) === 4) {
@@ -241,15 +224,15 @@ class GeoImage{
         }
       }
     }
-    if (this.useChannel === -1) {
-      if (channels === 3) {
+    if (options.useChannel == null) {
+      if (channels == 3) {
         // RGB
         let pixel = 0;
         for (let i = 0; i < s; i += 4) {
           r = rasters[0][pixel];
           g = rasters[1][pixel];
           b = rasters[2][pixel];
-          a = this.alpha;
+          a = options.alpha!;
 
           imageData.data[i] = r;
           imageData.data[i + 1] = g;
@@ -259,14 +242,14 @@ class GeoImage{
           pixel++;
         }
       }
-      if (channels === 4) {
+      if (channels == 4) {
         // RGBA
         let pixel = 0;
         for (let i = 0; i < width * height * 4; i += 4) {
           r = rasters[0][pixel];
           g = rasters[1][pixel];
           b = rasters[2][pixel];
-          a = this.alpha;
+          a = options.alpha!;
 
           imageData.data[i] = r;
           imageData.data[i + 1] = g;
@@ -276,11 +259,11 @@ class GeoImage{
           pixel++;
         }
       }
-    }else{
-      if (rasters[this.useChannel].length / (width * height) === 1) {
-        const channel = rasters[this.useChannel];
+    } else {
+      if (rasters[options.useChannel!].length / (width * height) === 1) {
+        const channel = rasters[options.useChannel];
         // AUTO RANGE
-        if (this.useAutoRange) {
+        if (options.useAutoRange) {
           let highest = Number.MIN_VALUE;
           let lowest = Number.MAX_VALUE;
           let value: number;
@@ -289,8 +272,8 @@ class GeoImage{
             if (value > highest) highest = value;
             if (value < lowest) lowest = value;
           }
-          this.rangeMin = lowest;
-          this.rangeMax = highest;
+          options.rangeMin = lowest;
+          options.rangeMax = highest;
           //console.log('data min: ' + this.rangeMin +', max: ' + this.rangeMax);
         }
         // SINGLE CHANNEL
@@ -298,24 +281,24 @@ class GeoImage{
 
         let pixel = 0;
         for (let i = 0; i < s; i += 4) {
-          if (this.useHeatMap) {
-            ratio = (2 * (channel[pixel] - this.rangeMin)) / (this.rangeMax - this.rangeMin);
-            this.color[2] = 0 > 255 * (1 - ratio) ? 0 : 255 * (1 - ratio);
-            this.color[0] = 0 > 255 * (ratio - 1) ? 0 : 255 * (ratio - 1);
-            this.color[1] = 255 - this.color[2] - this.color[0];
+          if (options.useHeatMap) {
+            ratio = (2 * (channel[pixel] - options.rangeMin!)) / (options.rangeMax! - options.rangeMin!);
+            options.color![2] = 0 > 255 * (1 - ratio) ? 0 : 255 * (1 - ratio);
+            options.color![0] = 0 > 255 * (ratio - 1) ? 0 : 255 * (ratio - 1);
+            options.color![1] = 255 - options.color![2] - options.color![0];
           }
 
-          r = this.color[0];
-          g = this.color[1];
-          b = this.color[2];
+          r = options.color![0];
+          g = options.color![1];
+          b = options.color![2];
 
-          a = this.alpha;
+          a = options.alpha!;
 
-          if (this.useClip === true && (channel[pixel] < this.clipLow || channel[pixel] > this.clipHigh)) {
+          if (options.clipLow != null && options.clipHigh != null && (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)) {
             a = 0;
           }
-          if (this.useDataForOpacity) {
-            a = this.scale(channel[pixel], this.rangeMin, this.rangeMax, 0, 255);
+          if (options.useDataForOpacity) {
+            a = this.scale(channel[pixel], options.rangeMin!, options.rangeMax!, 0, 255);
           }
 
           imageData.data[i] = r;
@@ -334,46 +317,4 @@ class GeoImage{
     //console.log('Bitmap generated.');
     return imageUrl;
   }
-
-  setDataOpacity(toggle = true) {
-    this.useDataForOpacity = toggle;
-  }
-
-  setHeatMap(heat = true) {
-    this.useHeatMap = heat;
-  }
-
-  setAutoRange(auto = true) {
-    this.useAutoRange = auto;
-  }
-
-  setDataClip(low = 0, high = 0) {
-    if (low === 0 && high === 0) {
-      this.useClip = false;
-      this.clipLow = low;
-      this.clipHigh = high;
-    } else {
-      this.useClip = true;
-      this.clipLow = low;
-      this.clipHigh = high;
-    }
-  }
-
-  setDataRange(min = 0, max = 255) {
-    this.rangeMin = min;
-    this.rangeMax = max;
-  }
-
-  setMultiplier(n = 1.0) {
-    this.multiplier = n;
-  }
-
-  setColor(r = 255, g = 0, b = 255) {
-    this.color = [r, g, b];
-  }
-
-  setOpacity(alpha = 150) {
-    this.alpha = alpha;
-  }
 }
-export { GeoImage }
