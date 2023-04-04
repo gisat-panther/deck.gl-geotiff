@@ -179,18 +179,17 @@ class CogTiles {
         if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
             //console.log("getting tile: " + [x - ox, y - oy]);
             const tile = await img.getTile((x - ox), (y - oy));
-
-            const data = tile!.bytes;
+            //console.time("Request to data time: ")
 
             switch (img.compression) {
                 case 'image/jpeg':
-                    decompressed = jpeg.decode(data, { useTArray: true });
+                    decompressed = jpeg.decode(tile!.bytes, { useTArray: true });
                     break
                 case 'application/deflate':
-                    decompressed = await inflate(data);
+                    decompressed = await inflate(tile!.bytes);
                     break
                 case 'application/lzw':
-                    decompressed = this.lzw.decodeBlock(data.buffer);
+                    decompressed = this.lzw.decodeBlock(tile!.bytes.buffer);
                     break
                 default:
                     console.warn("Unexpected compression method: " + img.compression)
@@ -220,6 +219,7 @@ class CogTiles {
         }
 
         return new Promise((resolve) => {
+            //console.timeEnd("Request to data time: ")
             resolve(decompressed);
             //reject(console.log('Cannot retrieve tile '));
         });

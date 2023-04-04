@@ -88,7 +88,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
             maxZoom: maxZoom,
             tileSize: tileSize,
             maxRequests: 6,
-            refinementStrategy: 'no-overlap',
+            refinementStrategy: 'best-available',
             //extent: extent,
 
             renderSubLayers: (props: any) => {
@@ -103,18 +103,16 @@ class CogTerrainLayer extends CompositeLayer<any> {
                         },
                         elevationData: props.data,
                         //texture: props.data,
-                        texture: String("https://api.mapbox.com/v4/mapbox.satellite/" + props.tile.index.z + "/" + props.tile.index.x + "/" + props.tile.index.y + ".png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg"),
+                        texture: "https://api.mapbox.com/v4/mapbox.satellite/" + props.tile.index.z + "/" + props.tile.index.x + "/" + props.tile.index.y + ".png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg",
                         bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north],
                         minZoom: minZoom,
                         maxZoom: maxZoom,
                         loadOptions:{
                             terrain:{
                                 skirtHeight:2000,
-                                
                             }
                         },
-                        //meshMaxError:0
-                        
+                        meshMaxError:12
                     });
                 }
             },
