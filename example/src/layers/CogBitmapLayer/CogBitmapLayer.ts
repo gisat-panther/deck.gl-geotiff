@@ -4,32 +4,31 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { CogTiles } from '../../utilities/cogtiles';
 
 import { homedir } from 'os';
+import { GeoImageOptions } from 'src/utilities/geoimage';
 
 let cogTiles: CogTiles;
 
 let tileSize: number;
 let minZoom: number;
 let maxZoom: number;
-let url: string;
 let needsRerender: boolean = false;
 let extent = [0, 0, 0, 0]
 
 class CogBitmapLayer extends CompositeLayer<any> {
     static layerName = 'CogBitmapLayer';
 
-    constructor(props:any) {
-        super(props);
-        url = props.url;
+    constructor(url:string, options:GeoImageOptions) {
+        super({});
 
-        cogTiles = new CogTiles()
-        this.init()
+        cogTiles = new CogTiles(options)
+        this.init(url)
     }
 
     async initializeState() {
 
     }
 
-    async init(){
+    async init(url:string){
         console.log("LAYER INITIALIZE STATE");
 
         const cog = await cogTiles.initializeCog(url)

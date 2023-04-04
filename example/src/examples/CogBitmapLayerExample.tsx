@@ -11,10 +11,10 @@ class CogBitmapLayerExample extends React.Component<{}> {
   render() {
     console.log("REACT RENDER");
 
-    const cogLayer = new CogBitmapLayer({
-      url:'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_DEFLATE.tif'
-      //url:'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif'
-    });
+    const cogLayer = new CogBitmapLayer(
+    'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif',
+    {type:"image", multiplier:1.0, clipLow:Number.MIN_VALUE, clipHigh:Number.MAX_SAFE_INTEGER, alpha:180}
+    )
 
     const tileLayer = new TileLayer({
       data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
