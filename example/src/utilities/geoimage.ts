@@ -150,6 +150,8 @@ export class GeoImage {
     let r, g, b, a;
     let s = width * height * 4;
 
+    //console.log(rasters[0])
+    //console.log("raster 0 length: " + rasters[0].length)
     console.log("image width: " + width)
     console.log("channels: " + channels)
     console.log("format: " + rasters[0].length / (width * height))

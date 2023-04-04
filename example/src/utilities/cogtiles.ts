@@ -208,7 +208,7 @@ class CogTiles {
                     break
                 default:
                     //console.log("8BIT INT")
-                    decompressedFormatted = decompressed
+                    decompressedFormatted = new Uint8Array(decompressed)
             }
 
             decompressed = await this.geo.getMap({

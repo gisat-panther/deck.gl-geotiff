@@ -12,8 +12,8 @@ class CogBitmapLayerExample extends React.Component<{}> {
     console.log("REACT RENDER");
 
     const cogLayer = new CogBitmapLayer(
-    'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
-    {type:"image", useChannel:0, multiplier:1.0, clipLow:Number.MIN_VALUE, clipHigh:Number.MAX_SAFE_INTEGER}
+    'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_LZW.tif',
+    {type:"image", multiplier:1.0, clipLow:Number.MIN_VALUE, clipHigh:Number.MAX_SAFE_INTEGER, alpha:180}
     )
 
     const tileLayer = new TileLayer({
