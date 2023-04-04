@@ -201,14 +201,14 @@ class CogTiles {
             switch (bitsPerSample) {
                 case 32:
                     decompressedFormatted = new Float32Array(decompressed.buffer);
-                    console.log("32BIT FLOAT")
+                    //console.log("32BIT FLOAT")
                     break
                 case 16:
                     decompressedFormatted = new Uint16Array(decompressed.buffer)
-                    console.log("16BIT INT")
+                    //console.log("16BIT INT")
                     break
                 default:
-                    console.log("8BIT INT")
+                    //console.log("8BIT INT")
                     decompressedFormatted = decompressed
             }
 
