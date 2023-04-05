@@ -40,7 +40,7 @@ class CogTiles {
         this.cog = await CogTiff.create(new SourceUrl(url));
 
         this.cog.images.forEach((image) => {
-            image.loadGeoTiffTags(1)
+            image.loadGeoTiffTags()
         })
 
         console.log("---- START OF COG INFO DUMP ----")
@@ -170,11 +170,12 @@ class CogTiles {
             }else{
                 bitsPerSample = bitsPerSample[0]
             }
-            
         }
 
         const samplesPerPixel = img.tags.get(277)!.value
         //console.log("Samples per pixel:" + samplesPerPixel)
+        //console.log("Bits per sample: " + bitsPerSample)
+        //console.log("Single channel pixel format: " + bitsPerSample/)
 
         if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
             //console.log("getting tile: " + [x - ox, y - oy]);
@@ -198,18 +199,26 @@ class CogTiles {
             let decompressedFormatted
             //bitsPerSample = 8
 
-            switch (bitsPerSample) {
-                case 32:
+            switch (this.options.format) {
+                case "FLOAT64":
+                    decompressedFormatted = new Float64Array(decompressed.buffer);
+                    //console.log("64BIT FLOAT")
+                    break
+                case "FLOAT32":
                     decompressedFormatted = new Float32Array(decompressed.buffer);
                     //console.log("32BIT FLOAT")
                     break
-                case 16:
+                case "UINT32":
+                    decompressedFormatted = new Uint32Array(decompressed.buffer);
+                    //console.log("32BIT FLOAT")
+                    break
+                case "UINT16":
                     decompressedFormatted = new Uint16Array(decompressed.buffer)
                     //console.log("16BIT INT")
                     break
-                default:
-                    //console.log("8BIT INT")
+                case "UINT8":
                     decompressedFormatted = new Uint8Array(decompressed)
+                    //console.log("8BIT INT")
             }
 
             //console.log(decompressedFormatted)

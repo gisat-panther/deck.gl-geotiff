@@ -1096,15 +1096,15 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@chunkd/core@^10.0.0":
+  version "10.1.1"
+  resolved "https://registry.yarnpkg.com/@chunkd/core/-/core-10.1.1.tgz#2f7193baba36049507354bbadc2e06717a7cca98"
+  integrity sha512-dd6+7KluZWFAa4Zzj/SQsi0WVu+I8oTlDAEYDzyyY7deYwgrHUnmtciKBL9Owc0kAChbrzzrAbZrZzqaneSStg==
+
 "@chunkd/core@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@chunkd/core/-/core-6.0.0.tgz#b1e3a0692cc0b9e1018d9ceef82e27472b274f5b"
   integrity sha512-3s11Z4c/4GI6a6U7RWeh5R3Wf/kxcQtSCOy1RK/D3ZPWCDoHkiNkTSCtXUodZWkkHmIhvBl5qdOJEpVDt2B+qQ==
-
-"@chunkd/core@^8.0.3":
-  version "8.4.0"
-  resolved "https://registry.yarnpkg.com/@chunkd/core/-/core-8.4.0.tgz#749434f6ae6d8fd95405bb0b33d73ebae6583d79"
-  integrity sha512-ayU+POyD/klSRJVf/x4ePeNnl6o+AFD87gTkqvwCuvh00snaJZGgtO7q8zzErAcDcvLla6mCElHtaQO6kn3dVw==
 
 "@chunkd/source-url@^6.0.0":
   version "6.0.0"
@@ -1114,12 +1114,12 @@
     "@chunkd/core" "^6.0.0"
     node-fetch "^2.6.0"
 
-"@cogeotiff/core@^6.1.1":
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/@cogeotiff/core/-/core-6.1.1.tgz#4d969d4ff2ee64e146417574aa447841c664562a"
-  integrity sha512-4Dph9SVeBiasysud/Nk3iaL8BRFzi7rRJ79EMM37VUJSGsQAD94fk7baipUXhKTMgfq8cgvyVRn4oEcUuSZZzQ==
+"@cogeotiff/core@^7.2.1":
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/@cogeotiff/core/-/core-7.2.1.tgz#96e62532613a5ae46781bb614a8e652b1750cecb"
+  integrity sha512-jA2AvDUFriRNcttMsz8dZxvDw25iNC/iRJWu4ayMIDcY3gJ9jZ1u0AUU9vOSk/o3eIBrMq2aIF17sRZjSIMphw==
   dependencies:
-    "@chunkd/core" "^8.0.3"
+    "@chunkd/core" "^10.0.0"
     ieee754 "^1.1.13"
 
 "@csstools/normalize.css@*":
