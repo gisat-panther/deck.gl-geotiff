@@ -196,6 +196,7 @@ class CogTiles {
             }
 
             let decompressedFormatted
+            //bitsPerSample = 8
 
             switch (bitsPerSample) {
                 case 32:
@@ -210,6 +211,8 @@ class CogTiles {
                     //console.log("8BIT INT")
                     decompressedFormatted = new Uint8Array(decompressed)
             }
+
+            //console.log(decompressedFormatted)
 
             decompressed = await this.geo.getMap({
                 rasters: [decompressedFormatted],
