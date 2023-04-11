@@ -8,8 +8,10 @@ import {TerrainLoader} from "@loaders.gl/terrain"
 import { homedir } from 'os';
 import { GeoImageOptions } from 'src/utilities/geoimage';
 import { noAuto } from '@fortawesome/fontawesome-svg-core';
+import { isCogUrl, isTileServiceUrl } from '../../utilities/tileurls';
 
 let terrainCogTiles: CogTiles;
+let bitmapCogTiles: CogTiles;
 
 let tileSize: number;
 let minZoom: number;
@@ -18,22 +20,35 @@ let needsRerender: boolean = false;
 
 class CogTerrainLayer extends CompositeLayer<any> {
     static layerName = 'CogTerrainLayer';
+    bitmapUrl: string;
 
-    constructor(url:string, options: GeoImageOptions) {
+    constructor(terrainUrl:string, terrainOptions: GeoImageOptions, bitmapUrl?:string, bitmapOptions?: GeoImageOptions) {
         super({});
 
-        terrainCogTiles = new CogTiles(options)
-        this.init(url)
+        if(bitmapUrl){
+            if(isTileServiceUrl(bitmapUrl)){
+                this.bitmapUrl = bitmapUrl
+            }else if ( isCogUrl(bitmapUrl)){
+                bitmapCogTiles = new CogTiles(bitmapOptions!)
+                bitmapCogTiles.initializeCog(bitmapUrl)
+            }else{
+                console.warn("URL needs to point to a valid cog file, or needs to be in the {x}{y}{z} format.")
+            }
+        }
+
+        terrainCogTiles = new CogTiles(terrainOptions)
+        this.init(terrainUrl)
+
     }
 
     async initializeState() {
 
     }
 
-    async init(url:string) {
+    async init(terrainUrl:string) {
         console.log("LAYER INITIALIZE STATE");
 
-        const cog = await terrainCogTiles.initializeCog(url)
+        const cog = await terrainCogTiles.initializeCog(terrainUrl)
         tileSize = terrainCogTiles.getTileSize(cog)
 
         const zoomRange = terrainCogTiles.getZoomRange(cog)
@@ -74,10 +89,16 @@ class CogTerrainLayer extends CompositeLayer<any> {
 
     renderLayers() {
         console.log("LAYER RENDER");
+
+        let bitmapTile
+
         //console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
                //console.log(tileData)
+
+                //if()
+
                 return terrainCogTiles.getTile(
                     tileData.index.x,
                     tileData.index.y,
