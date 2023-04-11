@@ -10,7 +10,6 @@ import { worldToLngLat } from '@math.gl/web-mercator';
 
 //Bitmap styling
 import { GeoImage, GeoImageOptions } from "./geoimage"; //TODO: remove absolute path
-import { type } from 'os';
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
