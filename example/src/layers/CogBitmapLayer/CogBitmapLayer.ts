@@ -3,7 +3,6 @@ import { TileLayer } from '@deck.gl/geo-layers'
 import { BitmapLayer } from '@deck.gl/layers';
 import { CogTiles } from '../../utilities/cogtiles';
 
-import { homedir } from 'os';
 import { GeoImageOptions } from 'src/utilities/geoimage';
 
 let cogTiles: CogTiles;
