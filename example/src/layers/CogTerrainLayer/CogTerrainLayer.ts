@@ -1,13 +1,9 @@
 import { CompositeLayer } from '@deck.gl/core'
 import { TileLayer } from '@deck.gl/geo-layers'
-//import { BitmapLayer } from '@deck.gl/layers';
 import { TerrainLayer } from '@deck.gl/geo-layers'
 import { CogTiles } from '../../utilities/cogtiles';
-import {TerrainLoader} from "@loaders.gl/terrain"
 
-import { homedir } from 'os';
 import { GeoImageOptions } from 'src/utilities/geoimage';
-import { noAuto } from '@fortawesome/fontawesome-svg-core';
 import { getTileUrl, isCogUrl, isTileServiceUrl } from '../../utilities/tileurls';
 
 let terrainCogTiles: CogTiles;
