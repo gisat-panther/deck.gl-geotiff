@@ -93,19 +93,16 @@ class CogTerrainLayer extends CompositeLayer<any> {
 
         //console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
+            zoomOffset:-2,
             getTileData: (tileData: any) => {
-               //console.log(tileData)
-
-                let terrainTile = terrainCogTiles.getTile(tileData.index.x,tileData.index.y,tileData.index.z)
-
-                return terrainTile
+                return terrainCogTiles.getTile(tileData.index.x,tileData.index.y,tileData.index.z)
             },
             minZoom: minZoom,
             maxZoom: maxZoom,
             tileSize: tileSize,
             maxRequests: 6,
             refinementStrategy: 'best-available',
-            //extent: extent,
+            extent: terrainCogTiles.getBoundsAsLatLon(terrainCogTiles.cog),
 
             renderSubLayers: (props: any) => {
                 if (props.data && (props.tile.index.x != undefined)) {
@@ -125,9 +122,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
                             offset: -10000
                         },
                         elevationData: props.data,
-                        //texture: props.data,
                         texture: bitmapTile,
-                        //texture: "https://api.mapbox.com/v4/mapbox.satellite/" + props.tile.index.z + "/" + props.tile.index.x + "/" + props.tile.index.y + ".png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg",
                         bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north],
                         minZoom: minZoom,
                         maxZoom: maxZoom,
