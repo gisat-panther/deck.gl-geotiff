@@ -28,7 +28,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
     }
 
     async init(url:string){
-        console.log("LAYER INITIALIZE STATE");
+        //console.log("LAYER INITIALIZE STATE");
 
         const cog = await cogTiles.initializeCog(url)
         tileSize = cogTiles.getTileSize(cog)
@@ -37,13 +37,13 @@ class CogBitmapLayer extends CompositeLayer<any> {
         minZoom = zoomRange[0]
         maxZoom = zoomRange[1]
 
-        console.log(zoomRange)
+        //console.log(zoomRange)
 
         extent = cogTiles.getBoundsAsLatLon(cog)
 
         extent = extent
 
-        console.log(extent)
+        //console.log(extent)
 
         needsRerender = true;
     }
@@ -70,7 +70,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
     }
 
     renderLayers() {
-        console.log("LAYER RENDER");
+        //console.log("LAYER RENDER");
         //console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
