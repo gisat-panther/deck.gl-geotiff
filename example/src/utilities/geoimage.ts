@@ -128,7 +128,7 @@ export class GeoImage {
   }
 
   async getBitmap(input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
-    console.time('bitmap-generated-in');
+    //console.time('bitmap-generated-in');
 
     let rasters = [];
     let channels: number;
@@ -158,10 +158,11 @@ export class GeoImage {
     let s = width * height * 4;
 
     //console.log(rasters[0])
-    console.log("raster 0 length: " + rasters[0].length)
+    /*console.log("raster 0 length: " + rasters[0].length)
     console.log("image width: " + width)
     console.log("channels: " + channels)
     console.log("format: " + rasters[0].length / (width * height))
+    */
 
     if (options.useChannel == null) {
       if (channels == 1) {
@@ -179,7 +180,7 @@ export class GeoImage {
             }
             options.rangeMin = lowest;
             options.rangeMax = highest;
-            console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
+            //console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
           }
           // SINGLE CHANNEL
           let ratio = 0;
@@ -215,7 +216,7 @@ export class GeoImage {
           }
         }
         if (rasters[0].length / (width * height) == 3) {
-          console.log("geoImage: " + "RGB 1 array of length: " + rasters[0].length);
+          //console.log("geoImage: " + "RGB 1 array of length: " + rasters[0].length);
           let pixel = 0;
           for (let i = 0; i < s; i += 4) {
             imageData.data[i] = rasters[0][pixel++];
@@ -225,7 +226,7 @@ export class GeoImage {
           }
         }
         if (rasters[0].length / (width * height) === 4) {
-          console.log("geoImage: " + "RGBA 1 array");
+          //console.log("geoImage: " + "RGBA 1 array");
           for (let i = 0; i < s; i += 4) {
             imageData.data[i] = rasters[0][i];
             imageData.data[i + 1] = rasters[0][i + 1];
@@ -268,7 +269,6 @@ export class GeoImage {
           pixel++;
         }
 
-        console.log("generated something")
       }
     } else {
       let channel = rasters[0];
@@ -289,7 +289,7 @@ export class GeoImage {
         }
         options.rangeMin = lowest;
         options.rangeMax = highest;
-        console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
+        //console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
       }
       // SINGLE CHANNEL
 
@@ -327,7 +327,7 @@ export class GeoImage {
       }
     }
 
-    console.timeEnd('bitmap-generated-in');
+    //console.timeEnd('bitmap-generated-in');
 
     c!.putImageData(imageData, 0, 0);
     const imageUrl = canvas.toDataURL('image/png');

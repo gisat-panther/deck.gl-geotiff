@@ -9,8 +9,6 @@ import { MapView } from '@deck.gl/core';
 class CogTerrainLayerExample extends React.Component<{}> {
 
   render() {
-    console.log("REACT RENDER");
-
     const cogLayer = new CogTerrainLayer(
       'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
       {type:"terrain", format:"FLOAT32", multiplier:1.0, useChannel:null},

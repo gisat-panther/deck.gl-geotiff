@@ -45,7 +45,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
     }
 
     async init(terrainUrl:string) {
-        console.log("LAYER INITIALIZE STATE");
+        //console.log("LAYER INITIALIZE STATE");
 
         const cog = await terrainCogTiles.initializeCog(terrainUrl)
         tileSize = terrainCogTiles.getTileSize(cog)
@@ -54,13 +54,13 @@ class CogTerrainLayer extends CompositeLayer<any> {
         minZoom = zoomRange[0]
         maxZoom = zoomRange[1]
 
-        console.log(zoomRange)
+        //console.log(zoomRange)
 
         let extent = terrainCogTiles.getBoundsAsLatLon(cog)
 
         extent = extent
 
-        console.log(extent)
+        //console.log(extent)
 
         needsRerender = true;
     }
@@ -87,7 +87,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
     }
 
     renderLayers() {
-        console.log("LAYER RENDER");
+        //console.log("LAYER RENDER");
 
         let bitmapTile:string
 

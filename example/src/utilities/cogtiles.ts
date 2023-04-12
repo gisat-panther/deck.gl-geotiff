@@ -34,7 +34,7 @@ class CogTiles {
     }
 
     async initializeCog(url: string) {
-        console.log("Initializing CogTiles...")
+        //console.log("Initializing CogTiles...")
 
         this.cog = await CogTiff.create(new SourceUrl(url));
 
@@ -42,6 +42,7 @@ class CogTiles {
             image.loadGeoTiffTags()
         })
 
+        /*
         console.log("---- START OF COG INFO DUMP ----")
         this.cog.images[0].tags.forEach((tag) => {
             //console.log(tag.value.name)
@@ -49,18 +50,14 @@ class CogTiles {
             console.log(tag.value)
         })
         console.log("---- END OF COG INFO DUMP ----")
-
-        console.log(this.cog)
+        */
+        //console.log(this.cog)
 
         this.tileSize = this.getTileSize(this.cog)
 
         this.lowestOriginTileOffset = this.getImageTileIndex(this.cog.images[this.cog.images.length - 1])
 
         this.zoomRange = this.getZoomRange(this.cog)
-
-        console.log("---------------------------------")
-
-        console.log("CogTiles initialized.")
 
         return this.cog
     }
@@ -81,7 +78,7 @@ class CogTiles {
     getBoundsAsLatLon(cog: CogTiff) {
         let bbox = cog.images[cog.images.length - 1].bbox
 
-        console.log(bbox)
+        //console.log(bbox)
 
         let minX = Math.min(bbox[0], bbox[2])
         let maxX = Math.max(bbox[0], bbox[2])
@@ -156,7 +153,7 @@ class CogTiles {
 
         //console.log("Asking for " + Math.floor(x - ox) + " : " + Math.floor(y - oy))
 
-        let decompressed: string = "";
+        let decompressed: string;
         let decoded: any
 
         let bitsPerSample = img.tags.get(258)!.value
@@ -172,7 +169,7 @@ class CogTiles {
             }
         }
 
-        const samplesPerPixel = img.tags.get(277)!.value
+        //const samplesPerPixel = img.tags.get(277)!.value
         //console.log("Samples per pixel:" + samplesPerPixel)
         //console.log("Bits per sample: " + bitsPerSample)
         //console.log("Single channel pixel format: " + bitsPerSample/)
@@ -228,9 +225,12 @@ class CogTiles {
                 width: this.tileSize,
                 height: this.tileSize,
             }, this.options);
-        }
 
-        return decompressed
+            //console.log(decompressed.length)
+
+            return decompressed
+        }
+        return false
     }
 
 }
