@@ -24,9 +24,5 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
-    "deflate-js": "^0.2.3",
-    "lzwcompress": "^1.1.0",
-    "proj4": "^2.8.1",
-    "utm": "^1.1.1"
   }
 }

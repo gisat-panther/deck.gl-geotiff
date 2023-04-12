@@ -38,7 +38,7 @@ class CogTiles {
 
         this.cog = await CogTiff.create(new SourceUrl(url));
 
-        this.cog.images.forEach((image) => {
+        this.cog.images.forEach((image:CogTiffImage) => {
             image.loadGeoTiffTags()
         })
 
