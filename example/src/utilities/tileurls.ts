@@ -15,9 +15,8 @@ function isCogUrl(url:string){
 }
 
 function getTileUrl(service:string, x:number, y:number, z:number){
-    service.replace("{x}", String(x))
-    service.replace("{y}", String(y))
-    service.replace("{z}", String(z))
+
+    service = service.replace("{x}", String(x)).replace("{y}", String(y)).replace("{z}", String(z))
 
     return service
 }

@@ -8,7 +8,7 @@ import {TerrainLoader} from "@loaders.gl/terrain"
 import { homedir } from 'os';
 import { GeoImageOptions } from 'src/utilities/geoimage';
 import { noAuto } from '@fortawesome/fontawesome-svg-core';
-import { isCogUrl, isTileServiceUrl } from '../../utilities/tileurls';
+import { getTileUrl, isCogUrl, isTileServiceUrl } from '../../utilities/tileurls';
 
 let terrainCogTiles: CogTiles;
 let bitmapCogTiles: CogTiles;
@@ -21,6 +21,7 @@ let needsRerender: boolean = false;
 class CogTerrainLayer extends CompositeLayer<any> {
     static layerName = 'CogTerrainLayer';
     bitmapUrl: string;
+    urlType : "none" | "tile" | "cog" = "none"
 
     constructor(terrainUrl:string, terrainOptions: GeoImageOptions, bitmapUrl?:string, bitmapOptions?: GeoImageOptions) {
         super({});
@@ -28,9 +29,11 @@ class CogTerrainLayer extends CompositeLayer<any> {
         if(bitmapUrl){
             if(isTileServiceUrl(bitmapUrl)){
                 this.bitmapUrl = bitmapUrl
+                this.urlType = "tile"
             }else if ( isCogUrl(bitmapUrl)){
                 bitmapCogTiles = new CogTiles(bitmapOptions!)
                 bitmapCogTiles.initializeCog(bitmapUrl)
+                this.urlType = "cog"
             }else{
                 console.warn("URL needs to point to a valid cog file, or needs to be in the {x}{y}{z} format.")
             }
@@ -90,20 +93,16 @@ class CogTerrainLayer extends CompositeLayer<any> {
     renderLayers() {
         console.log("LAYER RENDER");
 
-        let bitmapTile
+        let bitmapTile:string
 
         //console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
             getTileData: (tileData: any) => {
                //console.log(tileData)
 
-                //if()
+                let terrainTile = terrainCogTiles.getTile(tileData.index.x,tileData.index.y,tileData.index.z)
 
-                return terrainCogTiles.getTile(
-                    tileData.index.x,
-                    tileData.index.y,
-                    tileData.index.z
-                )
+                return terrainTile
             },
             minZoom: minZoom,
             maxZoom: maxZoom,
@@ -114,6 +113,13 @@ class CogTerrainLayer extends CompositeLayer<any> {
 
             renderSubLayers: (props: any) => {
                 if (props.data && (props.tile.index.x != undefined)) {
+
+                    if(this.urlType == "tile"){
+                        bitmapTile = getTileUrl(this.bitmapUrl, props.tile.index.x, props.tile.index.y, props.tile.index.z)
+                    }else if(this.urlType == "cog"){
+                        bitmapTile = bitmapCogTiles.getTile(props.tile.index.x,props.tile.index.y,props.tile.index.z)
+                    }
+
                     return new TerrainLayer({
                         id: ("terrain-" + props.tile.index.x + "-" + props.tile.index.y + "-" + props.tile.index.z),
                         elevationDecoder: {
@@ -124,7 +130,8 @@ class CogTerrainLayer extends CompositeLayer<any> {
                         },
                         elevationData: props.data,
                         //texture: props.data,
-                        texture: "https://api.mapbox.com/v4/mapbox.satellite/" + props.tile.index.z + "/" + props.tile.index.x + "/" + props.tile.index.y + ".png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg",
+                        texture: bitmapTile,
+                        //texture: "https://api.mapbox.com/v4/mapbox.satellite/" + props.tile.index.z + "/" + props.tile.index.x + "/" + props.tile.index.y + ".png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg",
                         bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north],
                         minZoom: minZoom,
                         maxZoom: maxZoom,

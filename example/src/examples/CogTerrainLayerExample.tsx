@@ -13,7 +13,9 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     const cogLayer = new CogTerrainLayer(
       'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
-      {type:"terrain", format:"FLOAT32", multiplier:1.0, useChannel:null}
+      {type:"terrain", format:"FLOAT32", multiplier:1.0, useChannel:null},
+      'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
+      {type:"image", format:"FLOAT32", multiplier:1.0, rangeMin:-100,rangeMax:1000}
       )
 
     const tileLayer = new TileLayer({

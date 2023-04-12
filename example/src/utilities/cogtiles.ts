@@ -156,7 +156,8 @@ class CogTiles {
 
         //console.log("Asking for " + Math.floor(x - ox) + " : " + Math.floor(y - oy))
 
-        let decompressed: any;
+        let decompressed: string = "";
+        let decoded: any
 
         let bitsPerSample = img.tags.get(258)!.value
         if(Array.isArray(bitsPerSample)){
@@ -183,13 +184,13 @@ class CogTiles {
 
             switch (img.compression) {
                 case 'image/jpeg':
-                    decompressed = jpeg.decode(tile!.bytes, { useTArray: true });
+                    decoded = jpeg.decode(tile!.bytes, { useTArray: true });
                     break
                 case 'application/deflate':
-                    decompressed = await inflate(tile!.bytes);
+                    decoded = await inflate(tile!.bytes);
                     break
                 case 'application/lzw':
-                    decompressed = this.lzw.decodeBlock(tile!.bytes.buffer);
+                    decoded = this.lzw.decodeBlock(tile!.bytes.buffer);
                     break
                 default:
                     console.warn("Unexpected compression method: " + img.compression)
@@ -200,23 +201,23 @@ class CogTiles {
 
             switch (this.options.format) {
                 case "FLOAT64":
-                    decompressedFormatted = new Float64Array(decompressed.buffer);
+                    decompressedFormatted = new Float64Array(decoded.buffer);
                     //console.log("64BIT FLOAT")
                     break
                 case "FLOAT32":
-                    decompressedFormatted = new Float32Array(decompressed.buffer);
+                    decompressedFormatted = new Float32Array(decoded.buffer);
                     //console.log("32BIT FLOAT")
                     break
                 case "UINT32":
-                    decompressedFormatted = new Uint32Array(decompressed.buffer);
-                    //console.log("32BIT FLOAT")
+                    decompressedFormatted = new Uint32Array(decoded.buffer);
+                    //console.log("32BIT INT")
                     break
                 case "UINT16":
-                    decompressedFormatted = new Uint16Array(decompressed.buffer)
+                    decompressedFormatted = new Uint16Array(decoded.buffer)
                     //console.log("16BIT INT")
                     break
                 case "UINT8":
-                    decompressedFormatted = new Uint8Array(decompressed)
+                    decompressedFormatted = new Uint8Array(decoded)
                     //console.log("8BIT INT")
             }
 
@@ -229,11 +230,7 @@ class CogTiles {
             }, this.options);
         }
 
-        return new Promise((resolve) => {
-            //console.timeEnd("Request to data time: ")
-            resolve(decompressed);
-            //reject(console.log('Cannot retrieve tile '));
-        });
+        return decompressed
     }
 
 }
