@@ -31,6 +31,8 @@ class CogTiles {
 
     constructor(options: GeoImageOptions) {
         this.options = options
+
+        //this.testCog()
     }
 
     async initializeCog(url: string) {
@@ -231,6 +233,37 @@ class CogTiles {
             return decompressed
         }
         return false
+    }
+
+    async testCog(){
+        let url = "https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif"
+        this.options = {type:"image", format:"UINT8", multiplier:1.0, useChannel:1, alpha:180, clipLow:1, clipHigh:Number.MAX_VALUE}
+
+        const c = await this.initializeCog(url)
+        const middle_image = c.images[Math.floor(c.images.length/2)]
+
+        console.log(middle_image)
+
+        const image_tile_index = this.getImageTileIndex(middle_image)
+
+        console.log(image_tile_index)
+
+        const x = Math.floor(middle_image.tileCount.x/2)
+        const y = Math.floor(middle_image.tileCount.y/2)
+
+        console.log(c.getTile(x,y,Math.floor(c.images.length/2)))
+
+        const tile_global_x = x + image_tile_index[0]
+        const tile_global_y = y + image_tile_index[1]
+        const tile_global_z = image_tile_index[2]
+
+        const tile = await this.getTile(tile_global_x,tile_global_y,tile_global_z)
+
+        if(tile == false){
+            console.log("couldn't retrieve tile")
+        }else{
+            console.log(tile)
+        }
     }
 
 }
