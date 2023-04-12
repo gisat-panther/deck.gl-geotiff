@@ -80,11 +80,11 @@ class CogBitmapLayer extends CompositeLayer<any> {
                     tileData.index.z
                 );
             },
-            //minZoom: minZoom,
+            minZoom: minZoom,
             maxZoom: maxZoom,
             tileSize: tileSize,
             maxRequests: 6,
-            //extent: extent,
+            extent: cogTiles.getBoundsAsLatLon(cogTiles.cog),
 
             renderSubLayers: (props: any) => {
                 const {
