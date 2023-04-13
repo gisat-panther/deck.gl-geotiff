@@ -7,9 +7,8 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 
 class CogBitmapLayerExample extends React.Component<{}> {
-
   render() {
-    console.log("REACT RENDER");
+    console.log('REACT RENDER');
 
     const cogLayer = new CogBitmapLayer(
     'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif',
@@ -18,22 +17,22 @@ class CogBitmapLayerExample extends React.Component<{}> {
 
     const tileLayer = new TileLayer({
       data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      id: "standard-tile-layer",
+      id: 'standard-tile-layer',
       minZoom: 0,
       maxZoom: 19,
       tileSize: 256,
-  
-      renderSubLayers: props => {
+
+      renderSubLayers: (props) => {
         const {
-          bbox: {west, south, east, north}
+          bbox: { west, south, east, north },
         } = props.tile;
-  
+
         return new BitmapLayer(props, {
           data: null,
           image: props.data,
-          bounds: [west, south, east, north]
+          bounds: [west, south, east, north],
         });
-      }
+      },
     });
 
     const initialViewState: InitialViewStateProps = {
@@ -44,9 +43,9 @@ class CogBitmapLayerExample extends React.Component<{}> {
 
     return (
       <>
-        {(
+        {
           <DeckGL
-            getCursor={() => "inherit"}
+            getCursor={() => 'inherit'}
             initialViewState={initialViewState}
             controller={true}
             layers={[tileLayer, cogLayer]}
@@ -59,9 +58,8 @@ class CogBitmapLayerExample extends React.Component<{}> {
                 width: '100%',
               }),
             ]}
-          >
-          </DeckGL>
-        )}
+          ></DeckGL>
+        }
       </>
     );
   }

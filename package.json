@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "example",
-    "deckgl-geolib"
+    "example"
   ],
   "scripts": {
     "start": "yarn && yarn rollup && yarn example",
