@@ -3,6 +3,7 @@ import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff';
 
 export type GeoImageOptions = {
   type: "image" | "terrain",
+  format: "UINT8" | "UINT16" | "UINT32" | "FLOAT32" | "FLOAT64"
   useHeatMap?: boolean,
   useAutoRange?: boolean,
   useDataForOpacity?: boolean,
@@ -16,9 +17,10 @@ export type GeoImageOptions = {
   alpha?: number,
 }
 
-const DefaultGeoImageOptions:GeoImageOptions = {
+const DefaultGeoImageOptions: GeoImageOptions = {
   type: "image",
-  useHeatMap : true,
+  format: "UINT8",
+  useHeatMap: true,
   useAutoRange: false,
   useDataForOpacity: false,
   rangeMin: 0,
@@ -53,9 +55,9 @@ export class GeoImage {
     this.data = data;
   }
 
-  async getMap(input: string | { width: number, height: number, rasters: any[] }, options:GeoImageOptions) {
-    
-    options = {...DefaultGeoImageOptions, ...options}
+  async getMap(input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
+
+    options = { ...DefaultGeoImageOptions, ...options }
 
 
     switch (options.type) {
@@ -84,11 +86,12 @@ export class GeoImage {
       height = input.height;
     }
 
-    let channel;
-    if (options.useChannel == null) {
-      channel = rasters[0];
-    } else {
-      channel = rasters[options.useChannel];
+    let channel = rasters[0];
+    
+    if(options.useChannel != null){
+      if(rasters[options.useChannel]){
+        channel = rasters[options.useChannel];
+      }
     }
 
     const canvas = document.createElement('canvas');
@@ -99,7 +102,11 @@ export class GeoImage {
 
     let channelCount = channel.length / (width * height)
     let s = width * height * 4;
+    
     let pixel = 0;
+    if(options.useChannel != null){
+      pixel = options.useChannel
+    }
 
     //console.time("heightmap generated in");
     for (let i = 0; i < s; i += 4) {
@@ -109,7 +116,7 @@ export class GeoImage {
       imageData.data[i + 2] = ~~(100000 + channel[pixel] * 10) - imageData.data[i] * 65536 - imageData.data[i + 1] * 256;
       imageData.data[i + 3] = 255;
 
-      pixel+=channelCount;
+      pixel += channelCount;
     }
 
     //console.timeEnd("heightmap generated in");
@@ -121,7 +128,7 @@ export class GeoImage {
   }
 
   async getBitmap(input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
-    console.time('bitmap-generated-in');
+    //console.time('bitmap-generated-in');
 
     let rasters = [];
     let channels: number;
@@ -151,82 +158,83 @@ export class GeoImage {
     let s = width * height * 4;
 
     //console.log(rasters[0])
-    console.log("raster 0 length: " + rasters[0].length)
+    /*console.log("raster 0 length: " + rasters[0].length)
     console.log("image width: " + width)
     console.log("channels: " + channels)
     console.log("format: " + rasters[0].length / (width * height))
+    */
 
-    if (channels == 1) {
-      if (rasters[0].length / (width * height) === 1) {
-        const channel = rasters[0];
-        // AUTO RANGE
-        if (options.useAutoRange) {
-          let highest = Number.MIN_VALUE;
-          let lowest = Number.MAX_VALUE;
-          let value: number;
-          for (let i = 0; i < channel.length; i++) {
-            value = channel[i];
-            if (value > highest) highest = value;
-            if (value < lowest) lowest = value;
-          }
-          options.rangeMin = lowest;
-          options.rangeMax = highest;
-          console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
-        }
-        // SINGLE CHANNEL
-        let ratio = 0;
-
-        let pixel = 0;
-        for (let i = 0; i < s; i += 4) {
-          if (options.useHeatMap) {
-            ratio = (2 * (channel[pixel] - options.rangeMin!)) / (options.rangeMax! - options.rangeMin!);
-            options.color![2] = 0 > 255 * (1 - ratio) ? 0 : 255 * (1 - ratio);
-            options.color![0] = 0 > 255 * (ratio - 1) ? 0 : 255 * (ratio - 1);
-            options.color![1] = 255 - options.color![2] - options.color![0];
-          }
-
-          r = options.color![0];
-          g = options.color![1];
-          b = options.color![2];
-
-          a = options.alpha!;
-
-          if (options.clipLow != null && options.clipHigh != null && (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)) {
-            a = 0;
-          }
-          if (options.useDataForOpacity) {
-            a = this.scale(channel[pixel], options.rangeMin!, options.rangeMax!, 0, 255);
-          }
-
-          imageData.data[i] = r;
-          imageData.data[i + 1] = g;
-          imageData.data[i + 2] = b;
-          imageData.data[i + 3] = a;
-
-          pixel++;
-        }
-      }
-      if (rasters[0].length / (width * height) === 3) {
-        console.log("geoImage: " + "RGB 1 array of length: " + rasters[0].length);
-        let pixel = 0;
-        for (let i = 0; i < s; i += 4) {
-          imageData.data[i] = rasters[0][pixel++];
-          imageData.data[i + 1] = rasters[0][pixel++];
-          imageData.data[i + 2] = rasters[0][pixel++];
-          imageData.data[i + 3] = options.alpha!;
-        }
-      }
-      if (rasters[0].length / (width * height) === 4) {
-        console.log("geoImage: " + "RGBA 1 array");
-        for (let i = 0; i < s; i += 4) {
-          imageData.data[i] = rasters[0][i];
-          imageData.data[i + 1] = rasters[0][i + 1];
-          imageData.data[i + 2] = rasters[0][i + 2];
-          imageData.data[i + 3] = rasters[0][i + 3];
-        }
-      }
-    }
     if (options.useChannel == null) {
+      if (channels == 1) {
+        if (rasters[0].length / (width * height) === 1) {
+          const channel = rasters[0];
+          // AUTO RANGE
+          if (options.useAutoRange) {
+            let highest = Number.MIN_VALUE;
+            let lowest = Number.MAX_VALUE;
+            let value: number;
+            for (let i = 0; i < channel.length; i++) {
+              value = channel[i];
+              if (value > highest) highest = value;
+              if (value < lowest) lowest = value;
+            }
+            options.rangeMin = lowest;
+            options.rangeMax = highest;
+            //console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
+          }
+          // SINGLE CHANNEL
+          let ratio = 0;
+
+          let pixel = 0;
+          for (let i = 0; i < s; i += 4) {
+            if (options.useHeatMap) {
+              ratio = (2 * (channel[pixel] - options.rangeMin!)) / (options.rangeMax! - options.rangeMin!);
+              options.color![2] = 0 > 255 * (1 - ratio) ? 0 : 255 * (1 - ratio);
+              options.color![0] = 0 > 255 * (ratio - 1) ? 0 : 255 * (ratio - 1);
+              options.color![1] = 255 - options.color![2] - options.color![0];
+            }
+
+            r = options.color![0];
+            g = options.color![1];
+            b = options.color![2];
+
+            a = options.alpha!;
+
+            if (options.clipLow != null && options.clipHigh != null && (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)) {
+              a = 0;
+            }
+            if (options.useDataForOpacity) {
+              a = this.scale(channel[pixel], options.rangeMin!, options.rangeMax!, 0, 255);
+            }
+
+            imageData.data[i] = r;
+            imageData.data[i + 1] = g;
+            imageData.data[i + 2] = b;
+            imageData.data[i + 3] = a;
+
+            pixel++;
+          }
+        }
+        if (rasters[0].length / (width * height) == 3) {
+          //console.log("geoImage: " + "RGB 1 array of length: " + rasters[0].length);
+          let pixel = 0;
+          for (let i = 0; i < s; i += 4) {
+            imageData.data[i] = rasters[0][pixel++];
+            imageData.data[i + 1] = rasters[0][pixel++];
+            imageData.data[i + 2] = rasters[0][pixel++];
+            imageData.data[i + 3] = options.alpha!;
+          }
+        }
+        if (rasters[0].length / (width * height) === 4) {
+          //console.log("geoImage: " + "RGBA 1 array");
+          for (let i = 0; i < s; i += 4) {
+            imageData.data[i] = rasters[0][i];
+            imageData.data[i + 1] = rasters[0][i + 1];
+            imageData.data[i + 2] = rasters[0][i + 2];
+            imageData.data[i + 3] = rasters[0][i + 3];
+          }
+        }
+      }
       if (channels == 3) {
         // RGB
         let pixel = 0;
@@ -260,59 +268,66 @@ export class GeoImage {
 
           pixel++;
         }
+
       }
     } else {
-      if (rasters[options.useChannel!].length / (width * height) === 1) {
-        const channel = rasters[options.useChannel];
-        // AUTO RANGE
-        if (options.useAutoRange) {
-          let highest = Number.MIN_VALUE;
-          let lowest = Number.MAX_VALUE;
-          let value: number;
-          for (let i = 0; i < channel.length; i++) {
-            value = channel[i];
-            if (value > highest) highest = value;
-            if (value < lowest) lowest = value;
-          }
-          options.rangeMin = lowest;
-          options.rangeMax = highest;
-          //console.log('data min: ' + this.rangeMin +', max: ' + this.rangeMax);
+      let channel = rasters[0];
+
+      if(rasters[options.useChannel]){
+        channel = rasters[options.useChannel];
+      }
+
+      // AUTO RANGE
+      if (options.useAutoRange) {
+        let highest = Number.MIN_VALUE;
+        let lowest = Number.MAX_VALUE;
+        let value: number;
+        for (let i = 0; i < channel.length; i++) {
+          value = channel[i];
+          if (value > highest) highest = value;
+          if (value < lowest) lowest = value;
         }
-        // SINGLE CHANNEL
-        let ratio = 0;
+        options.rangeMin = lowest;
+        options.rangeMax = highest;
+        //console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
+      }
+      // SINGLE CHANNEL
 
-        let pixel = 0;
-        for (let i = 0; i < s; i += 4) {
-          if (options.useHeatMap) {
-            ratio = (2 * (channel[pixel] - options.rangeMin!)) / (options.rangeMax! - options.rangeMin!);
-            options.color![2] = 0 > 255 * (1 - ratio) ? 0 : 255 * (1 - ratio);
-            options.color![0] = 0 > 255 * (ratio - 1) ? 0 : 255 * (ratio - 1);
-            options.color![1] = 255 - options.color![2] - options.color![0];
-          }
+      let channelCount = channel.length / (width * height)
 
-          r = options.color![0];
-          g = options.color![1];
-          b = options.color![2];
-
-          a = options.alpha!;
-
-          if (options.clipLow != null && options.clipHigh != null && (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)) {
-            a = 0;
-          }
-          if (options.useDataForOpacity) {
-            a = this.scale(channel[pixel], options.rangeMin!, options.rangeMax!, 0, 255);
-          }
-
-          imageData.data[i] = r;
-          imageData.data[i + 1] = g;
-          imageData.data[i + 2] = b;
-          imageData.data[i + 3] = a;
-
-          pixel++;
+      let pixel = options.useChannel;
+      let ratio = 0;
+      for (let i = 0; i < s; i += 4) {
+        if (options.useHeatMap) {
+          ratio = (2 * (channel[pixel] - options.rangeMin!)) / (options.rangeMax! - options.rangeMin!);
+          options.color![2] = 0 > 255 * (1 - ratio) ? 0 : 255 * (1 - ratio);
+          options.color![0] = 0 > 255 * (ratio - 1) ? 0 : 255 * (ratio - 1);
+          options.color![1] = 255 - options.color![2] - options.color![0];
         }
+
+        r = options.color![0];
+        g = options.color![1];
+        b = options.color![2];
+
+        a = options.alpha!;
+
+        if (options.clipLow != null && options.clipHigh != null && (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)) {
+          a = 0;
+        }
+        if (options.useDataForOpacity) {
+          a = this.scale(channel[pixel], options.rangeMin!, options.rangeMax!, 0, 255);
+        }
+
+        imageData.data[i] = r;
+        imageData.data[i + 1] = g;
+        imageData.data[i + 2] = b;
+        imageData.data[i + 3] = a;
+
+        pixel+=channelCount;
       }
     }
-    console.timeEnd('bitmap-generated-in');
+
+    //console.timeEnd('bitmap-generated-in');
 
     c!.putImageData(imageData, 0, 0);
     const imageUrl = canvas.toDataURL('image/png');

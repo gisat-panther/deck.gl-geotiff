@@ -11,19 +11,9 @@ class CogBitmapLayerExample extends React.Component<{}> {
     console.log('REACT RENDER');
 
     const cogLayer = new CogBitmapLayer(
-      // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_JPEG.tif',
-      // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_LZW.tif',
-      // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_DEFLATE.tif',
-
-      'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif',
-      {
-        type: 'image',
-        multiplier: 1.0,
-        clipLow: Number.MIN_VALUE,
-        clipHigh: Number.MAX_SAFE_INTEGER,
-        alpha: 180,
-      },
-    );
+    'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif',
+    {type:"image", format:"UINT8", multiplier:1.0, useChannel:1, alpha:180, clipLow:1, clipHigh:Number.MAX_VALUE}
+    )
 
     const tileLayer = new TileLayer({
       data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -46,10 +36,11 @@ class CogBitmapLayerExample extends React.Component<{}> {
     });
 
     const initialViewState: InitialViewStateProps = {
-      longitude: 120.6,
-      latitude: 14.5,
-      zoom: 4,
+      longitude: 0,
+      latitude: 0,
+      zoom: 1,
     };
+
     return (
       <>
         {

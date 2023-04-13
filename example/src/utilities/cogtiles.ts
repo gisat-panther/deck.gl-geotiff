@@ -10,7 +10,6 @@ import { worldToLngLat } from '@math.gl/web-mercator';
 
 //Bitmap styling
 import { GeoImage, GeoImageOptions } from "./geoimage"; //TODO: remove absolute path
-import { type } from 'os';
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
@@ -32,17 +31,20 @@ class CogTiles {
 
     constructor(options: GeoImageOptions) {
         this.options = options
+
+        //this.testCog()
     }
 
     async initializeCog(url: string) {
-        console.log("Initializing CogTiles...")
+        //console.log("Initializing CogTiles...")
 
         this.cog = await CogTiff.create(new SourceUrl(url));
 
-        this.cog.images.forEach((image) => {
-            image.loadGeoTiffTags(1)
+        this.cog.images.forEach((image:CogTiffImage) => {
+            image.loadGeoTiffTags()
         })
 
+        /*
         console.log("---- START OF COG INFO DUMP ----")
         this.cog.images[0].tags.forEach((tag) => {
             //console.log(tag.value.name)
@@ -50,18 +52,14 @@ class CogTiles {
             console.log(tag.value)
         })
         console.log("---- END OF COG INFO DUMP ----")
-
-        console.log(this.cog)
+        */
+        //console.log(this.cog)
 
         this.tileSize = this.getTileSize(this.cog)
 
         this.lowestOriginTileOffset = this.getImageTileIndex(this.cog.images[this.cog.images.length - 1])
 
         this.zoomRange = this.getZoomRange(this.cog)
-
-        console.log("---------------------------------")
-
-        console.log("CogTiles initialized.")
 
         return this.cog
     }
@@ -82,7 +80,7 @@ class CogTiles {
     getBoundsAsLatLon(cog: CogTiff) {
         let bbox = cog.images[cog.images.length - 1].bbox
 
-        console.log(bbox)
+        //console.log(bbox)
 
         let minX = Math.min(bbox[0], bbox[2])
         let maxX = Math.max(bbox[0], bbox[2])
@@ -157,7 +155,8 @@ class CogTiles {
 
         //console.log("Asking for " + Math.floor(x - ox) + " : " + Math.floor(y - oy))
 
-        let decompressed: any;
+        let decompressed: string;
+        let decoded: any
 
         let bitsPerSample = img.tags.get(258)!.value
         if(Array.isArray(bitsPerSample)){
@@ -170,11 +169,12 @@ class CogTiles {
             }else{
                 bitsPerSample = bitsPerSample[0]
             }
-            
         }
 
-        const samplesPerPixel = img.tags.get(277)!.value
+        //const samplesPerPixel = img.tags.get(277)!.value
         //console.log("Samples per pixel:" + samplesPerPixel)
+        //console.log("Bits per sample: " + bitsPerSample)
+        //console.log("Single channel pixel format: " + bitsPerSample/)
 
         if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
             //console.log("getting tile: " + [x - ox, y - oy]);
@@ -183,13 +183,13 @@ class CogTiles {
 
             switch (img.compression) {
                 case 'image/jpeg':
-                    decompressed = jpeg.decode(tile!.bytes, { useTArray: true });
+                    decoded = jpeg.decode(tile!.bytes, { useTArray: true });
                     break
                 case 'application/deflate':
-                    decompressed = await inflate(tile!.bytes);
+                    decoded = await inflate(tile!.bytes);
                     break
                 case 'application/lzw':
-                    decompressed = this.lzw.decodeBlock(tile!.bytes.buffer);
+                    decoded = this.lzw.decodeBlock(tile!.bytes.buffer);
                     break
                 default:
                     console.warn("Unexpected compression method: " + img.compression)
@@ -198,18 +198,26 @@ class CogTiles {
             let decompressedFormatted
             //bitsPerSample = 8
 
-            switch (bitsPerSample) {
-                case 32:
-                    decompressedFormatted = new Float32Array(decompressed.buffer);
+            switch (this.options.format) {
+                case "FLOAT64":
+                    decompressedFormatted = new Float64Array(decoded.buffer);
+                    //console.log("64BIT FLOAT")
+                    break
+                case "FLOAT32":
+                    decompressedFormatted = new Float32Array(decoded.buffer);
                     //console.log("32BIT FLOAT")
                     break
-                case 16:
-                    decompressedFormatted = new Uint16Array(decompressed.buffer)
+                case "UINT32":
+                    decompressedFormatted = new Uint32Array(decoded.buffer);
+                    //console.log("32BIT INT")
+                    break
+                case "UINT16":
+                    decompressedFormatted = new Uint16Array(decoded.buffer)
                     //console.log("16BIT INT")
                     break
-                default:
+                case "UINT8":
+                    decompressedFormatted = new Uint8Array(decoded)
                     //console.log("8BIT INT")
-                    decompressedFormatted = new Uint8Array(decompressed)
             }
 
             //console.log(decompressedFormatted)
@@ -219,13 +227,43 @@ class CogTiles {
                 width: this.tileSize,
                 height: this.tileSize,
             }, this.options);
-        }
 
-        return new Promise((resolve) => {
-            //console.timeEnd("Request to data time: ")
-            resolve(decompressed);
-            //reject(console.log('Cannot retrieve tile '));
-        });
+            //console.log(decompressed.length)
+
+            return decompressed
+        }
+        return false
+    }
+
+    async testCog(){
+        let url = "https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif"
+        this.options = {type:"image", format:"UINT8", multiplier:1.0, useChannel:1, alpha:180, clipLow:1, clipHigh:Number.MAX_VALUE}
+
+        const c = await this.initializeCog(url)
+        const middle_image = c.images[Math.floor(c.images.length/2)]
+
+        console.log(middle_image)
+
+        const image_tile_index = this.getImageTileIndex(middle_image)
+
+        console.log(image_tile_index)
+
+        const x = Math.floor(middle_image.tileCount.x/2)
+        const y = Math.floor(middle_image.tileCount.y/2)
+
+        console.log(c.getTile(x,y,Math.floor(c.images.length/2)))
+
+        const tile_global_x = x + image_tile_index[0]
+        const tile_global_y = y + image_tile_index[1]
+        const tile_global_z = image_tile_index[2]
+
+        const tile = await this.getTile(tile_global_x,tile_global_y,tile_global_z)
+
+        if(tile == false){
+            console.log("couldn't retrieve tile")
+        }else{
+            console.log(tile)
+        }
     }
 
 }
