@@ -1,7 +1,7 @@
 import { CompositeLayer } from '@deck.gl/core'
 import { TileLayer } from '@deck.gl/geo-layers'
 import { BitmapLayer } from '@deck.gl/layers';
-import { CogTiles } from '../../utilities/cogtiles';
+import { CogTiles } from '../cogtiles/cogtiles';
 
 import { GeoImageOptions } from 'src/utilities/geoimage';
 
@@ -76,7 +76,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
         //console.log("LAYER RENDER");
         //console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
-            id:this.id,
+            id:this.id + "-" + String(performance.now()),
             getTileData: (tileData: any) => {
                 return cogTiles.getTile(
                     tileData.index.x,

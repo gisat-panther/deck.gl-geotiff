@@ -19,6 +19,6 @@
     "baseUrl": ".",
     "strictPropertyInitialization": false
   },
-  "include": ["src"],
+  "include": ["src", "../geoimage/geoimage.ts", "../cogtiles/cogtiles.ts", "../CogTerrainLayer/CogTerrainLayer.ts", "../CogBitmapLayer/CogBitmapLayer.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

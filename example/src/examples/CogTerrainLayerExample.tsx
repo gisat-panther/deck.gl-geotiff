@@ -8,7 +8,7 @@ import {
   _WMSLayer as WMSLayer,
 } from '@deck.gl/geo-layers';
 import { MVTLoader } from '@loaders.gl/mvt';
-import { CogTerrainLayer } from '../layers/CogTerrainLayer/CogTerrainLayer';
+import { CogTerrainLayer } from '../../../CogTerrainLayer/CogTerrainLayer';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
@@ -136,7 +136,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
       latitude: 0,
       zoom: 1,
     };
-
+    /*
     const WMSlayerMapped = new WMSLayer({
       id: 'WMSlayerMapped',
       data: 'https://ows.terrestris.de/osm/service',
@@ -145,14 +145,14 @@ class CogTerrainLayerExample extends React.Component<{}> {
       extensions: [new TerrainExtension()],
       terrainDrawMode: 'drape',
     });
-
+    */
     const WMSlayer = new WMSLayer({
       id: 'WMSlayer',
       data: 'https://ows.terrestris.de/osm/service',
       serviceType: 'wms',
       layers: ['OSM-WMS'],
     });
-
+    /*
     const vectorLayer = new MVTLayer({
       extensions: [new TerrainExtension()],
       terrainDrawMode: 'drape',
@@ -178,7 +178,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
       },
       lineWidthMinPixels: 1,
     });
-
+    */
     return (
       <>
         {
@@ -187,11 +187,12 @@ class CogTerrainLayerExample extends React.Component<{}> {
             initialViewState={initialViewState}
             controller={true}
             layers={[
-              tileLayer,
-              cogLayer,
-              WMSlayerMapped,
+              //tileLayer,
               WMSlayer,
-              vectorLayer,
+              cogLayer,
+              //WMSlayerMapped,
+              
+              //vectorLayer,
             ]}
             views={[
               new MapView({

@@ -9,7 +9,7 @@ import LZWDecoder from "./lzw.js" //TODO: remove absolute path
 import { worldToLngLat } from '@math.gl/web-mercator';
 
 //Bitmap styling
-import { GeoImage, GeoImageOptions } from "./geoimage"; //TODO: remove absolute path
+import { GeoImage, GeoImageOptions } from "../geoimage/geoimage"; //TODO: remove absolute path
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;

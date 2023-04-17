@@ -1,10 +1,10 @@
 import { CompositeLayer } from '@deck.gl/core'
 import { TileLayer } from '@deck.gl/geo-layers'
 import { TerrainLayer } from '@deck.gl/geo-layers'
-import { CogTiles } from '../../utilities/cogtiles';
+import { CogTiles } from '../cogtiles/cogtiles';
 
 import { GeoImageOptions } from 'src/utilities/geoimage';
-import { getTileUrl, isCogUrl, isTileServiceUrl } from '../../utilities/tileurls';
+import { getTileUrl, isCogUrl, isTileServiceUrl } from '../example/src/utilities/tileurls';
 
 let terrainCogTiles: CogTiles;
 let bitmapCogTiles: CogTiles;
@@ -107,7 +107,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
         }
         //console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
-            id:this.id,
+            id:this.id + "-" + String(performance.now()),
             zoomOffset: -1,
             getTileData: (tileData: any) => {
                 return terrainCogTiles.getTile(tileData.index.x, tileData.index.y, tileData.index.z)
