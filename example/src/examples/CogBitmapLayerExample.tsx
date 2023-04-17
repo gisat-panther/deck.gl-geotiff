@@ -11,6 +11,7 @@ class CogBitmapLayerExample extends React.Component<{}> {
     console.log('REACT RENDER');
 
     const cogLayer = new CogBitmapLayer(
+    "CogBitmaapLayer",
     'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif',
     {type:"image", format:"UINT8", multiplier:1.0, useChannel:1, alpha:180, clipLow:1, clipHigh:Number.MAX_VALUE}
     )

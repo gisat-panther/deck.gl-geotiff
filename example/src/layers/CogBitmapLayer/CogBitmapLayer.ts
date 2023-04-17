@@ -16,8 +16,11 @@ let extent = [0, 0, 0, 0]
 class CogBitmapLayer extends CompositeLayer<any> {
     static layerName = 'CogBitmapLayer';
 
-    constructor(url:string, options:GeoImageOptions) {
+    id = ""
+
+    constructor(id:string, url:string, options:GeoImageOptions) {
         super({});
+        this.id = id
 
         cogTiles = new CogTiles(options)
         this.init(url)
@@ -73,6 +76,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
         //console.log("LAYER RENDER");
         //console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
+            id:this.id,
             getTileData: (tileData: any) => {
                 return cogTiles.getTile(
                     tileData.index.x,
