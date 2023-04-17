@@ -1,7 +1,7 @@
 import React from 'react';
 import DeckGL from '@deck.gl/react';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
-import { CogBitmapLayer } from '../../../CogBitmapLayer/CogBitmapLayer';
+import { CogBitmapLayer } from '../../../cogbitmaplayer/CogBitmapLayer';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';

@@ -8,7 +8,7 @@ import {
   _WMSLayer as WMSLayer,
 } from '@deck.gl/geo-layers';
 import { MVTLoader } from '@loaders.gl/mvt';
-import { CogTerrainLayer } from '../../../CogTerrainLayer/CogTerrainLayer';
+import { CogTerrainLayer } from '../../../cogterrainlayer/CogTerrainLayer';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
