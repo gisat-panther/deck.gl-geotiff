@@ -19,8 +19,11 @@ class CogTerrainLayer extends CompositeLayer<any> {
     bitmapUrl: string;
     urlType: "none" | "tile" | "cog" = "none"
 
-    constructor(terrainUrl: string, terrainOptions: GeoImageOptions, bitmapUrl?: string, bitmapOptions?: GeoImageOptions) {
+    id = ""
+
+    constructor(id:string, terrainUrl: string, terrainOptions: GeoImageOptions, bitmapUrl?: string, bitmapOptions?: GeoImageOptions) {
         super({});
+        this.id = id
 
         if (bitmapUrl) {
             if (isTileServiceUrl(bitmapUrl)) {
@@ -104,6 +107,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
         }
         //console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
+            id:this.id,
             zoomOffset: -1,
             getTileData: (tileData: any) => {
                 return terrainCogTiles.getTile(tileData.index.x, tileData.index.y, tileData.index.z)
