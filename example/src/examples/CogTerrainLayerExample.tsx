@@ -96,6 +96,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     /*
     const cogLayer = new CogTerrainLayer(
+      "CogTerrainLayer",
       // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
       'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
       { type: "terrain", format: "FLOAT32", multiplier: 1.0, useChannel: null },
@@ -103,14 +104,14 @@ class CogTerrainLayerExample extends React.Component<{}> {
       { type: "image", format: "FLOAT32", multiplier: 1.0, rangeMin: -100, rangeMax: 1000 }
     )
     */
-
+    
     const cogLayer = new CogTerrainLayer(
       "CogTerrainLayer",
       'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
       { type: "terrain", format: "FLOAT32", multiplier: 1.0, useChannel: null },
       "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg"
     )
-
+    
     const tileLayer = new TileLayer({
       data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
       id: 'standard-tile-layer',
