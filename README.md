@@ -1,5 +1,5 @@
 # 3DFlus - example
-#### An example use of [CogBitmapLayer](./CogBitmapLayer/README.md) and [CogTerrainLayer](./CogBitmapLayer/README.md) for Deck.gl using [GeoImage](./GeoImage/README.md) and [CogTiles](./CogTiles/README.md) libraries
+#### An example use of [CogBitmapLayer](./cogbitmaplayer/README.md) and [CogTerrainLayer](./cogterrainlayer/README.md) for Deck.gl using [GeoImage](./geoimage/README.md) and [CogTiles](./cogtiles/README.md) libraries
 <img src = "/images/ManillaCogHeatmap.png" width = "100%">
 
 ## Usage
