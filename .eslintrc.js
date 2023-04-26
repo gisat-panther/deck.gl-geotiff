@@ -20,7 +20,7 @@ module.exports = {
 
         '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
         'no-empty': 'off',
-        'max-len': [1, { code: 100, comments: 999, ignoreStrings: true, ignoreUrls: true }],
+        'max-len': [1, { code: 80, comments: 999, ignoreStrings: true, ignoreUrls: true }],
         'linebreak-style': 'off',
         'no-plusplus': 'off',
         indent: ['error', 4],

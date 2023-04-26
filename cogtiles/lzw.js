@@ -1,3 +1,5 @@
+/* eslint 'max-len': [1, { code: 100, comments: 999, ignoreStrings: true, ignoreUrls: true }] */
+
 // LITERALLY STOLEN CODE FROM GITHUB
 // NOT MY RESPONSIBILITY
 

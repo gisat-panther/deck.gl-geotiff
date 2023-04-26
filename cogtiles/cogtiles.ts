@@ -1,3 +1,4 @@
+/* eslint 'max-len': [1, { code: 100, comments: 999, ignoreStrings: true, ignoreUrls: true }] */
 // COG loading
 import { CogTiff, CogTiffImage } from '@cogeotiff/core'
 import { SourceUrl } from '@chunkd/source-url'
