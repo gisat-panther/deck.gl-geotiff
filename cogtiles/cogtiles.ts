@@ -56,7 +56,9 @@ class CogTiles {
 
         this.tileSize = this.getTileSize(this.cog)
 
-        this.lowestOriginTileOffset = this.getImageTileIndex(this.cog.images[this.cog.images.length - 1])
+        this.lowestOriginTileOffset = this.getImageTileIndex(
+            this.cog.images[this.cog.images.length - 1]
+        )
 
         this.zoomRange = this.getZoomRange(this.cog)
 
@@ -70,7 +72,10 @@ class CogTiles {
     getZoomRange (cog: CogTiff) {
         const img = this.cog.images[cog.images.length - 1]
 
-        const minZoom = this.getZoomLevelFromResolution(cog.images[cog.images.length - 1].tileSize.width, img.resolution[0])
+        const minZoom = this.getZoomLevelFromResolution(
+            cog.images[cog.images.length - 1].tileSize.width,
+            img.resolution[0]
+        )
         const maxZoom = minZoom + (cog.images.length - 1)
 
         return [minZoom, maxZoom]
@@ -102,7 +107,9 @@ class CogTiles {
         const ay = -(EARTH_HALF_CIRCUMFERENCE + (img.origin[1] - EARTH_CIRCUMFERENCE))
         // let mpt = img.resolution[0] * img.tileSize.width;
 
-        const mpt = this.getResolutionFromZoomLevel(img.tileSize.width, this.getZoomLevelFromResolution(img.tileSize.width, img.resolution[0])) * img.tileSize.width
+        const mpt = img.tileSize.width * this.getResolutionFromZoomLevel(img.tileSize.width,
+            this.getZoomLevelFromResolution(img.tileSize.width,
+                img.resolution[0]))
 
         const ox = Math.round(ax / mpt)
         const oy = Math.round(ay / mpt)
@@ -124,7 +131,10 @@ class CogTiles {
         const ax = EARTH_HALF_CIRCUMFERENCE + input[0]
         const ay = -(EARTH_HALF_CIRCUMFERENCE + (input[1] - EARTH_CIRCUMFERENCE))
 
-        const cartesianPosition = [ax * (512 / EARTH_CIRCUMFERENCE), ay * (512 / EARTH_CIRCUMFERENCE)]
+        const cartesianPosition = [
+            ax * (512 / EARTH_CIRCUMFERENCE),
+            ay * (512 / EARTH_CIRCUMFERENCE)
+        ]
         const cartographicPosition = worldToLngLat(cartesianPosition)
         const cartographicPositionAdjusted = [cartographicPosition[0], -cartographicPosition[1]]
 
@@ -137,11 +147,12 @@ class CogTiles {
         // await img.loadGeoTiffTags(1)
         let offset: number[] = [0, 0]
 
-        if (z == this.zoomRange[0]) {
+        if (z === this.zoomRange[0]) {
             offset = this.lowestOriginTileOffset
         } else {
-            offset[0] = Math.floor(this.lowestOriginTileOffset[0] * Math.pow(2, z - this.zoomRange[0]))
-            offset[1] = Math.floor(this.lowestOriginTileOffset[1] * Math.pow(2, z - this.zoomRange[0]))
+            const power = Math.pow(2, z - this.zoomRange[0])
+            offset[0] = Math.floor(this.lowestOriginTileOffset[0] * power)
+            offset[1] = Math.floor(this.lowestOriginTileOffset[1] * power)
         }
         const tilesX = img.tileCount.x
         const tilesY = img.tileCount.y
@@ -157,7 +168,7 @@ class CogTiles {
 
         let bitsPerSample = img.tags.get(258)!.value
         if (Array.isArray(bitsPerSample)) {
-            if (this.options.type == 'terrain') {
+            if (this.options.type === 'terrain') {
                 let c = 0
                 bitsPerSample.forEach((sample) => {
                     c += sample
@@ -237,26 +248,26 @@ class CogTiles {
         this.options = { type: 'image', format: 'UINT8', multiplier: 1.0, useChannel: 1, alpha: 180, clipLow: 1, clipHigh: Number.MAX_VALUE }
 
         const c = await this.initializeCog(url)
-        const middle_image = c.images[Math.floor(c.images.length / 2)]
+        const middleImage = c.images[Math.floor(c.images.length / 2)]
 
-        console.log(middle_image)
+        console.log(middleImage)
 
-        const image_tile_index = this.getImageTileIndex(middle_image)
+        const imageTileIndex = this.getImageTileIndex(middleImage)
 
-        console.log(image_tile_index)
+        console.log(imageTileIndex)
 
-        const x = Math.floor(middle_image.tileCount.x / 2)
-        const y = Math.floor(middle_image.tileCount.y / 2)
+        const x = Math.floor(middleImage.tileCount.x / 2)
+        const y = Math.floor(middleImage.tileCount.y / 2)
 
         console.log(c.getTile(x, y, Math.floor(c.images.length / 2)))
 
-        const tile_global_x = x + image_tile_index[0]
-        const tile_global_y = y + image_tile_index[1]
-        const tile_global_z = image_tile_index[2]
+        const tileGlobalX = x + imageTileIndex[0]
+        const tileGlobalY = y + imageTileIndex[1]
+        const tileGlobalZ = imageTileIndex[2]
 
-        const tile = await this.getTile(tile_global_x, tile_global_y, tile_global_z)
+        const tile = await this.getTile(tileGlobalX, tileGlobalY, tileGlobalZ)
 
-        if (tile == false) {
+        if (tile === false) {
             console.log("couldn't retrieve tile")
         } else {
             console.log(tile)
