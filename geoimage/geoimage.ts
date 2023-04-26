@@ -1,3 +1,5 @@
+/* eslint 'max-len': [1, { code: 105, comments: 999, ignoreStrings: true, ignoreUrls: true }] */
+
 // import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff'
 
@@ -54,7 +56,13 @@ export class GeoImage {
       this.data = data
   }
 
-  async getMap (input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
+  async getMap (
+      input: string | {
+        width: number,
+        height: number,
+        rasters: any[]
+        },
+      options: GeoImageOptions) {
       options = { ...DefaultGeoImageOptions, ...options }
 
       switch (options.type) {
@@ -66,7 +74,12 @@ export class GeoImage {
   }
 
   // GetHeightmap uses only "useChannel" and "multiplier" options
-  async getHeightmap (input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
+  async getHeightmap (
+      input: string | {
+        width: number,
+        height: number,
+        rasters: any[] },
+      options: GeoImageOptions) {
       let rasters = []
       let width: number
       let height: number
@@ -108,9 +121,11 @@ export class GeoImage {
       // console.time("heightmap generated in");
       for (let i = 0; i < s; i += 4) {
           channel[pixel] *= options.multiplier!
-          imageData.data[i] = ~~((100000 + channel[pixel] * 10) * 0.00001525878)
-          imageData.data[i + 1] = ~~((100000 + channel[pixel] * 10) * 0.00390625) - imageData.data[i] * 256
-          imageData.data[i + 2] = ~~(100000 + channel[pixel] * 10) - imageData.data[i] * 65536 - imageData.data[i + 1] * 256
+          const multiplied = 100000 + channel[pixel] * 10
+
+          imageData.data[i] = ~~(multiplied * 0.00001525878)
+          imageData.data[i + 1] = ~~(multiplied * 0.00390625) - imageData.data[i] * 256
+          imageData.data[i + 2] = ~~multiplied - imageData.data[i] * 65536 - imageData.data[i + 1] * 256
           imageData.data[i + 3] = 255
 
           pixel += channelCount
@@ -124,7 +139,12 @@ export class GeoImage {
     return imageUrl
   }
 
-  async getBitmap (input: string | { width: number, height: number, rasters: any[] }, options: GeoImageOptions) {
+  async getBitmap (
+      input: string | {
+        width: number,
+        height: number,
+        rasters: any[] },
+      options: GeoImageOptions) {
       // console.time('bitmap-generated-in');
 
       let rasters = []
@@ -162,7 +182,7 @@ export class GeoImage {
     */
 
       if (options.useChannel == null) {
-          if (channels == 1) {
+          if (channels === 1) {
               if (rasters[0].length / (width * height) === 1) {
                   const channel = rasters[0]
                   // AUTO RANGE
@@ -185,7 +205,8 @@ export class GeoImage {
                   let pixel = 0
                   for (let i = 0; i < s; i += 4) {
                       if (options.useHeatMap) {
-                          ratio = (2 * (channel[pixel] - options.rangeMin!)) / (options.rangeMax! - options.rangeMin!)
+                          const rangeDelta = options.rangeMax! - options.rangeMin!
+                          ratio = (2 * (channel[pixel] - options.rangeMin!)) / rangeDelta
               options.color![2] = 255 * (1 - ratio) < 0 ? 0 : 255 * (1 - ratio)
               options.color![0] = 255 * (ratio - 1) < 0 ? 0 : 255 * (ratio - 1)
               options.color![1] = 255 - options.color![2] - options.color![0]
@@ -197,7 +218,11 @@ export class GeoImage {
 
                       a = options.alpha!
 
-                      if (options.clipLow != null && options.clipHigh != null && (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)) {
+                      if (
+                          options.clipLow != null &&
+                        options.clipHigh != null &&
+                        (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)
+                      ) {
                           a = 0
                       }
                       if (options.useDataForOpacity) {
@@ -212,7 +237,7 @@ export class GeoImage {
                       pixel++
                   }
               }
-              if (rasters[0].length / (width * height) == 3) {
+              if (rasters[0].length / (width * height) === 3) {
                   // console.log("geoImage: " + "RGB 1 array of length: " + rasters[0].length);
                   let pixel = 0
                   for (let i = 0; i < s; i += 4) {
@@ -232,7 +257,7 @@ export class GeoImage {
                   }
               }
           }
-          if (channels == 3) {
+          if (channels === 3) {
               // RGB
               let pixel = 0
               for (let i = 0; i < s; i += 4) {
@@ -249,7 +274,7 @@ export class GeoImage {
                   pixel++
               }
           }
-          if (channels == 4) {
+          if (channels === 4) {
               // RGBA
               let pixel = 0
               for (let i = 0; i < width * height * 4; i += 4) {
@@ -295,7 +320,8 @@ export class GeoImage {
           let ratio = 0
           for (let i = 0; i < s; i += 4) {
               if (options.useHeatMap) {
-                  ratio = (2 * (channel[pixel] - options.rangeMin!)) / (options.rangeMax! - options.rangeMin!)
+                  const rangeDelta = options.rangeMax! - options.rangeMin!
+                  ratio = (2 * (channel[pixel] - options.rangeMin!)) / rangeDelta
           options.color![2] = 255 * (1 - ratio) < 0 ? 0 : 255 * (1 - ratio)
           options.color![0] = 255 * (ratio - 1) < 0 ? 0 : 255 * (ratio - 1)
           options.color![1] = 255 - options.color![2] - options.color![0]
@@ -307,7 +333,11 @@ export class GeoImage {
 
               a = options.alpha!
 
-              if (options.clipLow != null && options.clipHigh != null && (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)) {
+              if (
+                  options.clipLow != null &&
+                options.clipHigh != null &&
+                (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)
+              ) {
                   a = 0
               }
               if (options.useDataForOpacity) {
