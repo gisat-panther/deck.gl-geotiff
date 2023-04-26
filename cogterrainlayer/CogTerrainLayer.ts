@@ -1,54 +1,59 @@
 import { CompositeLayer } from '@deck.gl/core'
-import { TileLayer } from '@deck.gl/geo-layers'
-import { TerrainLayer } from '@deck.gl/geo-layers'
-import { CogTiles } from '../cogtiles/cogtiles';
+import { TileLayer, TerrainLayer } from '@deck.gl/geo-layers'
 
-import { GeoImageOptions } from 'src/utilities/geoimage';
-import { getTileUrl, isCogUrl, isTileServiceUrl } from '../example/src/utilities/tileurls';
+import { CogTiles } from '../cogtiles/cogtiles'
 
-let terrainCogTiles: CogTiles;
-let bitmapCogTiles: CogTiles;
+import { GeoImageOptions } from 'src/utilities/geoimage'
+import { getTileUrl, isCogUrl, isTileServiceUrl } from '../example/src/utilities/tileurls'
 
-let tileSize: number;
-let minZoom: number;
-let maxZoom: number;
-let needsRerender: boolean = false;
+let terrainCogTiles: CogTiles
+let bitmapCogTiles: CogTiles
+
+let tileSize: number
+let minZoom: number
+let maxZoom: number
+let needsRerender: boolean = false
 
 class CogTerrainLayer extends CompositeLayer<any> {
     static layerName = 'CogTerrainLayer';
     bitmapUrl: string;
-    urlType: "none" | "tile" | "cog" = "none"
+    urlType: 'none' | 'tile' | 'cog' = 'none'
 
-    id = ""
+    id = ''
 
-    constructor(id:string, terrainUrl: string, terrainOptions: GeoImageOptions, bitmapUrl?: string, bitmapOptions?: GeoImageOptions) {
-        super({});
+    constructor (
+        id:string,
+        terrainUrl: string,
+        terrainOptions: GeoImageOptions,
+        bitmapUrl?: string,
+        bitmapOptions?: GeoImageOptions
+    ) {
+        super({})
         this.id = id
 
         if (bitmapUrl) {
             if (isTileServiceUrl(bitmapUrl)) {
                 this.bitmapUrl = bitmapUrl
-                this.urlType = "tile"
+                this.urlType = 'tile'
             } else if (isCogUrl(bitmapUrl)) {
                 bitmapCogTiles = new CogTiles(bitmapOptions!)
                 bitmapCogTiles.initializeCog(bitmapUrl)
-                this.urlType = "cog"
+                this.urlType = 'cog'
             } else {
-                console.warn("URL needs to point to a valid cog file, or needs to be in the {x}{y}{z} format.")
+                console.warn('URL needs to point to a valid cog file, or needs to be in the {x}{y}{z} format.')
             }
         }
 
         terrainCogTiles = new CogTiles(terrainOptions)
         this.init(terrainUrl)
+    }
+
+    async initializeState () {
 
     }
 
-    async initializeState() {
-
-    }
-
-    async init(terrainUrl: string) {
-        //console.log("LAYER INITIALIZE STATE");
+    async init (terrainUrl: string) {
+        // console.log("LAYER INITIALIZE STATE");
 
         const cog = await terrainCogTiles.initializeCog(terrainUrl)
         tileSize = terrainCogTiles.getTileSize(cog)
@@ -57,57 +62,57 @@ class CogTerrainLayer extends CompositeLayer<any> {
         minZoom = zoomRange[0]
         maxZoom = zoomRange[1]
 
-        //console.log(zoomRange)
+        // console.log(zoomRange)
 
         let extent = terrainCogTiles.getBoundsAsLatLon(cog)
 
         extent = extent
 
-        //console.log(extent)
+        // console.log(extent)
 
-        needsRerender = true;
+        needsRerender = true
     }
 
-    updateState() {
-        //console.log("LAYER UPDATE STATE")
+    updateState () {
+        // console.log("LAYER UPDATE STATE")
     }
 
-    shouldUpdateState() {
-        //console.log("LAYER SHOULD UPDATE STATE");
-        //currentZoomLevel = Math.round(this.context.deck.viewState.map.zoom);
-        //console.log(status.oldProps);
-        //console.log(status.props);
+    shouldUpdateState () {
+        // console.log("LAYER SHOULD UPDATE STATE");
+        // currentZoomLevel = Math.round(this.context.deck.viewState.map.zoom);
+        // console.log(status.oldProps);
+        // console.log(status.props);
 
-        //if (status.props != status.oldProps) {
-        //console.log(status.props)
-        //console.log(status.oldProps)
-        //}
+        // if (status.props != status.oldProps) {
+        // console.log(status.props)
+        // console.log(status.oldProps)
+        // }
 
         if (needsRerender == true) {
-            needsRerender = false;
-            return true;
+            needsRerender = false
+            return true
         }
     }
 
-    renderLayers() {
-        //console.log("LAYER RENDER");
+    renderLayers () {
+        // console.log("LAYER RENDER");
 
         let bitmapTile: string
         let zoomOffset = 0
 
         switch (this.urlType) {
-            case "tile":
-                zoomOffset = 0
-                break
-            case "cog":
-                zoomOffset = -2
-                break
-            default:
-                0
+        case 'tile':
+            zoomOffset = 0
+            break
+        case 'cog':
+            zoomOffset = -2
+            break
+        default:
+            0
         }
-        //console.log("is fully loaded: " + loaded);
+        // console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
-            id:this.id + "-" + String(performance.now()),
+            id: this.id + '-' + String(performance.now()),
             zoomOffset: -1,
             getTileData: (tileData: any) => {
                 return terrainCogTiles.getTile(tileData.index.x, tileData.index.y, tileData.index.z)
@@ -121,18 +126,17 @@ class CogTerrainLayer extends CompositeLayer<any> {
 
             renderSubLayers: (props: any) => {
                 if (props.data && (props.tile.index.x != undefined)) {
-
                     switch (this.urlType) {
-                        case "tile":
-                            bitmapTile = getTileUrl(this.bitmapUrl, props.tile.index.x, props.tile.index.y, props.tile.index.z)
-                            break
-                        case "cog":
-                            bitmapTile = bitmapCogTiles.getTile(props.tile.index.x, props.tile.index.y, props.tile.index.z)
-                            break
+                    case 'tile':
+                        bitmapTile = getTileUrl(this.bitmapUrl, props.tile.index.x, props.tile.index.y, props.tile.index.z)
+                        break
+                    case 'cog':
+                        bitmapTile = bitmapCogTiles.getTile(props.tile.index.x, props.tile.index.y, props.tile.index.z)
+                        break
                     }
 
                     return new TerrainLayer({
-                        id: ("terrain-" + props.tile.index.x + "-" + props.tile.index.y + "-" + props.tile.index.z),
+                        id: ('terrain-' + props.tile.index.x + '-' + props.tile.index.y + '-' + props.tile.index.z),
                         elevationDecoder: {
                             rScaler: 6553.6,
                             gScaler: 25.6,
@@ -147,15 +151,15 @@ class CogTerrainLayer extends CompositeLayer<any> {
                         loadOptions: {
                             terrain: {
                                 skirtHeight: 2000,
-                                tesselator: "martini"
+                                tesselator: 'martini'
                             }
                         },
                         meshMaxError: 12
-                    });
+                    })
                 }
-            },
-        });
-        return [layer];
+            }
+        })
+        return [layer]
     }
 }
 
