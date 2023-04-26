@@ -215,7 +215,11 @@ function decompress (input) {
         } else {
             const oldVal = getDictionaryReversed(oldCode)
             if (!oldVal) {
-                throw new Error(`Bogus entry. Not in dictionary, ${oldCode} / ${dictionaryLength}, position: ${position}`)
+                throw new Error(
+                    `Bogus entry. Not in dictionary,
+                 ${oldCode} / ${dictionaryLength},
+                  position: ${position}`
+                )
             }
             appendReversed(result, oldVal)
             result.push(oldVal[oldVal.length - 1])
