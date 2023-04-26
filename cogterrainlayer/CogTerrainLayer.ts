@@ -3,7 +3,7 @@ import { TileLayer, TerrainLayer } from '@deck.gl/geo-layers'
 
 import { CogTiles } from '../cogtiles/cogtiles'
 
-import { GeoImageOptions } from 'src/utilities/geoimage'
+import { GeoImageOptions } from '../geoimage/geoimage'
 import { getTileUrl, isCogUrl, isTileServiceUrl } from '../example/src/utilities/tileurls'
 
 let terrainCogTiles: CogTiles
@@ -64,9 +64,9 @@ class CogTerrainLayer extends CompositeLayer<any> {
 
         // console.log(zoomRange)
 
-        let extent = terrainCogTiles.getBoundsAsLatLon(cog)
+        // const extent = terrainCogTiles.getBoundsAsLatLon(cog)
 
-        extent = extent
+        // extent = extent
 
         // console.log(extent)
 
@@ -88,7 +88,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
         // console.log(status.oldProps)
         // }
 
-        if (needsRerender == true) {
+        if (needsRerender === true) {
             needsRerender = false
             return true
         }
@@ -98,24 +98,27 @@ class CogTerrainLayer extends CompositeLayer<any> {
         // console.log("LAYER RENDER");
 
         let bitmapTile: string
-        let zoomOffset = 0
+        // let zoomOffset = 0
 
         switch (this.urlType) {
         case 'tile':
-            zoomOffset = 0
+            // zoomOffset = 0
             break
         case 'cog':
-            zoomOffset = -2
+            // zoomOffset = -2
             break
         default:
-            0
         }
         // console.log("is fully loaded: " + loaded);
         const layer = new TileLayer({
             id: this.id + '-' + String(performance.now()),
             zoomOffset: -1,
             getTileData: (tileData: any) => {
-                return terrainCogTiles.getTile(tileData.index.x, tileData.index.y, tileData.index.z)
+                return terrainCogTiles.getTile(
+                    tileData.index.x,
+                    tileData.index.y,
+                    tileData.index.z
+                )
             },
             minZoom: minZoom,
             maxZoom: maxZoom,
@@ -125,13 +128,20 @@ class CogTerrainLayer extends CompositeLayer<any> {
             extent: terrainCogTiles.getBoundsAsLatLon(terrainCogTiles.cog),
 
             renderSubLayers: (props: any) => {
-                if (props.data && (props.tile.index.x != undefined)) {
+                if (props.data && (props.tile.index.x !== undefined)) {
                     switch (this.urlType) {
                     case 'tile':
-                        bitmapTile = getTileUrl(this.bitmapUrl, props.tile.index.x, props.tile.index.y, props.tile.index.z)
+                        bitmapTile = getTileUrl(this.bitmapUrl,
+                            props.tile.index.x,
+                            props.tile.index.y,
+                            props.tile.index.z
+                        )
                         break
                     case 'cog':
-                        bitmapTile = bitmapCogTiles.getTile(props.tile.index.x, props.tile.index.y, props.tile.index.z)
+                        bitmapTile = bitmapCogTiles.getTile(props.tile.index.x,
+                            props.tile.index.y,
+                            props.tile.index.z
+                        )
                         break
                     }
 
@@ -145,7 +155,11 @@ class CogTerrainLayer extends CompositeLayer<any> {
                         },
                         elevationData: props.data,
                         texture: bitmapTile,
-                        bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north],
+                        bounds: [props.tile.bbox.west,
+                            props.tile.bbox.south,
+                            props.tile.bbox.east,
+                            props.tile.bbox.north
+                        ],
                         minZoom: minZoom,
                         maxZoom: maxZoom,
                         loadOptions: {
