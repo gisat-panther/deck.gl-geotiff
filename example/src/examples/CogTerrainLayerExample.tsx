@@ -8,7 +8,7 @@ import {
   _WMSLayer as WMSLayer,
 } from '@deck.gl/geo-layers';
 import { MVTLoader } from '@loaders.gl/mvt';
-import { CogTerrainLayer } from '../layers/CogTerrainLayer/CogTerrainLayer';
+import { CogTerrainLayer } from '../../../cogterrainlayer/CogTerrainLayer';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
@@ -96,6 +96,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     /*
     const cogLayer = new CogTerrainLayer(
+      "CogTerrainLayer",
       // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
       'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
       { type: "terrain", format: "FLOAT32", multiplier: 1.0, useChannel: null },
@@ -103,14 +104,14 @@ class CogTerrainLayerExample extends React.Component<{}> {
       { type: "image", format: "FLOAT32", multiplier: 1.0, rangeMin: -100, rangeMax: 1000 }
     )
     */
-
+    
     const cogLayer = new CogTerrainLayer(
       "CogTerrainLayer",
       'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
       { type: "terrain", format: "FLOAT32", multiplier: 1.0, useChannel: null },
       "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg"
     )
-
+    
     const tileLayer = new TileLayer({
       data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
       id: 'standard-tile-layer',
@@ -136,7 +137,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
       latitude: 0,
       zoom: 1,
     };
-
+    /*
     const WMSlayerMapped = new WMSLayer({
       id: 'WMSlayerMapped',
       data: 'https://ows.terrestris.de/osm/service',
@@ -145,14 +146,14 @@ class CogTerrainLayerExample extends React.Component<{}> {
       extensions: [new TerrainExtension()],
       terrainDrawMode: 'drape',
     });
-
+    */
     const WMSlayer = new WMSLayer({
       id: 'WMSlayer',
       data: 'https://ows.terrestris.de/osm/service',
       serviceType: 'wms',
       layers: ['OSM-WMS'],
     });
-
+    /*
     const vectorLayer = new MVTLayer({
       extensions: [new TerrainExtension()],
       terrainDrawMode: 'drape',
@@ -178,7 +179,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
       },
       lineWidthMinPixels: 1,
     });
-
+    */
     return (
       <>
         {
@@ -187,11 +188,12 @@ class CogTerrainLayerExample extends React.Component<{}> {
             initialViewState={initialViewState}
             controller={true}
             layers={[
-              tileLayer,
-              cogLayer,
-              WMSlayerMapped,
+              //tileLayer,
               WMSlayer,
-              vectorLayer,
+              cogLayer,
+              //WMSlayerMapped,
+              
+              //vectorLayer,
             ]}
             views={[
               new MapView({

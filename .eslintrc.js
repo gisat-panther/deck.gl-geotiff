@@ -20,10 +20,10 @@ module.exports = {
 
         '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
         'no-empty': 'off',
-        'max-len': [1, { code: 80, comments: 999 }],
+        'max-len': [1, { code: 80, comments: 999, ignoreStrings: true, ignoreUrls: true }],
         'linebreak-style': 'off',
         'no-plusplus': 'off',
-        indent: ['warn', 4],
+        indent: ['error', 4],
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error'],
         'jsx-a11y/no-static-element-interactions': 'off',
@@ -32,7 +32,6 @@ module.exports = {
         'no-unused-vars': 'warn',
         'no-console': 'off',
         'import/no-named-as-default': 0,
-        '@typescript-eslint/no-explicit-any': 1,
         strict: 'error',
         'padding-line-between-statements': [
             'error',

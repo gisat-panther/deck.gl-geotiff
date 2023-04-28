@@ -1,2 +1,2 @@
-export { CogBitmapLayerExample } from './CogBitmapLayerExample';
-export { CogTerrainLayerExample } from "./CogTerrainLayerExample";
+export { CogBitmapLayerExample } from './CogBitmapLayerExample'
+export { CogTerrainLayerExample } from './CogTerrainLayerExample'

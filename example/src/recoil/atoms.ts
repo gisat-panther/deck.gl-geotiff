@@ -1,11 +1,11 @@
-import { atom } from 'recoil';
+import { atom } from 'recoil'
 
 export const AtomUploaded = atom<string>({
-  key: 'uploaded',
-  default: '',
-});
+    key: 'uploaded',
+    default: ''
+})
 
 export const AtomOpacity = atom<number>({
-  key: 'opacity',
-  default: 255,
-});
+    key: 'opacity',
+    default: 255
+})

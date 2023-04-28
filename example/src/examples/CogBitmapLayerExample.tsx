@@ -1,7 +1,7 @@
 import React from 'react';
 import DeckGL from '@deck.gl/react';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
-import { CogBitmapLayer } from '../layers/CogBitmapLayer/CogBitmapLayer';
+import { CogBitmapLayer } from '../../../cogbitmaplayer/CogBitmapLayer';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
@@ -11,7 +11,7 @@ class CogBitmapLayerExample extends React.Component<{}> {
     console.log('REACT RENDER');
 
     const cogLayer = new CogBitmapLayer(
-    "CogBitmaapLayer",
+    "CogBitmapLayer",
     'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif',
     {type:"image", format:"UINT8", multiplier:1.0, useChannel:1, alpha:180, clipLow:1, clipHigh:Number.MAX_VALUE}
     )
