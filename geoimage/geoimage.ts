@@ -5,7 +5,7 @@ import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff'
 
 export type GeoImageOptions = {
   type: 'image' | 'terrain',
-  format: 'UINT8' | 'UINT16' | 'UINT32' | 'FLOAT32' | 'FLOAT64'
+  format?: 'uint8' | 'uint16' | 'uint32' |'int8' | 'int16' | 'int32' | 'float32' | 'float64'
   useHeatMap?: boolean,
   useAutoRange?: boolean,
   useDataForOpacity?: boolean,
@@ -21,7 +21,7 @@ export type GeoImageOptions = {
 
 const DefaultGeoImageOptions: GeoImageOptions = {
     type: 'image',
-    format: 'UINT8',
+    format: 'uint8',
     useHeatMap: true,
     useAutoRange: false,
     useDataForOpacity: false,

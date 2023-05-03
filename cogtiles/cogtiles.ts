@@ -167,6 +167,11 @@ class CogTiles {
         let decompressed: string
         let decoded: any
 
+        if (!this.options.format) {
+            // More information about TIFF tags: https://www.awaresystems.be/imaging/tiff/tifftags.html
+            this.options.format = this.getFormat(img.tags.get(339).value, img.tags.get(258).value)
+        }
+
         let bitsPerSample = img.tags.get(258)!.value
         if (Array.isArray(bitsPerSample)) {
             if (this.options.type === 'terrain') {
@@ -208,25 +213,22 @@ class CogTiles {
             // bitsPerSample = 8
 
             switch (this.options.format) {
-            case 'FLOAT64':
-                decompressedFormatted = new Float64Array(decoded.buffer)
-                // console.log("64BIT FLOAT")
-                break
-            case 'FLOAT32':
-                decompressedFormatted = new Float32Array(decoded.buffer)
-                // console.log("32BIT FLOAT")
-                break
-            case 'UINT32':
-                decompressedFormatted = new Uint32Array(decoded.buffer)
-                // console.log("32BIT INT")
-                break
-            case 'UINT16':
-                decompressedFormatted = new Uint16Array(decoded.buffer)
-                // console.log("16BIT INT")
-                break
-            case 'UINT8':
-                decompressedFormatted = new Uint8Array(decoded)
-                    // console.log("8BIT INT")
+            case 'uint8':
+                decompressedFormatted = new Uint8Array(decoded.buffer); break
+            case 'uint16':
+                decompressedFormatted = new Uint16Array(decoded.buffer); break
+            case 'uint32':
+                decompressedFormatted = new Uint32Array(decoded.buffer); break
+            case 'int8':
+                decompressedFormatted = new Int8Array(decoded.buffer); break
+            case 'int16':
+                decompressedFormatted = new Int16Array(decoded.buffer); break
+            case 'int32':
+                decompressedFormatted = new Int32Array(decoded.buffer); break
+            case 'float32':
+                decompressedFormatted = new Float32Array(decoded.buffer); break
+            case 'float64':
+                decompressedFormatted = new Float64Array(decoded.buffer); break
             }
 
             // console.log(decompressedFormatted)
@@ -244,9 +246,43 @@ class CogTiles {
         return false
     }
 
+    getFormat (sampleFormat: number[]|number, bitsPerSample:number[]|number) {
+        // TO DO: what if there are different channels formats
+        if (Array.isArray(sampleFormat)) sampleFormat = sampleFormat[0]
+        if (Array.isArray(bitsPerSample)) bitsPerSample = bitsPerSample[0]
+
+        let dataType
+        switch (sampleFormat) {
+        case 1: // Unsigned integer
+            switch (bitsPerSample) {
+            case 8: dataType = 'uint8'; break
+            case 16: dataType = 'uint16'; break
+            case 32: dataType = 'uint32'; break
+            }
+            break
+        case 2: // Signed integer
+            switch (bitsPerSample) {
+            case 8: dataType = 'int8'; break
+            case 16: dataType = 'int16'; break
+            case 32: dataType = 'int32'; break
+            }
+            break
+        case 3: // Floating point
+            switch (bitsPerSample) {
+            case 32: dataType = 'float32'; break
+            case 64: dataType = 'float64'; break
+            }
+            break
+        default:
+            throw new Error('Unknown data format.')
+        }
+        // console.log('Data type is: ', dataType)
+        return dataType
+    }
+
     async testCog () {
         const url = 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif'
-        this.options = { type: 'image', format: 'UINT8', multiplier: 1.0, useChannel: 1, alpha: 180, clipLow: 1, clipHigh: Number.MAX_VALUE }
+        this.options = { type: 'image', multiplier: 1.0, useChannel: 1, alpha: 180, clipLow: 1, clipHigh: Number.MAX_VALUE }
 
         const c = await this.initializeCog(url)
         const middleImage = c.images[Math.floor(c.images.length / 2)]
