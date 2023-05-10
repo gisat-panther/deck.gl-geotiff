@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
+import { readPixelsToArray } from '@luma.gl/core';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
 import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import {
@@ -181,10 +182,35 @@ class CogTerrainLayerExample extends React.Component<{}> {
       lineWidthMinPixels: 1,
     });
     */
+    // const deckRef = useRef();
+    const deckRef = React.createRef()
+    const onHover =
+      event => {
+        const hoveredItems = deckRef?.current?.pickMultipleObjects(event);
+        const item = hoveredItems?.[0]
+        // existuje pouze item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.elevationData z toho by asi šla hodnota dekodovat
+        // item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.image
+        const image =
+          item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.image;
+        if (image) {
+          item.pixelColor = readPixelsToArray(image, {
+            sourceX: event?.bitmap?.pixel?.[0],
+            sourceY: event?.bitmap?.pixel?.[1],
+            sourceWidth: 1,
+            sourceHeight: 1,
+          });
+
+        }
+
+        console.log(item, image, item?.pixelColor);
+
+      }
+
     return (
       <>
         {
           <DeckGL
+            ref={deckRef}
             getCursor={() => 'inherit'}
             initialViewState={initialViewState}
             controller={true}
@@ -193,7 +219,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
               WMSlayer,
               cogLayer,
               //WMSlayerMapped,
-              
+
               //vectorLayer,
             ]}
             views={[
@@ -205,6 +231,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
                 width: '100%',
               }),
             ]}
+            onHover={onHover}
           ></DeckGL>
         }
       </>

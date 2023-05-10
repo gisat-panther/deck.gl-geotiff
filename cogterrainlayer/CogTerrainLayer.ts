@@ -15,8 +15,8 @@ let maxZoom: number
 let needsRerender: boolean = false
 
 class CogTerrainLayer extends CompositeLayer<any> {
-    static layerName = 'CogTerrainLayer';
-    bitmapUrl: string;
+    static layerName = 'CogTerrainLayer'
+    bitmapUrl: string
     urlType: 'none' | 'tile' | 'cog' = 'none'
 
     id = ''
@@ -147,6 +147,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
 
                     return new TerrainLayer({
                         id: ('terrain-' + props.tile.index.x + '-' + props.tile.index.y + '-' + props.tile.index.z),
+                        pickable: true,
                         elevationDecoder: {
                             rScaler: 6553.6,
                             gScaler: 25.6,
