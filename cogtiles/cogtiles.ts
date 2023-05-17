@@ -167,6 +167,8 @@ class CogTiles {
         let decompressed: string
         let decoded: any
 
+        this.options.noDataValue = this.getNoDataValue(img.tags)
+
         if (!this.options.format) {
             // More information about TIFF tags: https://www.awaresystems.be/imaging/tiff/tifftags.html
             this.options.format = this.getFormat(img.tags.get(339).value, img.tags.get(258).value)
@@ -278,6 +280,18 @@ class CogTiles {
         }
         // console.log('Data type is: ', dataType)
         return dataType
+    }
+
+    getNoDataValue (tags) {
+        if (tags.has(42113)) {
+            const noDataValue = tags.get(42113).value
+            if (typeof noDataValue === 'string' || noDataValue instanceof String) {
+                const parsedValue = noDataValue.replace(/[\0\s]/g, '')
+                return Number(parsedValue)
+            }
+            return isNaN(Number(noDataValue)) ? undefined : Number(noDataValue)
+        }
+        return undefined
     }
 
     async testCog () {
