@@ -2,6 +2,7 @@
 
 // import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff'
+import chroma from 'chroma-js'
 
 export type GeoImageOptions = {
   type: 'image' | 'terrain',
@@ -16,7 +17,10 @@ export type GeoImageOptions = {
   clipHigh?: number | null,
   multiplier?: number,
   color?: [number, number, number],
+    colorScale?: chroma.Color[]
   alpha?: number,
+    noDataValue?: number
+    numOfChannels?: number
 }
 
 const DefaultGeoImageOptions: GeoImageOptions = {
@@ -31,8 +35,11 @@ const DefaultGeoImageOptions: GeoImageOptions = {
     clipHigh: null,
     multiplier: 1.0,
     color: [255, 0, 255],
+    colorScale: chroma.brewer.YlOrRd,
     alpha: 255,
-    useChannel: null
+    useChannel: null,
+    noDataValue: undefined,
+    numOfChannels: undefined
 }
 
 export class GeoImage {
@@ -164,6 +171,8 @@ export class GeoImage {
           width = input.width
           height = input.height
       }
+      // TO DO check null values -> empty rasters, no rendering or discard value in shader? currently noData value is displayed as transparent pixels..
+      // TO DO if alpha is set in options, then apply to entire image
 
       const canvas = document.createElement('canvas')
       canvas.width = width
@@ -172,7 +181,9 @@ export class GeoImage {
       const imageData: ImageData = c!.createImageData(width, height)
 
       let r, g, b, a
-      const s = width * height * 4
+      const size = width * height * 4
+
+      if (!options.noDataValue) console.log('Missing noData value. Raster might be displayed incorrectly.')
 
       // console.log(rasters[0])
       /* console.log("raster 0 length: " + rasters[0].length)
@@ -187,60 +198,19 @@ export class GeoImage {
                   const channel = rasters[0]
                   // AUTO RANGE
                   if (options.useAutoRange) {
-                      let highest = Number.MIN_VALUE
-                      let lowest = Number.MAX_VALUE
-                      let value: number
-                      for (let i = 0; i < channel.length; i++) {
-                          value = channel[i]
-                          if (value > highest) highest = value
-                          if (value < lowest) lowest = value
-                      }
-                      options.rangeMin = lowest
-                      options.rangeMax = highest
+                      [options.rangeMin, options.rangeMax] = this.getMinMax(channel, options)
                       // console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
                   }
                   // SINGLE CHANNEL
-                  let ratio = 0
-
-                  let pixel = 0
-                  for (let i = 0; i < s; i += 4) {
-                      if (options.useHeatMap) {
-                          const rangeDelta = options.rangeMax! - options.rangeMin!
-                          ratio = (2 * (channel[pixel] - options.rangeMin!)) / rangeDelta
-              options.color![2] = 255 * (1 - ratio) < 0 ? 0 : 255 * (1 - ratio)
-              options.color![0] = 255 * (ratio - 1) < 0 ? 0 : 255 * (ratio - 1)
-              options.color![1] = 255 - options.color![2] - options.color![0]
-                      }
-
-                      r = options.color![0]
-                      g = options.color![1]
-                      b = options.color![2]
-
-                      a = options.alpha!
-
-                      if (
-                          options.clipLow != null &&
-                        options.clipHigh != null &&
-                        (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)
-                      ) {
-                          a = 0
-                      }
-                      if (options.useDataForOpacity) {
-                          a = this.scale(channel[pixel], options.rangeMin!, options.rangeMax!, 0, 255)
-                      }
-
-                      imageData.data[i] = r
-                      imageData.data[i + 1] = g
-                      imageData.data[i + 2] = b
-                      imageData.data[i + 3] = a
-
-                      pixel++
-                  }
+                  const colorData = this.getColorValue(channel, options, size)
+                  colorData.forEach((value, index) => {
+                      imageData.data[index] = value
+                  })
               }
               if (rasters[0].length / (width * height) === 3) {
                   // console.log("geoImage: " + "RGB 1 array of length: " + rasters[0].length);
                   let pixel = 0
-                  for (let i = 0; i < s; i += 4) {
+                  for (let i = 0; i < size; i += 4) {
                       imageData.data[i] = rasters[0][pixel++]
                       imageData.data[i + 1] = rasters[0][pixel++]
                       imageData.data[i + 2] = rasters[0][pixel++]
@@ -249,18 +219,15 @@ export class GeoImage {
               }
               if (rasters[0].length / (width * height) === 4) {
                   // console.log("geoImage: " + "RGBA 1 array");
-                  for (let i = 0; i < s; i += 4) {
-                      imageData.data[i] = rasters[0][i]
-                      imageData.data[i + 1] = rasters[0][i + 1]
-                      imageData.data[i + 2] = rasters[0][i + 2]
-                      imageData.data[i + 3] = rasters[0][i + 3]
-                  }
+                  rasters[0].forEach((value, index) => {
+                      imageData.data[index] = value
+                  })
               }
           }
           if (channels === 3) {
               // RGB
               let pixel = 0
-              for (let i = 0; i < s; i += 4) {
+              for (let i = 0; i < size; i += 4) {
                   r = rasters[0][pixel]
                   g = rasters[1][pixel]
                   b = rasters[2][pixel]
@@ -277,7 +244,7 @@ export class GeoImage {
           if (channels === 4) {
               // RGBA
               let pixel = 0
-              for (let i = 0; i < width * height * 4; i += 4) {
+              for (let i = 0; i < size; i += 4) {
                   r = rasters[0][pixel]
                   g = rasters[1][pixel]
                   b = rasters[2][pixel]
@@ -292,72 +259,93 @@ export class GeoImage {
               }
           }
       } else {
-          let channel = rasters[0]
-
-          if (rasters[options.useChannel]) {
-              channel = rasters[options.useChannel]
-          }
-
-          // AUTO RANGE
-          if (options.useAutoRange) {
-              let highest = Number.MIN_VALUE
-              let lowest = Number.MAX_VALUE
-              let value: number
-              for (let i = 0; i < channel.length; i++) {
-                  value = channel[i]
-                  if (value > highest) highest = value
-                  if (value < lowest) lowest = value
+          // useChannel is not null
+          // check if user defined channel exists, if no --> greyscale image
+          if (options.useChannel <= options.numOfChannels) {
+              let channel = rasters[0]
+              if (rasters[options.useChannel]) {
+                  channel = rasters[options.useChannel]
               }
-              options.rangeMin = lowest
-              options.rangeMax = highest
-              // console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
-          }
-          // SINGLE CHANNEL
-
-          const channelCount = channel.length / (width * height)
-
-          let pixel = options.useChannel
-          let ratio = 0
-          for (let i = 0; i < s; i += 4) {
-              if (options.useHeatMap) {
-                  const rangeDelta = options.rangeMax! - options.rangeMin!
-                  ratio = (2 * (channel[pixel] - options.rangeMin!)) / rangeDelta
-          options.color![2] = 255 * (1 - ratio) < 0 ? 0 : 255 * (1 - ratio)
-          options.color![0] = 255 * (ratio - 1) < 0 ? 0 : 255 * (ratio - 1)
-          options.color![1] = 255 - options.color![2] - options.color![0]
+              // AUTO RANGE
+              if (options.useAutoRange) {
+                  [options.rangeMin, options.rangeMax] = this.getMinMax(channel, options)
+                  // console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
               }
-
-              r = options.color![0]
-              g = options.color![1]
-              b = options.color![2]
-
-              a = options.alpha!
-
-              if (
-                  options.clipLow != null &&
-                options.clipHigh != null &&
-                (channel[pixel] < options.clipLow || channel[pixel] > options.clipHigh)
-              ) {
-                  a = 0
-              }
-              if (options.useDataForOpacity) {
-                  a = this.scale(channel[pixel], options.rangeMin!, options.rangeMax!, 0, 255)
-              }
-
-              imageData.data[i] = r
-              imageData.data[i + 1] = g
-              imageData.data[i + 2] = b
-              imageData.data[i + 3] = a
-
-              pixel += channelCount
+              // SINGLE CHANNEL
+              const numOfChannels = channel.length / (width * height)
+              const colorData = this.getColorValue(channel, options, size, numOfChannels)
+              colorData.forEach((value, index) => {
+                  imageData.data[index] = value
+              })
+          } else {
+              // if user defined channel does not exist --> return greyscale image
+              console.log('Defined channel does not exist, displaying only grey values')
+              const defaultColorData = this.getDefaultColor(size)
+              defaultColorData.forEach((value, index) => {
+                  imageData.data[index] = value
+              })
           }
       }
-
       // console.timeEnd('bitmap-generated-in');
 
-    c!.putImageData(imageData, 0, 0)
-    const imageUrl = canvas.toDataURL('image/png')
-    // console.log('Bitmap generated.');
-    return imageUrl
+        c!.putImageData(imageData, 0, 0)
+        const imageUrl = canvas.toDataURL('image/png')
+        // console.log('Bitmap generated.');
+        return imageUrl
+  }
+
+  getMinMax (array, options) {
+      let maxValue = options.maxValue ? options.maxValue : Number.MIN_VALUE
+      let minValue = options.minValue ? options.minValue : Number.MAX_VALUE
+      for (let idx = 0; idx < array.length; idx++) {
+          if (!options.noDataValue || array[idx] !== options.noDataValue) {
+              if (array[idx] > maxValue) maxValue = array[idx]
+              if (array[idx] < minValue) minValue = array[idx]
+          }
+      }
+      return [minValue, maxValue]
+  }
+
+  getColorValue (dataArray:[], options:GeoImageOptions, arrayLength:number, numOfChannels=1) {
+      const colorScale = chroma.scale(options.colorScale).domain([options.rangeMin, options.rangeMax])
+      let pixel:number = options.useChannel === null ? 0 : options.useChannel
+      const colorsArray = new Array(arrayLength)
+      // default color is transparent grey, should be [0,0,0,0] so it is not rendered, but the grey color is good for debugging
+      // const defaultColor = [0, 0, 0, 0]
+      const defaultColor = [140, 138, 155, 100]
+      for (let i = 0; i < arrayLength; i += 4) {
+          let pixelColor = defaultColor
+          if (!options.noDataValue || dataArray[pixel] !== options.noDataValue) {
+              if (options.useHeatMap) {
+                  pixelColor = colorScale(dataArray[pixel]).rgb()
+                  pixelColor = [...pixelColor, 255]
+              }
+              if (options.useDataForOpacity) {
+                  // eslint-disable-next-line max-len
+                  pixelColor[3] = this.scale(dataArray[pixel], options.rangeMin!, options.rangeMax!, 0, 255)
+              }
+              // TO DO put the code below in the beginning, so we are not calculating color and then clipping it
+              if (
+                  (options.clipLow != null && dataArray[pixel] < options.clipLow) ||
+                (options.clipHigh != null && dataArray[pixel] > options.clipHigh)
+              ) {
+                  pixelColor = defaultColor
+              }
+          }
+          // eslint-disable-next-line max-len
+          [colorsArray[i], colorsArray[i + 1], colorsArray[i + 2], colorsArray[i + 3]] = pixelColor
+
+          pixel += numOfChannels
+      }
+      return colorsArray
+  }
+
+  getDefaultColor (size) {
+      const defaultColor = [140, 138, 155, 100]
+      const colorsArray = new Array(size)
+      for (let i = 0; i < size; i += 4) {
+          [colorsArray[i], colorsArray[i + 1], colorsArray[i + 2], colorsArray[i + 3]] = defaultColor
+      }
+      return colorsArray
   }
 }

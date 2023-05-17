@@ -167,6 +167,7 @@ class CogTiles {
         let decompressed: string
         let decoded: any
 
+        this.options.numOfChannels = img.tags.get(277).value
         this.options.noDataValue = this.getNoDataValue(img.tags)
 
         if (!this.options.format) {
