@@ -13,23 +13,40 @@ To create CogBitmapLayer, you need an URL of your COG and also an object contain
 
 #### Example
 Display simple rgb image. If you don't specify a channel to process, it defaults to grayscale, RGB, or RGBA depending on the channel count
-```
+```typescript
 const bitmapLayer = new CogBitmapLayer(
 "cog.tif",
 {type:"image"}
 )
 ```
 Display the second channel as a heatmap with data from 0 to 1000
-```
+- Currently, when `useAutoRange` is `true` min and max data value for each image is calculated separately, thus it is recommended to set `rangeMin` and `rangeMax`.
+
+```typescript
 const bitmapLayer = new CogBitmapLayer(
 "cog.tif",
 {type:"image", useHeatmap:true, useChannel:1, rangeMin:0, rangeMax: 1000}
 )
 ```
-Display the third channel as a blue color and only show data from 100 to 200
-```
+Display the second channel as a heatmap with data from 0 to 1000 with custom color scale <a id="custom-heatmap-color-scale"></a>
+
+```typescript
 const bitmapLayer = new CogBitmapLayer(
 "cog.tif",
-{type:"image", useChannel:2, clipLow:100, clipHigh: 200}
+{type:"image", useHeatmap:true, useChannel:1, rangeMin:0, rangeMax: 1000, colorScale: ['green', '#3182bd', [255, 0, 0]}
+)
+```
+Display the third channel as a green color and only show data from 100 to 200
+```typescript
+const bitmapLayer = new CogBitmapLayer(
+"cog.tif",
+{type:"image", useChannel:2, clipLow:100, clipHigh: 200, color: [0, 255, 0]}
+)
+```
+Asign color to specific data values <a id="assigning-color-to-specific-data-value"></a>
+```typescript
+const bitmapLayer = new CogBitmapLayer(
+"cog.tif",
+{type:"image", useChannel:20, useColorsBasedOnValues: true, colorsBasedOnValues: [[1, 'red'], [2, [0,0,255]], [3, '#00FF00']]}
 )
 ```

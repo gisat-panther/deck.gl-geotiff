@@ -14,11 +14,11 @@
 #### Data visualisation options
 - Color
 - Transparency
-- Heatmap (custom color scale example [here](#custom-heatmap-color-scale))
+- Heatmap (custom color scale example [here](../cogbitmaplayer/README.md#custom-heatmap-color-scale))
 - Data slice
 - Automatic data range
 - Manual data range
-- Assign color to specific data value (example [here](#assigning-color-to-specific-data-value))
+- Assign color to specific data value (example [here](../cogbitmaplayer/README.md#assigning-color-to-specific-data-value))
 ## Data processing options
 - `useAutoRange : boolean` - set automatic range of color gradient **(default false)**
 - `rangeMin : number | null` set minimal value range **if useAutoRange is false**  **(default 0)**
@@ -106,36 +106,4 @@ g.clipHigh(360);
 g.useHeatMap(false);
 g.color[0,255,100];
 const fourthImage = await g.getBitmap("image", 'image.tif');
-```
-
-## Bitmap coloring Examples
-### Assigning color to specific data value
-```typescript
-const cogLayer = new CogBitmapLayer(
-    "CogBitmapLayer",
-    'image.tif', 
-    {
-      type:"image", 
-      useChannel: 3, 
-      useColorsBasedOnValues: true,
-      colorsBasedOnValues: [[1, 'red'], [2, [0,0,255]], [3, '#00FF00']]
-    }
-)
-```
-
-### Custom heatmap color scale
-Currently, when `useAutoRange` is `true` min and max data value for each image is calculated separately, thus it is recommended to set `rangeMin` and `rangeMax`.
-```typescript
-const cogLayer = new CogBitmapLayer(
-    "CogBitmapLayer",
-    'image.tif', 
-    {
-      type:"image", 
-      useChannel: 20,
-      useHeatMap: true,
-      rangeMin: 0, 
-      rangeMax: 3,
-      colorScale: ['green', '#3182bd', [255, 0, 0]]
-    }
-)
 ```
