@@ -14,14 +14,15 @@
 #### Data visualisation options
 - Color
 - Transparency
-- Heatmap
+- Heatmap (custom color scale example [here](#custom-heatmap-color-scale))
 - Data slice
 - Automatic data range
 - Manual data range
+- Assign color to specific data value (example [here](#assigning-color-to-specific-data-value))
 ## Data processing options
 - `useAutoRange : boolean` - set automatic range of color gradient **(default false)**
-- `rangeMin : number | null` Set minimal value range **if useAutoRange is false**  **(default 0)**
-- `rangeMax : number | null`Set maximal value range **if useAutoRange is false**  **(default 255)**
+- `rangeMin : number | null` set minimal value range **if useAutoRange is false**  **(default 0)**
+- `rangeMax : number | null`set maximal value range **if useAutoRange is false**  **(default 255)**
 - `useDataForOpacity : boolean` - visualise data with opacity of each pixel according to its value **(default false)**
 - `alpha : number` - visualise data in specific opacity **(if useDataOpacity is false)** **(default 150)**
 - `useHeatMap : boolean` - generate data as a color heatmap **(default true)**
@@ -31,6 +32,11 @@
 - `clipLow : number | null`- generate only data greater than this **(default null)**
 
 - `clipHigh : number | null`- generate only data less than this **(default null)**
+- `colorScale:chroma.Color[]` - array of colors, supports chroma.js color definition such as `'red'`, `[255,0,0]`, `'#FF0000'`, etc. and [Color Brewer pallete names](https://www.datanovia.com/en/wp-content/uploads/dn-tutorials/ggplot2/figures/0101-rcolorbrewer-palette-rcolorbrewer-palettes-colorblind-friendly-1.png) in this format: `chroma.brewer.Greens`
+- `useColorsBasedOnValues: boolean` - assign pixels colors based on defined data values **(default false)**
+- `colorsBasedOnValues? : [number, chroma.Color][]` - array of value-color pairs, used **if useColorsBasedOnValues is true**, supports chroma.js color definition such as `'red'`, `[255,0,0]`, `'#FF0000'`, etc.
+- `unidentifiedColor: chroma.Color` - set color for not identified values **if useColorsBasedOnValues is true**, **(default [0, 0, 0, 0])**
+- `nullColor: chroma.Color` - set color for noData values **(default [0, 0, 0, 0])**
 
 ## Return options
 **Method returns Image DataUrl**
@@ -43,16 +49,16 @@
 
 ## Basic example
 #### Initialize the library
-```
+```typescript
 import GeoImage from 'geoimage';
 
 const g = new GeoImage();
 ```
 #### Get bitmap
-```
+```typescript
 const bitmap = await g.getMap("image", 'image.tif');
 ```
-```
+```typescript
 const bitmap = await g.getMap("image", { width : 512, height : 512, rasters : [[...data]] });
 ```
 
@@ -60,16 +66,16 @@ const bitmap = await g.getMap("image", { width : 512, height : 512, rasters : [[
 
 #### Get heightmap
 
-```
+```typescript
 const heightmap = await g.getMap("terrain", 'image.tif');
 ```
-```
+```typescript
 const bitmap = await g.getMap("terrain", { width : 512, height : 512, rasters : [[...data]] });
 ```
 
 ## Advanced example
 
-```
+```typescript
 //Import the library and initiate GeoImage object:
 import GeoImage from 'geoimage';
 
@@ -100,4 +106,36 @@ g.clipHigh(360);
 g.useHeatMap(false);
 g.color[0,255,100];
 const fourthImage = await g.getBitmap("image", 'image.tif');
+```
+
+## Bitmap coloring Examples
+### Assigning color to specific data value
+```typescript
+const cogLayer = new CogBitmapLayer(
+    "CogBitmapLayer",
+    'image.tif', 
+    {
+      type:"image", 
+      useChannel: 3, 
+      useColorsBasedOnValues: true,
+      colorsBasedOnValues: [[1, 'red'], [2, [0,0,255]], [3, '#00FF00']]
+    }
+)
+```
+
+### Custom heatmap color scale
+Currently, when `useAutoRange` is `true` min and max data value for each image is calculated separately, thus it is recommended to set `rangeMin` and `rangeMax`.
+```typescript
+const cogLayer = new CogBitmapLayer(
+    "CogBitmapLayer",
+    'image.tif', 
+    {
+      type:"image", 
+      useChannel: 20,
+      useHeatMap: true,
+      rangeMin: 0, 
+      rangeMax: 3,
+      colorScale: ['green', '#3182bd', [255, 0, 0]]
+    }
+)
 ```
