@@ -12,12 +12,13 @@ export type GeoImageOptions = {
     useAutoRange?: boolean,
     useDataForOpacity?: boolean,
     useChannel?: number | null,
+    useSingleColor?: boolean,
     rangeMin?: number,
     rangeMax?: number,
     clipLow?: number | null,
     clipHigh?: number | null,
     multiplier?: number,
-    color?: [number, number, number],
+    color?: chroma.Color,
     colorScale?: chroma.Color[]
     colorsBasedOnValues? : [number|undefined, chroma.Color][],
     alpha?: number,
@@ -25,6 +26,7 @@ export type GeoImageOptions = {
     numOfChannels?: number,
     nullColor?: chroma.Color,
     unidentifiedColor?: chroma.Color,
+    clippedColor?: chroma.Color
 }
 
 const DefaultGeoImageOptions: GeoImageOptions = {
@@ -34,12 +36,13 @@ const DefaultGeoImageOptions: GeoImageOptions = {
     useColorsBasedOnValues: false,
     useAutoRange: false,
     useDataForOpacity: false,
+    useSingleColor: false,
     rangeMin: 0,
     rangeMax: 255,
     clipLow: null,
     clipHigh: null,
     multiplier: 1.0,
-    color: [255, 0, 255],
+    color: [255, 0, 255, 255],
     colorScale: chroma.brewer.YlOrRd,
     colorsBasedOnValues: null,
     alpha: 255,
@@ -47,7 +50,8 @@ const DefaultGeoImageOptions: GeoImageOptions = {
     noDataValue: undefined,
     numOfChannels: undefined,
     nullColor: [0, 0, 0, 0],
-    unidentifiedColor: [0, 0, 0, 0]
+    unidentifiedColor: [0, 0, 0, 0],
+    clippedColor: [0, 0, 0, 0]
 }
 
 export class GeoImage {
@@ -193,6 +197,8 @@ export class GeoImage {
       if (!options.noDataValue) console.log('Missing noData value. Raster might be displayed incorrectly.')
       options.unidentifiedColor = this.getColorFromChromaType(options.unidentifiedColor)
       options.nullColor = this.getColorFromChromaType(options.nullColor)
+      options.clippedColor = this.getColorFromChromaType(options.clippedColor)
+      options.color = this.getColorFromChromaType(options.color)
 
       // console.log(rasters[0])
       /* console.log("raster 0 length: " + rasters[0].length)
@@ -327,26 +333,28 @@ export class GeoImage {
       for (let i = 0; i < arrayLength; i += 4) {
           let pixelColor = options.nullColor
           if (!options.noDataValue || dataArray[pixel] !== options.noDataValue) {
-              // TO DO add single color calculation
-              if (options.useHeatMap) {
-                  pixelColor = [...colorScale(dataArray[pixel]).rgb(), 255]
-              }
-              if (options.useColorsBasedOnValues) {
-                  const index = dataValues.indexOf(dataArray[pixel])
-                  if (index > -1) {
-                      pixelColor = colorValues[index]
-                  } else pixelColor = options.unidentifiedColor
-              }
-              if (options.useDataForOpacity) {
-                  // eslint-disable-next-line max-len
-                  pixelColor[3] = this.scale(dataArray[pixel], options.rangeMin!, options.rangeMax!, 0, 255)
-              }
-              // TO DO put the code below in the beginning, so we are not calculating color and then clipping it
               if (
                   (options.clipLow != null && dataArray[pixel] < options.clipLow) ||
                 (options.clipHigh != null && dataArray[pixel] > options.clipHigh)
               ) {
-                  pixelColor = options.nullColor
+                  pixelColor = options.clippedColor
+              } else {
+                  if (options.useHeatMap) {
+                      pixelColor = [...colorScale(dataArray[pixel]).rgb(), 255]
+                  }
+                  if (options.useColorsBasedOnValues) {
+                      const index = dataValues.indexOf(dataArray[pixel])
+                      if (index > -1) {
+                          pixelColor = colorValues[index]
+                      } else pixelColor = options.unidentifiedColor
+                  }
+                  if (options.useSingleColor) {
+                      pixelColor = options.color
+                  }
+                  if (options.useDataForOpacity) {
+                      // eslint-disable-next-line max-len
+                      pixelColor[3] = this.scale(dataArray[pixel], options.rangeMin!, options.rangeMax!, 0, 255)
+                  }
               }
           }
           // eslint-disable-next-line max-len

@@ -28,9 +28,11 @@ class CogBitmapLayerExample extends React.Component<{}> {
     //   'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
     //   'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/DEM_COP30_float32_wgs84_deflate_cog_float32.tif',
    //    heatmap
-   { type:"image", useChannel: 30, useHeatMap:true, rangeMin: 0, rangeMax: 3, clipLow: 1, colorScale: chroma.brewer.Blues}
+   // { type:"image", useChannel: 30, useHeatMap:true, rangeMin: 0, rangeMax: 3, clipLow: 1, colorScale: chroma.brewer.Blues}
       //     colors based on values
       // { type:"image", useChannel: 5, useColorsBasedOnValues: true, clipLow: 0, colorsBasedOnValues: [[1, '#deebf7'], [2, '#9ecae1'], [3, '#3182bd']]}
+      // single color
+      { type:"image", useChannel: 10, useSingleColor: true, clipLow: 2, clipHigh: 3, color: 'red', clippedColor:[245, 245, 220, 80]}
     )
 
     const tileLayer = new TileLayer({
