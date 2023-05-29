@@ -36,11 +36,11 @@ const bitmapLayer = new CogBitmapLayer(
 {type:"image", useHeatmap:true, useChannel:1, rangeMin:0, rangeMax: 1000, colorScale: ['green', '#3182bd', [255, 0, 0]}
 )
 ```
-Display the third channel as a green color and only show data from 100 to 200
+Display the third channel as a green color and only show data from 100 to 200, the clipped data should be visualized with yellow color
 ```typescript
 const bitmapLayer = new CogBitmapLayer(
 "cog.tif",
-{type:"image", useChannel:2, clipLow:100, clipHigh: 200, color: [0, 255, 0]}
+{type:"image", useChannel:2, useSingleColor: true, clipLow:100, clipHigh: 200, color: [0, 255, 0], clippedColor: 'yellow'}
 )
 ```
 Asign color to specific data values <a id="assigning-color-to-specific-data-value"></a>
