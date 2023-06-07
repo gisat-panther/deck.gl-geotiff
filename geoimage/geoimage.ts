@@ -275,7 +275,6 @@ export class GeoImage {
           }
       } else {
           // useChannel is not null
-          // check if user defined channel exists, if no --> greyscale image
           if (options.useChannel <= options.numOfChannels) {
               let channel = rasters[0]
               if (rasters[options.useChannel]) {
@@ -286,7 +285,6 @@ export class GeoImage {
                   [options.rangeMin, options.rangeMax] = this.getMinMax(channel, options)
                   // console.log('data min: ' + options.rangeMin + ', max: ' + options.rangeMax);
               }
-              // SINGLE CHANNEL
               const numOfChannels = channel.length / (width * height)
               const colorData = this.getColorValue(channel, options, size, numOfChannels)
               colorData.forEach((value, index) => {
@@ -334,8 +332,8 @@ export class GeoImage {
           let pixelColor = options.nullColor
           if (!options.noDataValue || dataArray[pixel] !== options.noDataValue) {
               if (
-                  (options.clipLow != null && dataArray[pixel] < options.clipLow) ||
-                (options.clipHigh != null && dataArray[pixel] > options.clipHigh)
+                  (options.clipLow != null && dataArray[pixel] <= options.clipLow) ||
+                (options.clipHigh != null && dataArray[pixel] >= options.clipHigh)
               ) {
                   pixelColor = options.clippedColor
               } else {
