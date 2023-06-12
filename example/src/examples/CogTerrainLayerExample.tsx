@@ -9,10 +9,10 @@ import {
   _WMSLayer as WMSLayer,
 } from '@deck.gl/geo-layers';
 import { MVTLoader } from '@loaders.gl/mvt';
-import { CogTerrainLayer } from '../../../cogterrainlayer/CogTerrainLayer';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
+import CogTerrainLayer from 'gisatcz/cogterrainlayer/CogTerrainLayer';
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -22,9 +22,8 @@ function hexToRgb(hex: string) {
       parseInt(result[2], 16),
       parseInt(result[3], 16),
     ];
-  } else {
-    return [];
   }
+  return [];
 }
 
 const styleClasses = [
@@ -94,7 +93,6 @@ const styleClasses = [
 
 class CogTerrainLayerExample extends React.Component<{}> {
   render() {
-
     /*
     const cogLayer = new CogTerrainLayer(
       "CogTerrainLayer",
@@ -107,12 +105,12 @@ class CogTerrainLayerExample extends React.Component<{}> {
     */
 
     const cogLayer = new CogTerrainLayer(
-      "CogTerrainLayer",
+      'CogTerrainLayer',
       'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
       // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
-      { type: "terrain", multiplier: 0.1, useChannel: null },
-      "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg"
-    )
+      { type: 'terrain', multiplier: 0.1, useChannel: null },
+      'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
+    );
 
     const tileLayer = new TileLayer({
       data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -123,7 +121,9 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
       renderSubLayers: (props) => {
         const {
-          bbox: { west, south, east, north },
+          bbox: {
+            west, south, east, north,
+          },
         } = props.tile;
 
         return new BitmapLayer(props, {
@@ -183,28 +183,24 @@ class CogTerrainLayerExample extends React.Component<{}> {
     });
     */
     // const deckRef = useRef();
-    const deckRef = React.createRef()
-    const onHover =
-      event => {
-        const hoveredItems = deckRef?.current?.pickMultipleObjects(event);
-        const item = hoveredItems?.[0]
-        // existuje pouze item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.elevationData z toho by asi šla hodnota dekodovat
-        // item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.image
-        const image =
-          item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.image;
-        if (image) {
-          item.pixelColor = readPixelsToArray(image, {
-            sourceX: event?.bitmap?.pixel?.[0],
-            sourceY: event?.bitmap?.pixel?.[1],
-            sourceWidth: 1,
-            sourceHeight: 1,
-          });
-
-        }
-
-        console.log(item, image, item?.pixelColor);
-
+    const deckRef = React.createRef();
+    const onHover = (event) => {
+      const hoveredItems = deckRef?.current?.pickMultipleObjects(event);
+      const item = hoveredItems?.[0];
+      // existuje pouze item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.elevationData z toho by asi šla hodnota dekodovat
+      // item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.image
+      const image = item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.image;
+      if (image) {
+        item.pixelColor = readPixelsToArray(image, {
+          sourceX: event?.bitmap?.pixel?.[0],
+          sourceY: event?.bitmap?.pixel?.[1],
+          sourceWidth: 1,
+          sourceHeight: 1,
+        });
       }
+
+      console.log(item, image, item?.pixelColor);
+    };
 
     return (
       <>
@@ -213,14 +209,14 @@ class CogTerrainLayerExample extends React.Component<{}> {
             ref={deckRef}
             getCursor={() => 'inherit'}
             initialViewState={initialViewState}
-            controller={true}
+            controller
             layers={[
-              //tileLayer,
+              // tileLayer,
               WMSlayer,
               cogLayer,
-              //WMSlayerMapped,
+              // WMSlayerMapped,
 
-              //vectorLayer,
+              // vectorLayer,
             ]}
             views={[
               new MapView({
@@ -232,7 +228,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
               }),
             ]}
             onHover={onHover}
-          ></DeckGL>
+          />
         }
       </>
     );

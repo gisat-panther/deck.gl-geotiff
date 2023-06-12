@@ -8,23 +8,37 @@
   "scripts": {
     "start": "yarn && yarn rollup && yarn example",
     "example": "yarn workspace example dev",
-    "lint": "eslint --fix --ext .js,.ts ."
+    "lint": "eslint cogtiles/** cogterrainlayer/** -c ./.eslintrc.js",
+    "lintFix": "eslint cogbitmaplayer/** cogterrainlayer/** cogtiles/** geoimage/** --fix"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.12.0",
-    "@typescript-eslint/parser": "^5.12.0",
-    "eslint": "^7.32.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.9",
+    "@typescript-eslint/parser": "^5.59.9",
+    "eslint": "^8.42.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^5.2.0",
-    "eslint-plugin-react": "^7.28.0",
-    "prettier": "^2.5.1"
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^2.5.1",
+    "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@chunkd/source-url": "^6.0.0",
+    "@cogeotiff/core": "^7.2.1",
+    "@deck.gl/core": "^8.9.18",
+    "@deck.gl/geo-layers": "^8.9.18",
+    "@deck.gl/layers": "^8.9.18",
+    "@math.gl/web-mercator": "^3.6.3",
     "@types/chroma-js": "^2.4.0",
-    "chroma-js": "^2.4.2"
+    "chroma-js": "^2.4.2",
+    "geotiff": "^2.0.7",
+    "jpeg-js": "^0.4.4",
+    "pako": "^2.1.0"
   }
 }
