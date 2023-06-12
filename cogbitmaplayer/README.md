@@ -20,12 +20,12 @@ const bitmapLayer = new CogBitmapLayer(
 )
 ```
 Display the second channel as a heatmap with data from 0 to 1000
-- Currently, when `useAutoRange` is `true` min and max data value for each image is calculated separately, thus it is recommended to set `rangeMin` and `rangeMax`.
+- Currently, when `useAutoRange` is `true` min and max data value for each image is calculated separately, thus it is recommended to set min and max values in `colorScaleValueRange`.
 
 ```typescript
 const bitmapLayer = new CogBitmapLayer(
 "cog.tif",
-{type:"image", useHeatmap:true, useChannel:1, rangeMin:0, rangeMax: 1000}
+{type:"image", useHeatmap:true, useChannel:1, colorScaleValueRange: [0, 1000]}
 )
 ```
 Display the second channel as a heatmap with data from 0 to 1000 with custom color scale <a id="custom-heatmap-color-scale"></a>
@@ -33,7 +33,7 @@ Display the second channel as a heatmap with data from 0 to 1000 with custom col
 ```typescript
 const bitmapLayer = new CogBitmapLayer(
 "cog.tif",
-{type:"image", useHeatmap:true, useChannel:1, rangeMin:0, rangeMax: 1000, colorScale: ['green', '#3182bd', [255, 0, 0]}
+{type:"image", useHeatmap:true, useChannel:1, colorScale: ['green', '#3182bd', [255, 0, 0], colorScaleValueRange: [0, 1000]}
 )
 ```
 Display the third channel as a green color and only show data from 100 to 200, the clipped data should be visualized with yellow color
