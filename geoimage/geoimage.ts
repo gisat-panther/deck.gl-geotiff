@@ -13,13 +13,12 @@ export type GeoImageOptions = {
     useDataForOpacity?: boolean,
     useChannel?: number | null,
     useSingleColor?: boolean,
-    rangeMin?: number,
-    rangeMax?: number,
     clipLow?: number | null,
     clipHigh?: number | null,
     multiplier?: number,
     color?: Array<number> | chroma.Color,
     colorScale?: Array<string> | Array<chroma.Color>,
+    colorScaleValueRange?: number[],
     colorsBasedOnValues? : [number|undefined, chroma.Color][],
     alpha?: number,
     noDataValue?: number
@@ -37,13 +36,12 @@ const DefaultGeoImageOptions: GeoImageOptions = {
   useAutoRange: false,
   useDataForOpacity: false,
   useSingleColor: false,
-  rangeMin: 0,
-  rangeMax: 255,
   clipLow: null,
   clipHigh: null,
   multiplier: 1.0,
   color: [255, 0, 255, 255],
   colorScale: chroma.brewer.YlOrRd,
+  colorScaleValueRange: [0, 255],
   colorsBasedOnValues: null,
   alpha: 255,
   useChannel: null,
@@ -224,7 +222,7 @@ export class GeoImage {
           const channel = rasters[0];
           // AUTO RANGE
           if (optionsLocal.useAutoRange) {
-            [optionsLocal.rangeMin, optionsLocal.rangeMax] = this.getMinMax(channel, optionsLocal);
+            optionsLocal.colorScaleValueRange = this.getMinMax(channel, optionsLocal);
             // console.log('data min: ' + optionsLocal.rangeMin + ', max: ' + optionsLocal.rangeMax);
           }
           // SINGLE CHANNEL
@@ -291,7 +289,7 @@ export class GeoImage {
       }
       // AUTO RANGE
       if (optionsLocal.useAutoRange) {
-        [optionsLocal.rangeMin, optionsLocal.rangeMax] = this.getMinMax(channel, optionsLocal);
+        optionsLocal.colorScaleValueRange = this.getMinMax(channel, optionsLocal);
         // console.log('data min: ' + optionsLocal.rangeMin + ', max: ' + optionsLocal.rangeMax);
       }
       const numOfChannels = channel.length / (width * height);
@@ -328,9 +326,7 @@ export class GeoImage {
   }
 
   getColorValue(dataArray:[], options:GeoImageOptions, arrayLength:number, numOfChannels = 1) {
-    const colorScale = chroma.scale(options.colorScale).domain(
-      [options.rangeMin, options.rangeMax],
-    );
+    const colorScale = chroma.scale(options.colorScale).domain(options.colorScaleValueRange);
     let pixel:number = options.useChannel === null ? 0 : options.useChannel;
     const colorsArray = new Array(arrayLength);
 
@@ -364,7 +360,7 @@ export class GeoImage {
           }
           if (options.useDataForOpacity) {
             // eslint-disable-next-line max-len
-            pixelColor[3] = this.scale(dataArray[pixel], options.rangeMin!, options.rangeMax!, 0, 255);
+            pixelColor[3] = this.scale(dataArray[pixel], options.colorScaleValueRange[0]!, options.colorScaleValueRange.slice(-1)[0]!, 0, 255);
           }
         }
       }

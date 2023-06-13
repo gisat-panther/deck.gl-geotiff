@@ -21,8 +21,6 @@
 - Assign color to specific data value (example [here](../cogbitmaplayer/README.md#assigning-color-to-specific-data-value))
 ## Data processing options
 - `useAutoRange : boolean` - set automatic range of color gradient **(default false)**
-- `rangeMin : number | null` set minimal value range **if useAutoRange is false**  **(default 0)**
-- `rangeMax : number | null`set maximal value range **if useAutoRange is false**  **(default 255)**
 - `useDataForOpacity : boolean` - visualise data with opacity of each pixel according to its value **(default false)**
 - `alpha : number` - visualise data in specific opacity **(if useDataOpacity is false)** **(default 150)**
 - `useHeatMap : boolean` - generate data as a color heatmap **(default true)**
@@ -33,6 +31,7 @@
 - `clipHigh : number | null`- generate only data less than this **(default null)**
 - `clippedColor: chroma.Color` - set color for clipped values when using `clipLow` or `clipHigh`, **(default [0, 0, 0, 0])**
 - `colorScale:chroma.Color[]` - array of colors, supports chroma.js color definition such as `'red'`, `[255,0,0]`, `'#FF0000'`, etc. and [Color Brewer pallete names](https://www.datanovia.com/en/wp-content/uploads/dn-tutorials/ggplot2/figures/0101-rcolorbrewer-palette-rcolorbrewer-palettes-colorblind-friendly-1.png) in this format: `chroma.brewer.Greens`
+- `colorScaleValueRange: number[]` - set min and max range values or set any array of values to set exact colors to values, **if useAutoRange is false**, **(default [0,255])**
 - `useColorsBasedOnValues: boolean` - assign pixels colors based on defined data values **(default false)**
 - `colorsBasedOnValues : [number, chroma.Color][]` - array of value-color pairs, used **if useColorsBasedOnValues is true**, supports chroma.js color definition such as `'red'`, `[255,0,0]`, `'#FF0000'`, etc.
 - `unidentifiedColor: chroma.Color` - set color for not identified values **if useColorsBasedOnValues is true**, **(default [0, 0, 0, 0])**
