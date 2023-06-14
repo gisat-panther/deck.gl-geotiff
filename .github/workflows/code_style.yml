@@ -20,9 +20,6 @@ jobs:
         shell: bash -l {0}
         run: nvm install
 
-      - name: Install
-        run: npm i prettier @gisatcz/prettier-config --no-save
-
       - name: Fix Code Style
         run: npm run format
 

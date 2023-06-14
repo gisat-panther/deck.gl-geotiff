@@ -8,8 +8,8 @@ import json from '@rollup/plugin-json';
 // import resolve from 'rollup-plugin-node-resolve';
 
 const packageJson = {
-  main: '../dist/cjs/index.js',
-  module: '../dist/esm/index.js',
+  main: './dist/cjs/index.js',
+  module: './dist/esm/index.js',
 };
 
 export default [
