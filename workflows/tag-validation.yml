@@ -1,0 +1,17 @@
+name: Tag validation
+
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize]
+
+jobs:
+  tag_validation:
+    name: Tag validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require Labels
+        uses: mheap/github-action-required-labels@v1
+        with:
+          mode: exactly
+          count: 1
+          labels: 'major, minor, patch, skip-release'

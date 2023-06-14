@@ -1,0 +1,35 @@
+name: Code Style
+
+on:
+  - pull_request
+
+jobs:
+  code_style:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Ensure that git uses your token with write access to the repo
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Prepare repository
+        run: git fetch --unshallow --tags
+
+      - name: Set the correct Node version using nvm
+        shell: bash -l {0}
+        run: nvm install
+
+      - name: Install
+        run: npm i prettier @gisatcz/prettier-config --no-save
+
+      - name: Fix Code Style
+        run: npm run format
+
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v2.3.0
+        with:
+          commit_message: Fix code style ${{ github.event.pull_request.head.sha }} [ci skip]
+          branch: ${{ github.event.pull_request.head.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
