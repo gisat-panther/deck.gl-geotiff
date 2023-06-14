@@ -1,3 +1,4 @@
 node_modules
 example/public/copernicus.tif
 yarn.lock
+dist

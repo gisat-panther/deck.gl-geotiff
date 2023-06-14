@@ -1,23 +1,15 @@
 {
-  "name": "gisatcz",
+  "name": "geoimage",
   "version": "1.0.0",
   "private": true,
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "type": "module",
   "types": "dist/index.d.ts",
-  "workspaces": [
-    "geoimage",
-    "example"
-  ],
   "scripts": {
-    "start": "yarn && yarn rollup && yarn example",
-    "build": "yarn rollup",
-    "rollup": "yarn workspace geoimage rollup",
-    "example": "yarn workspace example dev",
-    "lint": "yarn workspace geoimage lint",
-    "lint_": "yarn workspace geoimage lint && yarn workspace example lint",
-    "lintFix": "eslint cogbitmaplayer/** cogterrainlayer/** cogtiles/** geoimage/** --fix"
+    "rollup": "rollup -c",
+    "start": "yarn && yarn rollup",
+    "lint": "eslint src/**/* -c ./.eslintrc.cjs",
+    "lintFix": "eslint src/**/* -c ./.eslintrc.cjs --fix"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.1",
@@ -46,8 +38,10 @@
     "@chunkd/source-url": "^6.0.0",
     "@cogeotiff/core": "^7.2.1",
     "@deck.gl/core": "^8.9.18",
+    "@deck.gl/extensions": "^8.9.18",
     "@deck.gl/geo-layers": "^8.9.18",
     "@deck.gl/layers": "^8.9.18",
+    "@deck.gl/mesh-layers": "^8.9.18",
     "@math.gl/web-mercator": "^3.6.3",
     "@types/chroma-js": "^2.4.0",
     "chroma-js": "^2.4.2",

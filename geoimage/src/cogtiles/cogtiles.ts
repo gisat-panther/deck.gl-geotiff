@@ -76,7 +76,7 @@ class CogTiles {
   }
 
   getZoomRange(cog: CogTiff) {
-    const img = this.cog.images[cog.images.length - 1];
+    const img = cog.images[cog.images.length - 1];
 
     const minZoom = this.getZoomLevelFromResolution(
       cog.images[cog.images.length - 1].tileSize.width,
@@ -100,7 +100,7 @@ class CogTiles {
     const minXYDeg = this.getLatLon([minX, minY]);
     const maxXYDeg = this.getLatLon([maxX, maxY]);
 
-    return [...minXYDeg, ...maxXYDeg];
+    return [minXYDeg[0], minXYDeg[1], maxXYDeg[0], maxXYDeg[1]] as [number, number, number, number];
   }
 
   getOriginAsLatLon(cog: CogTiff) {
@@ -182,8 +182,8 @@ class CogTiles {
     if (!this.options.format) {
       // More information about TIFF tags: https://www.awaresystems.be/imaging/tiff/tifftags.html
       this.options.format = this.getFormat(
-        Number(img.tags.get(339).value),
-        Number(img.tags.get(258).value),
+img.tags.get(339).value as Array<number>,
+      img.tags.get(258).value as Array<number>,
       );
     }
 
@@ -339,7 +339,7 @@ class CogTiles {
 
     const tile = await this.getTile(tileGlobalX, tileGlobalY, tileGlobalZ);
 
-    if (tile === null) {
+    if (tile === false) {
       console.log("couldn't retrieve tile");
     } else {
       console.log(tile);
