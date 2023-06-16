@@ -18,13 +18,10 @@ jobs:
 
       - name: Set the correct Node version using nvm
         shell: bash -l {0}
-        run: nvm install
-
-      - name: Install
-        run: npm i prettier @gisatcz/prettier-config --no-save
+        run: yarn install
 
       - name: Fix Code Style
-        run: npm run format
+        run: yarn run lintFix
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v2.3.0

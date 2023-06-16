@@ -7,10 +7,10 @@ import { SourceUrl } from '@chunkd/source-url';
 import { inflate } from 'pako';
 import jpeg from 'jpeg-js';
 import { worldToLngLat } from '@math.gl/web-mercator';
-import LZWDecoder from './lzw'; // TODO: remove absolute path
+import LZWDecoder from './lzw';
 
 // Bitmap styling
-import { GeoImage, GeoImageOptions } from '../geoimage/geoimage'; // TODO: remove absolute path
+import GeoImage, { GeoImageOptions } from '../geoimage/geoimage'; // TODO: remove absolute path
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
@@ -41,9 +41,14 @@ class CogTiles {
   }
 
   async initializeCog(url: string) {
-    // console.log("Initializing CogTiles...")
+    // Set native fetch instead node-fetch to SourceUrl
+    SourceUrl.fetch = async (input, init) => {
+      const res = await fetch(input, init);
+      return res;
+    };
 
-    this.cog = await CogTiff.create(new SourceUrl(url));
+    const sourceUrl = new SourceUrl(url);
+    this.cog = await CogTiff.create(sourceUrl);
 
     this.cog.images.forEach((image:CogTiffImage) => {
       image.loadGeoTiffTags();

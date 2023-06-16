@@ -1,7 +1,6 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
-import { log } from 'geotiff/dist-node/logging';
 import CogTiles from '../cogtiles/cogtiles';
 
 import { GeoImageOptions } from '../geoimage/geoimage';
@@ -22,6 +21,8 @@ class CogBitmapLayer extends CompositeLayer<any> {
   id = '';
 
   url: string;
+
+  static displayName: string;
 
   constructor(id:string, url:string, options:GeoImageOptions) {
     super({});
@@ -97,5 +98,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
     return null;
   }
 }
+
+CogBitmapLayer.displayName = 'CogBitmapLayer';
 
 export default CogBitmapLayer;

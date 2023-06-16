@@ -2,12 +2,18 @@
   "exclude": ["**/tests", "**/*.test.ts", "node_modules"],
   "allowSyntheticDefaultImports": true,
   "compilerOptions": {
+    "lib": ["es2020"],
+    "target": "es6",
     "declaration": true,
+    "importHelpers": true,
     "declarationDir": "types",
     "baseUrl": ".",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     // "noEmit": true,
+    "paths": {
+      "tslib" : ["./node_modules/tslib/tslib.d.ts"]
+    },
   }
 }

@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
 import { readPixelsToArray } from '@luma.gl/core';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
-import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
+// import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import {
   MVTLayer,
   TileLayer,
@@ -12,7 +12,7 @@ import { MVTLoader } from '@loaders.gl/mvt';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
-import CogTerrainLayer from 'geoimage/src/cogterrainlayer/CogTerrainLayer';
+import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);

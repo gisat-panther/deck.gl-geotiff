@@ -1,11 +1,11 @@
 {
-  "name": "gisatcz",
+  "name": "gisatcz-deckgl-geolib-repo",
   "version": "1.0.0",
   "private": true,
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "geoimage/dist/cjs/index.js",
+  "module": "geoimage/dist/esm/index.js",
   "type": "module",
-  "types": "dist/index.d.ts",
+  "types": "geoimage/dist/esm/types/index.d.ts",
   "workspaces": [
     "geoimage",
     "example"
@@ -13,11 +13,10 @@
   "scripts": {
     "start": "yarn && yarn rollup && yarn example",
     "build": "yarn rollup",
-    "rollup": "yarn workspace geoimage rollup",
+    "rollup": "yarn workspace @gisatcz/deckgl-geolib rollup",
     "example": "yarn workspace example dev",
-    "lint": "yarn workspace geoimage lint",
-    "lint_": "yarn workspace geoimage lint && yarn workspace example lint",
-    "lintFix": "eslint cogbitmaplayer/** cogterrainlayer/** cogtiles/** geoimage/** --fix"
+    "lint": "yarn workspace @gisatcz/deckgl-geolib lint",
+    "lintFix": "yarn workspace @gisatcz/deckgl-geolib lintFix"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.1",

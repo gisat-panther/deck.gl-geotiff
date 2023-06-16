@@ -52,7 +52,7 @@ const DefaultGeoImageOptions: GeoImageOptions = {
   clippedColor: [0, 0, 0, 0],
 };
 
-export class GeoImage {
+export default class GeoImage {
   data: GeoTIFFImage | undefined;
 
   scale = (

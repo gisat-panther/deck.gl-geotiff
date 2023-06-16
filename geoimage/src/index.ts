@@ -1,4 +1,11 @@
-export * from './cogbitmaplayer/CogBitmapLayer';
-export * from './cogterrainlayer/CogTerrainLayer';
-export * from './cogtiles/cogtiles';
-export * from './geoimage/geoimage';
+import CogBitmapLayer from './cogbitmaplayer/CogBitmapLayer';
+import CogTerrainLayer from './cogterrainlayer/CogTerrainLayer';
+import cogtiles from './cogtiles/cogtiles';
+import GeoImage from './geoimage/geoimage';
+
+export default {
+  CogBitmapLayer,
+  CogTerrainLayer,
+  cogtiles,
+  GeoImage,
+};
