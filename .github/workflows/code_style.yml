@@ -21,7 +21,7 @@ jobs:
         run: nvm install
 
       - name: Fix Code Style
-        run: npm run format
+        run: npm run lintFix
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v2.3.0
