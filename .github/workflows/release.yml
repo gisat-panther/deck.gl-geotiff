@@ -37,4 +37,5 @@ jobs:
         run: |
           yarn install
           yarn run build
+          cd geoimage
           npx auto shipit
