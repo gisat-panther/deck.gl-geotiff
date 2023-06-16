@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
 import { readPixelsToArray } from '@luma.gl/core';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
-import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
+// import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import {
   MVTLayer,
   TileLayer,

@@ -1,10 +1,11 @@
 {
   "name": "@gisatcz/deckgl-geolib",
   "version": "0.0.4",
-  "private": true,
+  "private": false,
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "scripts": {
     "rollup": "rollup -c",
     "start": "yarn && yarn rollup",

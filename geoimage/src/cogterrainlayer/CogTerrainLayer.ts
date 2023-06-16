@@ -3,7 +3,7 @@ import { TileLayer, TerrainLayer } from '@deck.gl/geo-layers';
 
 // FIXME
 // eslint-disable-next-line
-import { getTileUrl, isCogUrl, isTileServiceUrl } from 'example/src/utilities/tileurls';
+import { getTileUrl, isCogUrl, isTileServiceUrl } from '../utilities/tileurls';
 import CogTiles from '../cogtiles/cogtiles';
 
 import { GeoImageOptions } from '../geoimage/geoimage';
@@ -26,6 +26,8 @@ class CogTerrainLayer extends CompositeLayer<any> {
   id = '';
 
   terrainUrl: string;
+
+  static displayName: string;
 
   constructor(
     id:string,
@@ -166,5 +168,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
     return [];
   }
 }
+
+CogTerrainLayer.displayName = 'CogTerrainLayer';
 
 export default CogTerrainLayer;
