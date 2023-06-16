@@ -1,6 +1,6 @@
 {
   "name": "gisatcz-deckgl-geolib-repo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "main": "geoimage/dist/cjs/index.js",
   "module": "geoimage/dist/esm/index.js",
