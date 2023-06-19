@@ -10,7 +10,7 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "allowImportingTsExtensions": true,
+    // "allowImportingTsExtensions": true,
     // "noEmit": true,
     "paths": {
       "tslib" : ["./node_modules/tslib/tslib.d.ts"]

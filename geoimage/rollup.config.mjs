@@ -6,8 +6,6 @@ import { terser } from 'rollup-plugin-terser';
 import json from '@rollup/plugin-json';
 import path from 'path';
 
-// import resolve from 'rollup-plugin-node-resolve';
-
 const packageJson = {
   main: './dist/cjs/',
   module: './dist/esm/',
@@ -29,34 +27,39 @@ export default [
       '@loaders.gl/core',
     ],
     input: './src/index.ts',
-    inlineDynamicImports: true,
     output: [
       {
         file: path.join(packageJson.main, 'index.js'),
         format: 'cjs',
         sourcemap: true,
+        inlineDynamicImports: true,
       },
       {
         file: path.join(packageJson.main, 'index.min.js'),
         format: 'cjs',
         sourcemap: true,
         plugins: [terser()],
+        inlineDynamicImports: true,
       },
       {
         file: path.join(packageJson.module, 'index.js'),
         format: 'esm',
         sourcemap: true,
+        inlineDynamicImports: true,
       },
       {
         file: path.join(packageJson.module, 'index.min.js'),
         format: 'esm',
         sourcemap: true,
         plugins: [terser()],
+        inlineDynamicImports: true,
       },
     ],
     plugins: [
       json(),
-      resolve(),
+      resolve({
+        preferBuiltins: true,
+      }),
       commonjs(),
       typescript({ tsconfig: './tsconfig.json', exclude: ['**.js'] }),
     ],

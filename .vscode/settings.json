@@ -3,7 +3,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "prettier.enable": false,
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "eslint.validate": ["javascript", "typescript"],
   "[javascript]": {
