@@ -37,13 +37,13 @@ const cogLayer = new CogBitmapLayer(
   // { type:"image", useChannel: 10, useSingleColor: true, clipLow: 2, clipHigh: 3, color: 'red', clippedColor:[245, 245, 220, 80]}
 
   // Nepal snow cover
-  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/SNOW_3857_COG_DEFL_2017-2021_cog_deflate_float32.tif',
-  // { type: 'image', useChannel: 0, useHeatMap: true, clipLow: 0, colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], colorScaleValueRange: [1,100,200,300,366] }
+  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/SNOW_3857_2017-2021_cog_deflate.tif',
+  // { type: 'image', useChannel: 0, useHeatMap: true, colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], colorScaleValueRange: [1,100,200,300,366] }
 
   // Nepal wet snow cover
-  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_COG_DEFL_2017-2021_cog_deflate_float32.tif',
+  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate.tif',
   // {
-  //   type: 'image', useChannel: 2, useHeatMap: true, clipLow: 0, colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], colorScaleValueRange: [1, 100, 200, 300, 366],
+  //   type: 'image', useChannel: 2, useHeatMap: true, colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], colorScaleValueRange: [1, 100, 200, 300, 366],
   // },
 );
 

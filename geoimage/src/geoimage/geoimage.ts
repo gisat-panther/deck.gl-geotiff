@@ -317,7 +317,7 @@ export default class GeoImage {
     let maxValue = options.maxValue ? options.maxValue : Number.MIN_VALUE;
     let minValue = options.minValue ? options.minValue : Number.MAX_VALUE;
     for (let idx = 0; idx < array.length; idx += 1) {
-      if (!options.noDataValue || array[idx] !== options.noDataValue) {
+      if (options.noDataValue === undefined || array[idx] !== options.noDataValue) {
         if (array[idx] > maxValue) maxValue = array[idx];
         if (array[idx] < minValue) minValue = array[idx];
       }
@@ -336,7 +336,7 @@ export default class GeoImage {
 
     for (let i = 0; i < arrayLength; i += 4) {
       let pixelColor = options.nullColor;
-      if (!options.noDataValue || dataArray[pixel] !== options.noDataValue) {
+      if (options.noDataValue === undefined || dataArray[pixel] !== options.noDataValue) {
         if (
           (options.clipLow != null && dataArray[pixel] <= options.clipLow)
                 || (options.clipHigh != null && dataArray[pixel] >= options.clipHigh)
