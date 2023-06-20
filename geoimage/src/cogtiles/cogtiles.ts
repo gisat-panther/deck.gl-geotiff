@@ -7,10 +7,10 @@ import { SourceUrl } from '@chunkd/source-url';
 import { inflate } from 'pako';
 import jpeg from 'jpeg-js';
 import { worldToLngLat } from '@math.gl/web-mercator';
-import LZWDecoder from './lzw';
+import LZWDecoder from './lzw.js';
 
 // Bitmap styling
-import GeoImage, { GeoImageOptions } from '../geoimage/geoimage'; // TODO: remove absolute path
+import GeoImage, { GeoImageOptions } from '../geoimage/geoimage.ts'; // TODO: remove absolute path
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;

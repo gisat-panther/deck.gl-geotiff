@@ -21,7 +21,7 @@ module.exports = {
   ],
   rules: {
     'class-methods-use-this': ['off'],
-    'import/extensions': ['error', 'never'],
+    // 'import/extensions': ['error', 'never'],
     'import/no-extraneous-dependencies': ['error', { includeInternal: false }],
     'no-underscore-dangle': ['off'],
     'no-restricted-imports': [
