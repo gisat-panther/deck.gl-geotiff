@@ -15,6 +15,7 @@ import GeoImage, { GeoImageOptions } from '../geoimage/geoimage.ts'; // TODO: re
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
 
+
 class CogTiles {
   cog: CogTiff;
 
