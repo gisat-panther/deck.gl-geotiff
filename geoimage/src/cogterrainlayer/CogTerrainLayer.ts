@@ -3,21 +3,23 @@ import { TileLayer, TerrainLayer } from '@deck.gl/geo-layers';
 
 // FIXME
 // eslint-disable-next-line
-import { getTileUrl, isCogUrl, isTileServiceUrl } from '../utilities/tileurls';
-import CogTiles from '../cogtiles/cogtiles';
+import { getTileUrl, isCogUrl, isTileServiceUrl } from '../utilities/tileurls.ts';
+import CogTiles from '../cogtiles/cogtiles.ts';
 
-import { GeoImageOptions } from '../geoimage/geoimage';
-
-let terrainCogTiles: CogTiles;
-let bitmapCogTiles: CogTiles;
-
-let tileSize: number;
-let minZoom: number;
-let maxZoom: number;
-// let needsRerender: boolean = false;
+import { GeoImageOptions } from '../geoimage/geoimage.ts';
 
 class CogTerrainLayer extends CompositeLayer<any> {
   static layerName = 'CogTerrainLayer';
+
+  terrainCogTiles: CogTiles;
+
+  bitmapCogTiles: CogTiles;
+
+  tileSize: number;
+
+  minZoom: number;
+
+  maxZoom: number;
 
   bitmapUrl: string;
 
@@ -44,15 +46,15 @@ class CogTerrainLayer extends CompositeLayer<any> {
         this.bitmapUrl = bitmapUrl;
         this.urlType = 'tile';
       } else if (isCogUrl(bitmapUrl)) {
-        bitmapCogTiles = new CogTiles(bitmapOptions!);
-        bitmapCogTiles.initializeCog(bitmapUrl);
+        this.bitmapCogTiles = new CogTiles(bitmapOptions!);
+        this.bitmapCogTiles.initializeCog(bitmapUrl);
         this.urlType = 'cog';
       } else {
         console.warn('URL needs to point to a valid cog file, or needs to be in the {x}{y}{z} format.');
       }
     }
 
-    terrainCogTiles = new CogTiles(terrainOptions);
+    this.terrainCogTiles = new CogTiles(terrainOptions);
     // this.init(terrainUrl);
     this.terrainUrl = terrainUrl;
   }
@@ -70,17 +72,17 @@ class CogTerrainLayer extends CompositeLayer<any> {
   async init(terrainUrl: string) {
     // console.log("LAYER INITIALIZE STATE");
 
-    const cog = await terrainCogTiles.initializeCog(terrainUrl);
-    tileSize = terrainCogTiles.getTileSize(cog);
+    const cog = await this.terrainCogTiles.initializeCog(terrainUrl);
+    this.tileSize = this.terrainCogTiles.getTileSize(cog);
 
-    const zoomRange = terrainCogTiles.getZoomRange(cog);
-    [minZoom, maxZoom] = zoomRange;
+    const zoomRange = this.terrainCogTiles.getZoomRange(cog);
+    [this.minZoom, this.maxZoom] = zoomRange;
 
     this.setState({ initialized: true });
   }
 
   renderLayers() {
-    if (terrainCogTiles.cog) {
+    if (this.terrainCogTiles.cog) {
     // console.log("LAYER RENDER");
 
       let bitmapTile: string;
@@ -99,17 +101,17 @@ class CogTerrainLayer extends CompositeLayer<any> {
       const layer = new TileLayer({
         id: `${this.id}-${String(performance.now())}`,
         zoomOffset: -1,
-        getTileData: (tileData: any) => terrainCogTiles.getTile(
+        getTileData: (tileData: any) => this.terrainCogTiles.getTile(
           tileData.index.x,
           tileData.index.y,
           tileData.index.z,
         ),
-        minZoom,
-        maxZoom,
-        tileSize,
+        minZoom: this.minZoom,
+        maxZoom: this.maxZoom,
+        tileSize: this.tileSize,
         maxRequests: 6,
         refinementStrategy: 'best-available',
-        extent: terrainCogTiles.getBoundsAsLatLon(terrainCogTiles.cog),
+        extent: this.terrainCogTiles.getBoundsAsLatLon(this.terrainCogTiles.cog),
 
         renderSubLayers: (props: any) => {
           if (props.data && (props.tile.index.x !== undefined)) {
@@ -123,7 +125,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
                 );
                 break;
               case 'cog':
-                bitmapTile = bitmapCogTiles.getTile(
+                bitmapTile = this.bitmapCogTiles.getTile(
                   props.tile.index.x,
                   props.tile.index.y,
                   props.tile.index.z,
@@ -149,8 +151,8 @@ class CogTerrainLayer extends CompositeLayer<any> {
                 props.tile.bbox.east,
                 props.tile.bbox.north,
               ],
-              minZoom,
-              maxZoom,
+              minZoom: this.minZoom,
+              maxZoom: this.maxZoom,
               loadOptions: {
                 terrain: {
                   skirtHeight: 2000,
