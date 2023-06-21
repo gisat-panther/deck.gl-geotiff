@@ -1,3 +1,15 @@
+# v1.4.2 (Wed Jun 21 2023)
+
+#### 🐾 Patch
+
+- remove unused line [#22](https://github.com/gisat-panther/deck.gl-geotiff/pull/22) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v1.4.1 (Tue Jun 20 2023)
 
 #### ⚠️ Pushed to `master`
