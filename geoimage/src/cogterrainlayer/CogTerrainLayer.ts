@@ -67,8 +67,6 @@ class CogTerrainLayer extends CompositeLayer<any> {
     this.init(this.terrainUrl);
   }
 
-  // async initializeState() {}
-
   async init(terrainUrl: string) {
     // console.log("LAYER INITIALIZE STATE");
 
