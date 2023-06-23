@@ -67,8 +67,6 @@ class CogTerrainLayer extends CompositeLayer<any> {
     this.init(this.terrainUrl);
   }
 
-  // async initializeState() {}
-
   async init(terrainUrl: string) {
     // console.log("LAYER INITIALIZE STATE");
 
@@ -151,6 +149,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
                 props.tile.bbox.east,
                 props.tile.bbox.north,
               ],
+              operation: 'terrain+draw',
               minZoom: this.minZoom,
               maxZoom: this.maxZoom,
               loadOptions: {
