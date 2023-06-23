@@ -149,6 +149,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
                 props.tile.bbox.east,
                 props.tile.bbox.north,
               ],
+              operation: 'terrain+draw',
               minZoom: this.minZoom,
               maxZoom: this.maxZoom,
               loadOptions: {

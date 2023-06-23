@@ -231,14 +231,18 @@ export default class GeoImage {
             imageData.data[index] = value;
           });
         }
+        // RGB values in one channel
         if (rasters[0].length / (width * height) === 3) {
           // console.log("geoImage: " + "RGB 1 array of length: " + rasters[0].length);
           let pixel = 0;
-          for (let i = 0; i < size; i += 4) {
-            imageData.data[i] = rasters[0][pixel += 1];
-            imageData.data[i + 1] = rasters[0][pixel += 1];
-            imageData.data[i + 2] = rasters[0][pixel += 1];
-            imageData.data[i + 3] = optionsLocal.alpha!;
+          for (let idx = 0; idx < size; idx += 4) {
+            const rgbColor = [rasters[0][pixel], rasters[0][pixel + 1], rasters[0][pixel + 2]];
+            const rgbaColor = this.hasPixelsNoData(rgbColor, optionsLocal.noDataValue)
+              ? optionsLocal.nullColor
+              : [...rgbColor, optionsLocal.alpha!];
+            // eslint-disable-next-line max-len
+            [imageData.data[idx], imageData.data[idx + 1], imageData.data[idx + 2], imageData.data[idx + 3]] = rgbaColor;
+            pixel += 3;
           }
         }
         if (rasters[0].length / (width * height) === 4) {
@@ -386,5 +390,9 @@ export default class GeoImage {
       return [...chroma(colorDefinition).rgb(), 255];
     }
     return colorDefinition;
+  }
+
+  hasPixelsNoData(pixels, noDataValue) {
+    return noDataValue !== undefined && pixels.every((pixel) => pixel === noDataValue);
   }
 }
