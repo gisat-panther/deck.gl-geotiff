@@ -13,6 +13,7 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
 import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
+import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -110,10 +111,23 @@ const cogLayer = new CogTerrainLayer(
   'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
 );
 
+const coBitmapLayer = new CogBitmapLayer(
+  'CogBitmapLayer',
+  'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate_in16_zoom16_levels8.tif',
+  {
+    type: 'image',
+    useChannel: 0,
+    useHeatMap: true,
+    colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'],
+    colorScaleValueRange: [1, 100, 200, 300, 366],
+    clampToTerrain: {
+      terrainDrawMode: 'drape',
+    },
+  },
+);
+
 class CogTerrainLayerExample extends React.Component<{}> {
   render() {
-
-
     const tileLayer = new TileLayer({
       data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
       id: 'standard-tile-layer',
@@ -216,6 +230,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
               // tileLayer,
               WMSlayer,
               cogLayer,
+              coBitmapLayer,
               // WMSlayerMapped,
 
               // vectorLayer,

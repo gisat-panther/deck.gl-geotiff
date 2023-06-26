@@ -4,6 +4,9 @@
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff';
 import chroma from 'chroma-js';
 
+export type ClampToTerrainOptions = {
+  terrainDrawMode?: string
+}
 export type GeoImageOptions = {
     type: 'image' | 'terrain',
     format?: 'uint8' | 'uint16' | 'uint32' |'int8' | 'int16' | 'int32' | 'float32' | 'float64'
@@ -25,7 +28,8 @@ export type GeoImageOptions = {
     numOfChannels?: number,
     nullColor?: Array<number> | chroma.Color
     unidentifiedColor?: Array<number> | chroma.Color,
-    clippedColor?: Array<number> | chroma.Color
+    clippedColor?: Array<number> | chroma.Color,
+    clampToTerrain?: ClampToTerrainOptions | boolean, // terrainDrawMode: 'drape',
 }
 
 const DefaultGeoImageOptions: GeoImageOptions = {

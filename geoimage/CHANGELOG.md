@@ -1,3 +1,33 @@
+# v1.5.0 (Fri Jun 23 2023)
+
+#### 🚀 Enhancement
+
+- Feature/terrain layer [#24](https://github.com/gisat-panther/deck.gl-geotiff/pull/24) ([@vdubr](https://github.com/vdubr))
+
+#### 🐾 Patch
+
+- calculation of single channel rgb values updated [#23](https://github.com/gisat-panther/deck.gl-geotiff/pull/23) (mariana.kecova@gisat.cz [@MariDani](https://github.com/MariDani))
+
+#### Authors: 3
+
+- Mariana Kecová ([@MariDani](https://github.com/MariDani))
+- Mariana Kecova (mariana.kecova@gisat.cz)
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
+# v1.4.2 (Wed Jun 21 2023)
+
+#### 🐾 Patch
+
+- remove unused line [#22](https://github.com/gisat-panther/deck.gl-geotiff/pull/22) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v1.4.1 (Tue Jun 20 2023)
 
 #### ⚠️ Pushed to `master`
