@@ -1,3 +1,16 @@
+# v1.6.0 (Mon Jun 26 2023)
+
+#### 🚀 Enhancement
+
+- Feature/terrain layer [#27](https://github.com/gisat-panther/deck.gl-geotiff/pull/27) ([@vdubr](https://github.com/vdubr) ci@example.com)
+
+#### Authors: 2
+
+- ci (ci@example.com)
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v1.5.0 (Fri Jun 23 2023)
 
 #### 🚀 Enhancement
