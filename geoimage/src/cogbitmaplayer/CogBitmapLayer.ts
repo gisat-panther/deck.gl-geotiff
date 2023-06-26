@@ -1,6 +1,7 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
+import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import CogTiles from '../cogtiles/cogtiles.ts';
 
 import { GeoImageOptions } from '../geoimage/geoimage.ts';
@@ -93,6 +94,10 @@ class CogBitmapLayer extends CompositeLayer<any> {
             image: props.data,
             bounds: [west, south, east, north],
             opacity: 1, // 0.6
+            extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
+            ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode
+              ? { terrainDrawMode: this.cogTiles?.options?.clampToTerrain.terrainDrawMode }
+              : {}),
           });
         },
       });
