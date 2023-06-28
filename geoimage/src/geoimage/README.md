@@ -1,4 +1,4 @@
-# GEOIMAGE
+# Geoimage
 #### A Javascript library for generating bitmaps out of **geoTIFF** files.
 <img src = "/images/example0crop1.png" width = "100%">
 

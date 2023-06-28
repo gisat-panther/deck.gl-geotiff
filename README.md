@@ -28,12 +28,13 @@ You can visit the package page to explore further versions and additional inform
 Import package into project
 
 ```typescript
-import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
-import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
+import geolib from '@gisatcz/deckgl-geolib'
 ```
 
 Create bitmap layer
 ```typescript
+const CogBitmapLayer = geolib.CogBitmapLayer;
+
 const cogLayer = new CogBitmapLayer(
     'CogBitmapLayer',
     'cog_data_url.tif',
@@ -49,6 +50,8 @@ const cogLayer = new CogBitmapLayer(
 
 or create terrain layer
 ```typescript
+const CogTerrainLayer = geolib.CogTerrainLayer;
+
 const cogLayer = new CogTerrainLayer(
     'CogTerrainLayer',
     'cog_data_url.tif',

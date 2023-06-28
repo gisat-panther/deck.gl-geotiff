@@ -28,7 +28,8 @@ const bitmapLayer = new CogBitmapLayer(
 {type:"image", useHeatmap:true, useChannel:1, colorScaleValueRange: [0, 1000]}
 )
 ```
-Display the second channel as a heatmap with data from 0 to 1000 with custom color scale <a id="custom-heatmap-color-scale"></a>
+<a name="custom-heatmap-color-scale"></a>
+Display the second channel as a heatmap with data from 0 to 1000 with custom color scale 
 
 ```typescript
 const bitmapLayer = new CogBitmapLayer(
@@ -43,7 +44,8 @@ const bitmapLayer = new CogBitmapLayer(
 {type:"image", useChannel:2, useSingleColor: true, clipLow:100, clipHigh: 200, color: [0, 255, 0], clippedColor: 'yellow'}
 )
 ```
-Asign color to specific data values <a id="assigning-color-to-specific-data-value"></a>
+<a name="assigning-color-to-specific-data-value"></a>
+Asign color to specific data values 
 ```typescript
 const bitmapLayer = new CogBitmapLayer(
 "cog.tif",
