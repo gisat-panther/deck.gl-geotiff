@@ -1,7 +1,7 @@
 # 3DFLUS - Geolib Visualizer
 The Geolib Visualizer is a library that extends the functionality of the deck.gl library to visualize geospatial data. 
 Currently, it supports Cloud-Optimized GeoTIFF (COG). 
-It provides an easy and efficient way to render both bitmap and terrain representations of COG datasets using [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md) and [CogTerrainLayer](./geoimage/src/cogbitmaplayer/README.md), and [GeoImage](./geoimage/src/geoimage/README.md) and [CogTiles](./geoimage/src/cogtiles/README.md) libraries
+It provides an easy and efficient way to render both bitmap and terrain representations of COG datasets using [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md) and [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md), and [GeoImage](./geoimage/src/geoimage/README.md) and [CogTiles](./geoimage/src/cogtiles/README.md) libraries
 
 <img src = "/images/ManillaCogHeatmap.png" width = "100%">
 
@@ -55,7 +55,7 @@ const CogTerrainLayer = geolib.CogTerrainLayer;
 const cogLayer = new CogTerrainLayer(
     'CogTerrainLayer',
     'cog_data_url.tif',
-    { type: 'terrain', multiplier: 0.1 },
+    { type: 'terrain'},
 );
 ```
 
