@@ -1,17 +1,17 @@
-# GEOIMAGE
-#### A Javascript library for generating bitmaps out of **geoTIFF** files.
+# Geoimage
+##### A Javascript library for generating bitmaps out of **geoTIFF** files.
 <img src = "/images/example0crop1.png" width = "100%">
 
-## Features
-#### Color texture generation
+### Features
+##### Color texture generation
 - Create RGB pictures out of RGB geoTIFF data.
 - Generate pictures out of non-RGB geoTIFF data with different processing options.
 
-#### Terrain texture generation
+##### Terrain texture generation
 - Generate heightmaps out of single-channel geoTIFF elevation data.
 - The **elevation data** is encoded into the bitmap as [Mapbox Terrain-RGB](https://docs.mapbox.com/data/tilesets/guides/access-elevation-data/#decode-data).
 
-#### Data visualisation options
+##### Data visualisation options
 - Color
 - Transparency
 - Heatmap (custom color scale example [here](../cogbitmaplayer/README.md#custom-heatmap-color-scale))
@@ -19,7 +19,7 @@
 - Automatic data range
 - Manual data range
 - Assign color to specific data value (example [here](../cogbitmaplayer/README.md#assigning-color-to-specific-data-value))
-## Data processing options
+### Data processing options
 - `useAutoRange : boolean` - set automatic range of color gradient **(default false)**
 - `useDataForOpacity : boolean` - visualise data with opacity of each pixel according to its value **(default false)**
 - `alpha : number` - visualise data in specific opacity **(if useDataOpacity is false)** **(default 150)**
@@ -39,7 +39,7 @@
 - `useSingleColor: boolean` - display data values only with single color **(default false)**
 - `color: chroma.Color` - set color when **if useSingleColor is true**, **(default [255, 0, 255, 255])**
 
-## Return options
+### Return options
 **Method returns Image DataUrl**
 
 - `getMap(returnFormat : "image" | "terrain", input : string | { width : number, height : number, rasters : any[] }, options?: { opacity : number })`
@@ -48,14 +48,14 @@
 
   If `returnFormat` = `"terrain"` - Ignores all options except `multiplier` and returns  [Mapbox Terrain-RGB](https://docs.mapbox.com/data/tilesets/guides/access-elevation-data/#decode-data)
 
-## Basic example
-#### Initialize the library
+### Basic example
+##### Initialize the library
 ```typescript
 import GeoImage from 'geoimage';
 
 const g = new GeoImage();
 ```
-#### Get bitmap
+##### Get bitmap
 ```typescript
 const bitmap = await g.getMap("image", 'image.tif');
 ```
@@ -65,7 +65,7 @@ const bitmap = await g.getMap("image", { width : 512, height : 512, rasters : [[
 
 
 
-#### Get heightmap
+##### Get heightmap
 
 ```typescript
 const heightmap = await g.getMap("terrain", 'image.tif');
@@ -74,7 +74,7 @@ const heightmap = await g.getMap("terrain", 'image.tif');
 const bitmap = await g.getMap("terrain", { width : 512, height : 512, rasters : [[...data]] });
 ```
 
-## Advanced example
+### Advanced example
 
 ```typescript
 //Import the library and initiate GeoImage object:

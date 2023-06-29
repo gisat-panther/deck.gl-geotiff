@@ -1,12 +1,12 @@
-# COGTILES
+# COG Tiles
 
 
 
-#### A Javascript library for easier tile functionality with COG files
+##### A Javascript library for easier tile functionality with COG files
 
 
 
-## Features
+### Features
 
 Class allows using CogTiff files with Deck.gl TileLayer.
 
@@ -20,7 +20,7 @@ Provides extra functionality for CogTiff files
 
 
 
-## Methods
+### Methods
 
 
 
