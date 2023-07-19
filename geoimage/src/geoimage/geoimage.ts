@@ -135,29 +135,23 @@ export default class GeoImage {
     const c = canvas.getContext('2d');
     const imageData = c!.createImageData(width, height);
 
-    const channelCount = channel.length / (width * height);
-    const s = width * height * 4;
+    const numOfChannels = channel.length / (width * height);
+    const size: number = width * height * 4;
+    let pixel:number = options.useChannel === null ? 0 : options.useChannel;
 
-    let pixel = 0;
-    if (options.useChannel != null) {
-      pixel = options.useChannel;
-    }
+    for (let i = 0; i < size; i += 4) {
+      //  height image calculation based on:
+      //  https://deck.gl/docs/api-reference/geo-layers/terrain-layer
 
-    // console.time("heightmap generated in");
-    for (let i = 0; i < s; i += 4) {
-      channel[pixel] *= options.multiplier!;
-      const multiplied = 100000 + channel[pixel] * 10;
-
-      imageData.data[i] = Math.trunc(multiplied * 0.00001525878);
-      imageData.data[i + 1] = Math.trunc(multiplied * 0.00390625) - imageData.data[i] * 256;
-      imageData.data[i + 2] = Math.trunc(multiplied) - imageData.data[i] * 65536
-      - imageData.data[i + 1] * 256;
+      const elevationValue = channel[pixel] * options.multiplier!;
+      const colorValue = Math.floor((elevationValue + 10000) / 0.1);
+      imageData.data[i] = Math.floor(colorValue / (256 * 256));
+      imageData.data[i + 1] = Math.floor((colorValue / 256) % 256);
+      imageData.data[i + 2] = colorValue % 256;
       imageData.data[i + 3] = 255;
 
-      pixel += channelCount;
+      pixel += numOfChannels;
     }
-
-    // console.timeEnd("heightmap generated in");
 
     c!.putImageData(imageData, 0, 0);
     const imageUrl = canvas.toDataURL('image/png');
