@@ -18,7 +18,7 @@ Before converting GeoTIFFs into COG files, install the required dependencies:
   with pip
   ```bash
   pip install rio-cogeo
-  - ```
+  ```
   or with conda
   ```bash
   conda install -c conda-forge rio-cogeo
@@ -38,11 +38,11 @@ based on data format, extent, metadata availability, bands/channels, etc..
 - rio-cogeo
     ```bash
     rio cogeo info file.tif
-    - ```
+    ```
 - GDAL
     ```bash
     gdalinfo file.tif
-    - ```
+    ```
 - QGIS
 
 ### Step 3: Convert to COG
@@ -97,6 +97,7 @@ After the conversion, verify the generated COG files to ensure they are correctl
 - QGIS
 
   You can display a COG file saved locally on your computer by dragging and dropping it onto the Layers menu. 
+  
   Or use link for COG file uploaded on a server *Layer -> Add Layer -> Add Raster Layer*
 
   <img src = "/images/qgis-add-cog-url.jpg" width = "50%">
