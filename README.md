@@ -3,6 +3,9 @@ The Geolib Visualizer is a library that extends the functionality of the deck.gl
 Currently, it supports Cloud-Optimized GeoTIFF (COG). 
 It provides an easy and efficient way to render both bitmap and terrain representations of COG datasets using [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md) and [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md), and [GeoImage](./geoimage/src/geoimage/README.md) and [CogTiles](./geoimage/src/cogtiles/README.md) libraries
 
+Additionally, we provide a [guide for data preparation](dataPreparation.md) which currently includes step-by-step instructions on converting GeoTIFFs into COG files. 
+This resource enables seamless integration with Geolib Visualizer.
+
 <img src = "/images/ManillaCogHeatmap.png" width = "100%">
 
 ### Installation
