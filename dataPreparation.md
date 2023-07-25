@@ -56,7 +56,9 @@ The creation template is `rio cogeo create [OPTIONS] INPUT OUTPUT`
 - `--web-optimized` - important for creation COG files optimized for Web
 - `--aligned-levels` - number of zoom levels for which is COG aligned with base maps, 
 we use `8` levels which has the best results based on our testing
-- `--dtype` - data type can be specified here (sometimes it does not work properly)
+- `--dtype` - data type can be specified here (sometimes it does not work properly); 
+data types supported by [CogTiles](./geoimage/src/cogtiles/README.md):
+  - uint8, uint16, uint32, int8, int16, int32, float32, float64
 - `--zoom-level` - for a certain type of data, we can specify the zoom level. 
 For instance, if your data has clear edges, and you want to zoom in significantly 
 while avoiding blurred edges. However, for other continuous data, such as imagery, 
@@ -103,6 +105,15 @@ After the conversion, verify the generated COG files to ensure they are correctl
   <img src = "/images/qgis-add-cog-url.jpg" width = "50%">
 
   Then in *Layer Properties* you can check detailed information about format, compression, bands, metadata, etc.
+
+
+- [COG Explorer](https://gisat-panther.github.io/app-gisat-cog-explorer/)
+  - application for verification and style creation for COG files developed by Gisat
+  - based on Panther components
+  - supports all COG styles available in [Geoimage](./geoimage/src/cogbitmaplayer/README.md) library from Geolib Visualiser
+  - <ins>requirements</ins>: URL for COG file uploaded on S3 server
+
+    <img src = "/images/gisat_cog_explorer.jpg" width = "70%">
 
 :point_right: *TO DO: add GDAL verification*
 
