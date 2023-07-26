@@ -1,3 +1,20 @@
+# v1.7.0 (Wed Jul 26 2023)
+
+#### 🚀 Enhancement
+
+- height images calculation updated [#33](https://github.com/gisat-panther/deck.gl-geotiff/pull/33) (mariana.kecova@gisat.cz [@MariDani](https://github.com/MariDani))
+
+#### 📝 Documentation
+
+- Documentation [#29](https://github.com/gisat-panther/deck.gl-geotiff/pull/29) (mariana.kecova@gisat.cz [@MariDani](https://github.com/MariDani))
+
+#### Authors: 2
+
+- Mariana Kecová ([@MariDani](https://github.com/MariDani))
+- Mariana Kecova (mariana.kecova@gisat.cz)
+
+---
+
 # v1.6.0 (Mon Jun 26 2023)
 
 #### 🚀 Enhancement
