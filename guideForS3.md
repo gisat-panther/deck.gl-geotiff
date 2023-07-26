@@ -38,3 +38,8 @@ drag and drop it to the desired folder on the S3 server.
 To get the final URL data, modify *project_folder* based on your directory structure and *cog_file_name* based on your COG file:
 
 https://gisat-gis.eu-central-1.linodeobjects.com/project_folder/cog_file_name.tif
+
+***Example***, below is the directory which you can see in WinSCP:
+- /gisat-gis/esaGdaAdbNepal23/rasters/sentinel_cog/imagery.tif
+- replace `/gisat.gis/` with `https://gisat-gis.eu-central-1.linodeobjects.com/`
+- resulting in: https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/sentinel_cog/imagery.tif
