@@ -67,9 +67,9 @@ while avoiding blurred edges. However, for other continuous data, such as imager
 this is not necessary. See examples below:
   - not continuous snow cover
 
-    | <img src="/images/create_cog_not_blurred.jpg" alt="not blurred edges" width="90%"> | <img src="/images/create_cog_not_blurred.jpg" alt="not blurred edges" width="90%"> |
-    |:----------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------:|
-    |                             *Not using `--zoom-level`*                             |                             *Using `--zoom-level=16`*                             |
+    | <img src="/images/create_cog_blurred.jpg" alt="not blurred edges" width="90%"> | <img src="/images/create_cog_not_blurred.jpg" alt="not blurred edges" width="90%"> |
+    |:--------------------------------------------------------:|:---------------------------------------------------------------------------------:|
+    |                *Not using `--zoom-level`*                |                             *Using `--zoom-level=16`*                             |
   
   - :exclamation: be careful, new data values are calculated when using `zoom-level`. This can cause
 unwanted artefacts within your COG dataset, see the below example of DEM data:
@@ -122,7 +122,7 @@ After the conversion, verify the generated COG files to ensure they are correctl
   - application for verification and style creation for COG files developed by Gisat
   - based on Panther components
   - supports all COG styles available in [Geoimage](./geoimage/src/geoimage/README.md) library from Geolib Visualiser
-  - <ins>requirements</ins>: URL for COG file uploaded on S3 server
+  - <ins>requirements</ins>: URL for COG file uploaded on S3 server, check this guide for [uploading cog files on S3](guideForS3.md) server
 
     <img src = "/images/gisat_cog_explorer.jpg" width = "70%">
 
