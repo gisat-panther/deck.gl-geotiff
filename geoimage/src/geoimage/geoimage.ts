@@ -187,7 +187,6 @@ export default class GeoImage {
       width = input.width;
       height = input.height;
     }
-    // TO DO if alpha is set in options, then apply to entire image
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -334,7 +333,7 @@ export default class GeoImage {
 
     // for useColorsBasedOnValues
     const dataValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([first]) => first) : undefined;
-    const colorValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([, second]) => [...chroma(second).rgb(), 255]) : undefined;
+    const colorValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([, second]) => [...chroma(second).rgb(), options.alpha]) : undefined;
 
     for (let i = 0; i < arrayLength; i += 4) {
       let pixelColor = options.nullColor;

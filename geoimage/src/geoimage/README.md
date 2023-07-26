@@ -22,7 +22,7 @@
 ### Data processing options
 - `useAutoRange : boolean` - set automatic range of color gradient **(default false)**
 - `useDataForOpacity : boolean` - visualise data with opacity of each pixel according to its value **(default false)**
-- `alpha : number` - visualise data in specific opacity **(if useDataOpacity is false)** **(default 150)**
+- `alpha : number` - visualise entire image with specified opacity **(if useDataOpacity is false)** **(default 255)**
 - `useHeatMap : boolean` - generate data as a color heatmap **(default true)**
  `useChannel : number | null` - specify a single channel to use **(default null)**
 - `multiplier : number  ` - multiplies each value **(default 1.00)**
