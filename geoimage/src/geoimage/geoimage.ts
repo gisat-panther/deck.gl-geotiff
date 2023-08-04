@@ -47,7 +47,7 @@ const DefaultGeoImageOptions: GeoImageOptions = {
   colorScale: chroma.brewer.YlOrRd,
   colorScaleValueRange: [0, 255],
   colorsBasedOnValues: null,
-  alpha: 255,
+  alpha: 100,
   useChannel: null,
   noDataValue: undefined,
   numOfChannels: undefined,
@@ -236,7 +236,7 @@ export default class GeoImage {
             const rgbColor = [rasters[0][pixel], rasters[0][pixel + 1], rasters[0][pixel + 2]];
             const rgbaColor = this.hasPixelsNoData(rgbColor, optionsLocal.noDataValue)
               ? optionsLocal.nullColor
-              : [...rgbColor, optionsLocal.alpha!];
+              : [...rgbColor, Math.floor(optionsLocal.alpha! * 2.55)];
             // eslint-disable-next-line max-len
             [imageData.data[idx], imageData.data[idx + 1], imageData.data[idx + 2], imageData.data[idx + 3]] = rgbaColor;
             pixel += 3;
@@ -256,7 +256,7 @@ export default class GeoImage {
           r = rasters[0][pixel];
           g = rasters[1][pixel];
           b = rasters[2][pixel];
-          a = optionsLocal.alpha!;
+          a = Math.floor(optionsLocal.alpha! * 2.55);
 
           imageData.data[i] = r;
           imageData.data[i + 1] = g;
@@ -273,7 +273,7 @@ export default class GeoImage {
           r = rasters[0][pixel];
           g = rasters[1][pixel];
           b = rasters[2][pixel];
-          a = optionsLocal.alpha!;
+          a = Math.floor(optionsLocal.alpha! * 2.55);
 
           imageData.data[i] = r;
           imageData.data[i + 1] = g;
@@ -333,7 +333,7 @@ export default class GeoImage {
 
     // for useColorsBasedOnValues
     const dataValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([first]) => first) : undefined;
-    const colorValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([, second]) => [...chroma(second).rgb(), options.alpha]) : undefined;
+    const colorValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([, second]) => [...chroma(second).rgb(), Math.floor(options.alpha * 2.55)]) : undefined;
 
     for (let i = 0; i < arrayLength; i += 4) {
       let pixelColor = options.nullColor;
@@ -347,7 +347,7 @@ export default class GeoImage {
           if (options.useHeatMap) {
             // FIXME
             // eslint-disable-next-line
-            pixelColor = [...colorScale(dataArray[pixel]).rgb(), 255];
+            pixelColor = [...colorScale(dataArray[pixel]).rgb(), Math.floor(options.alpha * 2.55)];
           }
           if (options.useColorsBasedOnValues) {
             const index = dataValues.indexOf(dataArray[pixel]);

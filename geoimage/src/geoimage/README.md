@@ -22,7 +22,7 @@
 ### Data processing options
 - `useAutoRange : boolean` - set automatic range of color gradient **(default false)**
 - `useDataForOpacity : boolean` - visualise data with opacity of each pixel according to its value **(default false)**
-- `alpha : number` - visualise entire image with specified opacity **(if useDataOpacity is false)** **(default 255)**
+- `alpha : number` - visualise entire image with specified opacity **(if useDataOpacity is false)**, values 0-100 **(default 100)**
 - `useHeatMap : boolean` - generate data as a color heatmap **(default true)**
  `useChannel : number | null` - specify a single channel to use **(default null)**
 - `multiplier : number  ` - multiplies each value **(default 1.00)**
@@ -85,14 +85,14 @@ const g = new GeoImage();
 //Single-channel geotiff as a transparent heatmap with auto-rage:
 g.useAutoRange(true);
 g.useHeatMap(true);
-g.alpha(120);
+g.alpha(100);
 const firstImage = await g.getMap("image", 'image.tif');
 
 //Single-channel geotiff as a transparent heatmap with manual range in meters:
 g.useAutoRange(false);
 g.useDataRange(0,250); //Blue at 0m, red at 250m
 g.useHeatMap(true);
-g.alpha(120);
+g.alpha(80);
 const secondImage = await g.getBitmap("image", 'image.tif');
 
 //Single-channel geotiff with data as transparency:
