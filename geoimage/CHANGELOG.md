@@ -1,3 +1,20 @@
+# v1.8.0 (Fri Aug 04 2023)
+
+#### 🚀 Enhancement
+
+- Feature/alpha visualization [#35](https://github.com/gisat-panther/deck.gl-geotiff/pull/35) (mariana.kecova@gisat.cz [@MariDani](https://github.com/MariDani))
+
+#### 🐾 Patch
+
+- Documentation [#34](https://github.com/gisat-panther/deck.gl-geotiff/pull/34) (mariana.kecova@gisat.cz [@MariDani](https://github.com/MariDani))
+
+#### Authors: 2
+
+- Mariana Kecová ([@MariDani](https://github.com/MariDani))
+- Mariana Kecova (mariana.kecova@gisat.cz)
+
+---
+
 # v1.7.0 (Wed Jul 26 2023)
 
 #### 🚀 Enhancement
