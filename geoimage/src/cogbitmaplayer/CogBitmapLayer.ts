@@ -3,6 +3,7 @@ import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import CogTiles from '../cogtiles/cogtiles.ts';
+import GL from '@luma.gl/constants';
 
 import { GeoImageOptions } from '../geoimage/geoimage.ts';
 
@@ -28,6 +29,8 @@ class CogBitmapLayer extends CompositeLayer<any> {
 
   maxZoom: number;
 
+  blurredTexture: boolean;
+
   constructor(id:string, url:string, options:GeoImageOptions) {
     super({});
     this.id = id;
@@ -36,7 +39,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
     // };
     // this._isLoaded = false;
     this.cogTiles = new CogTiles(options);
-
+    this.blurredTexture = options.blurredTexture;
     this.url = url;
     // setTimeout(() => {
     //   this.init(url);
@@ -94,6 +97,9 @@ class CogBitmapLayer extends CompositeLayer<any> {
             image: props.data,
             bounds: [west, south, east, north],
             opacity: 1, // 0.6
+            textureParameters: {
+              [GL.TEXTURE_MAG_FILTER]: this.blurredTexture? GL.LINEAR : GL.NEAREST,
+            },
             extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
             ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode
               ? { terrainDrawMode: this.cogTiles?.options?.clampToTerrain.terrainDrawMode }
