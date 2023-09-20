@@ -2,8 +2,8 @@ import { CompositeLayer } from '@deck.gl/core';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
-import CogTiles from '../cogtiles/cogtiles.ts';
 import GL from '@luma.gl/constants';
+import CogTiles from '../cogtiles/cogtiles.ts';
 
 import { GeoImageOptions } from '../geoimage/geoimage.ts';
 
@@ -98,7 +98,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
             bounds: [west, south, east, north],
             opacity: 1, // 0.6
             textureParameters: {
-              [GL.TEXTURE_MAG_FILTER]: this.blurredTexture? GL.LINEAR : GL.NEAREST,
+              [GL.TEXTURE_MAG_FILTER]: this.blurredTexture ? GL.LINEAR : GL.NEAREST,
             },
             extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
             ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode

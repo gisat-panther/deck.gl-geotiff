@@ -40,6 +40,7 @@
     "chroma-js": "^2.4.2",
     "geotiff": "^2.0.7",
     "jpeg-js": "^0.4.4",
-    "pako": "^2.1.0"
+    "pako": "^2.1.0",
+    "@luma.gl/constants": "^8.5.21"
   }
 }
