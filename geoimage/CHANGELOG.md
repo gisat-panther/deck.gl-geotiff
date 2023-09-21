@@ -1,3 +1,16 @@
+# v1.8.1 (Thu Sep 21 2023)
+
+#### 🐾 Patch
+
+- added option to not use blurred textures [#36](https://github.com/gisat-panther/deck.gl-geotiff/pull/36) (mariana.kecova@gisat.cz [@MariDani](https://github.com/MariDani))
+
+#### Authors: 2
+
+- Mariana Kecová ([@MariDani](https://github.com/MariDani))
+- Mariana Kecova (mariana.kecova@gisat.cz)
+
+---
+
 # v1.8.0 (Fri Aug 04 2023)
 
 #### 🚀 Enhancement
