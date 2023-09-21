@@ -35,9 +35,10 @@
 - `useColorsBasedOnValues: boolean` - assign pixels colors based on defined data values **(default false)**
 - `colorsBasedOnValues : [number, chroma.Color][]` - array of value-color pairs, used **if useColorsBasedOnValues is true**, supports chroma.js color definition such as `'red'`, `[255,0,0]`, `'#FF0000'`, etc.
 - `unidentifiedColor: chroma.Color` - set color for not identified values **if useColorsBasedOnValues is true**, **(default [0, 0, 0, 0])**
-- `nullColor: chroma.Color` - set color for noData values **(default [0, 0, 0, 0])**
-- `useSingleColor: boolean` - display data values only with single color **(default false)**
-- `color: chroma.Color` - set color when **if useSingleColor is true**, **(default [255, 0, 255, 255])**
+- `nullColor : chroma.Color` - set color for noData values **(default [0, 0, 0, 0])**
+- `useSingleColor : boolean` - display data values only with single color **(default false)**
+- `color : chroma.Color` - set color when **if useSingleColor is true**, **(default [255, 0, 255, 255])**
+- `blurredTexture : boolean` - define blurring behaviour for textures when zoomed in = magnification filter parameter (`gl.TEXTURE_MAG_FILTER`). Default is `true` for blurry textures (corresponds to `GL.LINEAR`), to not blur textures use `false` (corresponds to `GL.NEAREST`)
 
 ### Return options
 **Method returns Image DataUrl**
