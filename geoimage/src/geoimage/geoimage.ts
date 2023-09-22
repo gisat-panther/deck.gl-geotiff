@@ -70,6 +70,7 @@ export default class GeoImage {
   ) => ((num - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 
   async setUrl(url: string) {
+    // TODO - not tested
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     const tiff = await fromArrayBuffer(arrayBuffer);
@@ -112,6 +113,8 @@ export default class GeoImage {
     let height: number;
 
     if (typeof (input) === 'string') {
+      // TODO not tested
+      // input is type of object
       await this.setUrl(input);
 
       rasters = (await this.data!.readRasters()) as TypedArray[];
@@ -178,6 +181,8 @@ export default class GeoImage {
     let height: number;
 
     if (typeof (input) === 'string') {
+      // TODO not tested
+      // input is type of object
       await this.setUrl(input);
       rasters = (await this.data!.readRasters()) as TypedArray[];
       channels = rasters.length;
