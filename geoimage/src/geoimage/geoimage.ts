@@ -144,8 +144,8 @@ export default class GeoImage {
     for (let i = 0; i < size; i += 4) {
       //  height image calculation based on:
       //  https://deck.gl/docs/api-reference/geo-layers/terrain-layer
-
-      const elevationValue = channel[pixel] * options.multiplier!;
+      const elevationValue = (options.noDataValue && channel[pixel] === options.noDataValue)? 0: channel[pixel] * options.multiplier!;
+      // const elevationValue = channel[pixel] * options.multiplier!;
       const colorValue = Math.floor((elevationValue + 10000) / 0.1);
       imageData.data[i] = Math.floor(colorValue / (256 * 256));
       imageData.data[i + 1] = Math.floor((colorValue / 256) % 256);

@@ -105,9 +105,10 @@ const styleClasses = [
 
 const cogLayer = new CogTerrainLayer(
   'CogTerrainLayer',
-  'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
+  // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
-  { type: 'terrain', multiplier: 0.1, useChannel: null },
+    'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/copdem_cog/copdem_cog_deflate_float32_zoom16_levels8.tif',
+  { type: 'terrain', multiplier: 1, useChannel: null },
   'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
 );
 
@@ -228,9 +229,9 @@ class CogTerrainLayerExample extends React.Component<{}> {
             controller
             layers={[
               // tileLayer,
-              WMSlayer,
+              // WMSlayer,
               cogLayer,
-              coBitmapLayer,
+              // coBitmapLayer,
               // WMSlayerMapped,
 
               // vectorLayer,
