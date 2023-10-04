@@ -17,6 +17,9 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "strictPropertyInitialization": false
   },
   // "include": ["src", "../geoimage/geoimage.ts", "../cogtiles/cogtiles.ts", "../cogterrainlayer/CogTerrainLayer.ts", "../cogbitmaplayer/CogBitmapLayer.ts"],

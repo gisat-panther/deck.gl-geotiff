@@ -105,10 +105,11 @@ const styleClasses = [
 
 const cogLayer = new CogTerrainLayer(
   'CogTerrainLayer',
-  'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
+  // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
-  { type: 'terrain', multiplier: 0.1, useChannel: null },
-  'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
+    'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/copdem_cog/copdem_cog_deflate_float32_zoom16_levels8.tif',
+  { type: 'terrain', multiplier: 1, useChannel: null },
+  // 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
 );
 
 const coBitmapLayer = new CogBitmapLayer(
@@ -171,6 +172,12 @@ class CogTerrainLayerExample extends React.Component<{}> {
       serviceType: 'wms',
       layers: ['OSM-WMS'],
     });
+
+    const verticalProfileLayer = new BitmapLayer({
+      id: 'myBitmapLayer',
+      bounds: [[85.548504, 27.833295, -1000], [85.548504, 27.833295, 6000], [85.702454, 27.850170, 6000], [85.702454, 27.850170, -1000]],
+      image: './test_profile.png'
+    });
     /*
     const vectorLayer = new MVTLayer({
       extensions: [new TerrainExtension()],
@@ -228,9 +235,10 @@ class CogTerrainLayerExample extends React.Component<{}> {
             controller
             layers={[
               // tileLayer,
-              WMSlayer,
+              // WMSlayer,
+              verticalProfileLayer,
               cogLayer,
-              coBitmapLayer,
+              // coBitmapLayer,
               // WMSlayerMapped,
 
               // vectorLayer,

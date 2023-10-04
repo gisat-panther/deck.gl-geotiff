@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@deck.gl/react": "^8.9.18",
+    "@deck.gl/geo-layers": "^8.9.18",
     "@fortawesome/free-solid-svg-icons": "^6.0.0",
     "@fortawesome/react-fontawesome": "^0.1.17",
     "@types/node": "^17.0.18",
