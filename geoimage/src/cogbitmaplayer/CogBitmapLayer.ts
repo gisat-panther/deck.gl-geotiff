@@ -1,11 +1,14 @@
-import { CompositeLayer } from '@deck.gl/core';
+import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
-import GL from '@luma.gl/constants';
+import {Matrix4} from '@math.gl/core';
 import CogTiles from '../cogtiles/cogtiles.ts';
+import GL from '@luma.gl/constants';
 
 import { GeoImageOptions } from '../geoimage/geoimage.ts';
+import {bboxToCenter} from "global-mercator";
+import {metersToLngLat} from 'global-mercator';
 
 // let needsRerender: boolean = false;
 // let extent = [0, 0, 0, 0]
@@ -32,6 +35,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
   blurredTexture: boolean;
 
   constructor(id:string, url:string, options:GeoImageOptions) {
+    console.log("1. Create new CogBitmapLayer");
     super({});
     this.id = id;
     // this.state = {
@@ -47,6 +51,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
   }
 
   initializeState() {
+    console.log("2. Run initializeState function in CogBitmapLayer")
     this.state = {
       initialized: false,
     };
@@ -55,13 +60,11 @@ class CogBitmapLayer extends CompositeLayer<any> {
   }
 
   async init(url:string) {
+    console.log("3. Run init function in CogBitmapLayer")
     const cog = await this.cogTiles.initializeCog(url);
     this.setState({ initialized: true });
-    this.tileSize = this.cogTiles.getTileSize(cog);
-    const zoomRange = this.cogTiles.getZoomRange(cog);
-    [this.minZoom, this.maxZoom] = zoomRange;
-
-    // console.log(zoomRange)
+    this.tileSize = this.cogTiles.tileSize;
+    [this.minZoom, this.maxZoom] = this.cogTiles.zoomRange;
 
     // extent = cogTiles.getBoundsAsLatLon(cog)
 
@@ -83,17 +86,28 @@ class CogBitmapLayer extends CompositeLayer<any> {
         maxZoom: this.maxZoom,
         tileSize: this.tileSize,
         maxRequests: 6,
-        extent: this.cogTiles.cog ? this.cogTiles.getBoundsAsLatLon(this.cogTiles.cog) : null,
+        // extent: this.cogTiles.cog ? this.cogTiles.getBoundsAsLatLon(this.cogTiles.cog) : null,
+        extent: this.cogTiles.getBoundsAsLatLon(this.cogTiles.cog),
 
         renderSubLayers: (props: any) => {
+          // const offsetToLatLon = metersToLngLat([8.342789325863123, 156534.69113874808], 14)
           const {
             bbox: {
               west, south, east, north,
             },
           } = props.tile;
+          // props.modelMatrix = new Matrix4().scale(1).translate([0.00007494455164, -1, 0]);
+          // console.log(`----- ${offsetToLatLon}`)
+          // props.coordinateOrigin = [0, 2.5, 0];
+          // props.coordinateOrigin = worldToLngLat[312, 328, 0];
+          // props.coordinateSystem = COORDINATE_SYSTEM.LNGLAT_OFFSETS;
 
           return new BitmapLayer(props, {
             data: null,
+            // textureParameters: {
+              // [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_NEAREST,
+              // [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
+            // },
             image: props.data,
             bounds: [west, south, east, north],
             opacity: 1, // 0.6
