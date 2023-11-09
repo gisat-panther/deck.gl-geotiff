@@ -51,13 +51,23 @@ const cogLayer = new CogBitmapLayer(
   //   type: 'image', useChannel: 0, useHeatMap: true,colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], colorScaleValueRange: [1, 100, 200, 300, 366],alpha:100, clipLow:0
   // },
 
-    // offset not working
-    'https://gisat-gis.eu-central-1.linodeobjects.com/bsadri/test_raster/COG/LC_2005_all_Georgia_COG_8b_z16.tif',
-    // offset working
-    // 'https://gisat-gis.eu-central-1.linodeobjects.com/bsadri/test_raster/COG/LC_2021_all_Georgia_WEST3940_ZOOM6_test1_defl_COG256.tif',
+    // offset not working Gruzie
+    'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/offsetIssue/LC_2005_all_Georgia_COG_8b_z16.tif',
+    // offset working Gruzie
+    // 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/offsetIssue/LC_2021_all_Georgia_WEST3940_ZOOM6_test1_defl_COG256.tif',
     {
       type: 'image', useChannel: 0, nullColor:[45,23,34,60],alpha:50, unidentifiedColor:[0,0,0,0] ,useColorsBasedOnValues: true,colorsBasedOnValues: [[11,"#ffe875"],[12,"#d8ff92"],[13,"#ed8200"],[22,"#009628"]]
     },
+
+    // offset not working utep
+    // 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/offsetIssue/WSF2019_zoom2_2-2_nearest_COG_TEST.tif',
+    // offset working utep
+    // 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/offsetIssue/WSF2019_zoom2_2-2_nearest_COGeo.tif',
+    // {
+    //   type: 'image', useAutoRange:true,  useSingleColor:true, color: "red", nullColor:[45,23,34,60], unidentifiedColor:"green"
+    // },
+
+    // offset not working
     // Sentinel
     // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/sentinel_cog/2018-11-07-00_00_2018-11-07-23_59_Sentinel-2_L1C_SWIR_cog_nodata.tif',
     // {
