@@ -112,8 +112,6 @@ class CogTiles {
     console.log("5. Run getBoundsAsLatLon")
     let { bbox } = cog.images[cog.images.length - 1];
 
-    console.log("bbox: ", bbox)
-
     // const minX = Math.min(bbox[0], bbox[2]);
     // const maxX = Math.max(bbox[0], bbox[2]);
     // const minY = Math.min(bbox[1], bbox[3]);
@@ -127,12 +125,9 @@ class CogTiles {
     const minXYlnglat = metersToLngLat([bbox[0], bbox[1]], 14);
     const maxXYlnglat = metersToLngLat([bbox[2], bbox[3]], 14);
 
+    // console.log("bbox: ",  [...minXYlnglat, ...maxXYlnglat])
     return [...minXYlnglat, ...maxXYlnglat];
   }
-
-  // getBoundAsCartesian(cog:CogTiff){
-  //   return cog.images[cog.images.length - 1].bbox
-  // }
 
   // getOriginAsLatLon(cog: CogTiff) {
   //   const { origin } = cog.images[cog.images.length - 1];
@@ -200,8 +195,10 @@ class CogTiles {
 
   async getTile(x: number, y: number, z: number) {
     console.log("4. run getTile")
-    console.log(`Getting tile by index x: ${x}, y: ${y}, z: ${z}`);
+    console.log(`--- getting tile by index: ${x}, ${y}, zoom: ${z}`);
+    console.count(`--- running getTile count`);
     const img = this.cog.getImageByResolution(this.getResolutionFromZoomLevel(this.tileSize, z));
+    console.log(`--- img id: ${img.id}`)
     // await img.loadGeoTiffTags(1)
     let leftUpTileIdx: number[] = [0, 0];
 
@@ -219,7 +216,6 @@ class CogTiles {
     //
     // this.modelMatrix = new Matrix4().scale([xScale, yScale, 1]).translate([8.342789325863123,-156534.69113874808,0]);
 
-    // MK: proc??
     if (z === this.zoomRange[0]) {
       leftUpTileIdx = this.lowestOriginTileIndex;
     } else {
@@ -227,12 +223,15 @@ class CogTiles {
       leftUpTileIdx[0] = Math.floor(this.lowestOriginTileIndex[0] * power);
       leftUpTileIdx[1] = Math.floor(this.lowestOriginTileIndex[1] * power);
     }
+    console.log(`--- left up tile idx: ${leftUpTileIdx}`)
     const tilesX = img.tileCount.x;
     const tilesY = img.tileCount.y;
+    console.log(`--- tile count: ${tilesX}, ${tilesY}`)
 
     // console.log(`Image Tile Count ${img.tileCount.x}, ${img.tileCount.y}`);
     // console.log(`Image Tile Offset ${img.tileOffset.size}, ${img.tileOffset.value?.length}`);
 
+    // origin xy
     const ox = leftUpTileIdx[0];
     // const ox = this.xOffset;
     const oy = leftUpTileIdx[1];
@@ -243,38 +242,42 @@ class CogTiles {
     let decompressed: string;
     let decoded: any;
 
-    this.options.numOfChannels = Number(img.tags.get(277).value);
-    this.options.noDataValue = this.getNoDataValue(img.tags);
-
-    if (!this.options.format) {
-      // More information about TIFF tags: https://www.awaresystems.be/imaging/tiff/tifftags.html
-      this.options.format = this.getFormat(
-img.tags.get(339).value as Array<number>,
-      img.tags.get(258).value as Array<number>,
-      );
-    }
-
-    let bitsPerSample = img.tags.get(258)!.value;
-    if (Array.isArray(bitsPerSample)) {
-      if (this.options.type === 'terrain') {
-        let c = 0;
-        bitsPerSample.forEach((sample) => {
-          c += sample;
-        });
-        bitsPerSample = c;
-      } else {
-        [bitsPerSample] = bitsPerSample;
-      }
-    }
-
-    // const samplesPerPixel = img.tags.get(277)!.value
-    // console.log("Samples per pixel:" + samplesPerPixel)
-    // console.log("Bits per sample: " + bitsPerSample)
-    // console.log("Single channel pixel format: " + bitsPerSample/)
-
+  // check whether tile index that we tile layer is asking for exist within the image
+  //   comparing tile index of image origin (upper left) and current tile
     if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
+      this.options.numOfChannels = Number(img.tags.get(277).value);
+      this.options.noDataValue = this.getNoDataValue(img.tags);
+
+      if (!this.options.format) {
+        // More information about TIFF tags: https://www.awaresystems.be/imaging/tiff/tifftags.html
+        this.options.format = this.getFormat(
+            img.tags.get(339).value as Array<number>,
+            img.tags.get(258).value as Array<number>,
+        );
+      }
+
+      let bitsPerSample = img.tags.get(258)!.value;
+      if (Array.isArray(bitsPerSample)) {
+        if (this.options.type === 'terrain') {
+          let c = 0;
+          bitsPerSample.forEach((sample) => {
+            c += sample;
+          });
+          bitsPerSample = c;
+        } else {
+          [bitsPerSample] = bitsPerSample;
+        }
+      }
+
+      // const samplesPerPixel = img.tags.get(277)!.value
+      // console.log("Samples per pixel:" + samplesPerPixel)
+      // console.log("Bits per sample: " + bitsPerSample)
+      // console.log("Single channel pixel format: " + bitsPerSample/)
+
       // console.log("getting tile: " + [x - ox, y - oy]);
-      const tile = await img.getTile((x - ox), (y - oy));
+      const tile = await this.getTileWithOffset((x-ox), (y - oy), img);
+      console.log(`4.1 run image.getTile for ${(x-ox)}, ${y-oy}, ${z}`)
+      // console.count(`--- running image.getTile count`);
       // console.time("Request to data time: ")
 
       switch (img.compression) {

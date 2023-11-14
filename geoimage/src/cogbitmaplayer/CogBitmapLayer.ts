@@ -86,8 +86,7 @@ class CogBitmapLayer extends CompositeLayer<any> {
         maxZoom: this.maxZoom,
         tileSize: this.tileSize,
         maxRequests: 6,
-        // extent: this.cogTiles.cog ? this.cogTiles.getBoundsAsLatLon(this.cogTiles.cog) : null,
-        extent: this.cogTiles.getBoundsAsLatLon(this.cogTiles.cog),
+        extent: this.cogTiles.cog ? this.cogTiles.getBoundsAsLatLon(this.cogTiles.cog) : null,
 
         renderSubLayers: (props: any) => {
           // const offsetToLatLon = metersToLngLat([8.342789325863123, 156534.69113874808], 14)
@@ -96,11 +95,6 @@ class CogBitmapLayer extends CompositeLayer<any> {
               west, south, east, north,
             },
           } = props.tile;
-          // props.modelMatrix = new Matrix4().scale(1).translate([0.00007494455164, -1, 0]);
-          // console.log(`----- ${offsetToLatLon}`)
-          // props.coordinateOrigin = [0, 2.5, 0];
-          // props.coordinateOrigin = worldToLngLat[312, 328, 0];
-          // props.coordinateSystem = COORDINATE_SYSTEM.LNGLAT_OFFSETS;
 
           return new BitmapLayer(props, {
             data: null,
