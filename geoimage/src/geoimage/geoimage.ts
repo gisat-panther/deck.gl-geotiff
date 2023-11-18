@@ -12,6 +12,7 @@ export type GeoImageOptions = {
     format?: 'uint8' | 'uint16' | 'uint32' |'int8' | 'int16' | 'int32' | 'float32' | 'float64'
     useHeatMap?: boolean,
     useColorsBasedOnValues? : boolean,
+    useColorClasses? : boolean,
     useAutoRange?: boolean,
     useDataForOpacity?: boolean,
     useChannel?: number | null,
@@ -24,6 +25,7 @@ export type GeoImageOptions = {
     colorScale?: Array<string> | Array<chroma.Color>,
     colorScaleValueRange?: number[],
     colorsBasedOnValues? : [number|undefined, chroma.Color][],
+    colorClasses? : [[number, number], chroma.Color][],
     alpha?: number,
     noDataValue?: number
     numOfChannels?: number,
@@ -41,6 +43,7 @@ const DefaultGeoImageOptions: GeoImageOptions = {
   useAutoRange: false,
   useDataForOpacity: false,
   useSingleColor: false,
+  useColorClasses: false,
   blurredTexture: true,
   clipLow: null,
   clipHigh: null,
@@ -49,6 +52,7 @@ const DefaultGeoImageOptions: GeoImageOptions = {
   colorScale: chroma.brewer.YlOrRd,
   colorScaleValueRange: [0, 255],
   colorsBasedOnValues: null,
+  colorClasses: null,
   alpha: 100,
   useChannel: null,
   noDataValue: undefined,
@@ -338,9 +342,13 @@ export default class GeoImage {
     let pixel:number = options.useChannel === null ? 0 : options.useChannel;
     const colorsArray = new Array(arrayLength);
 
-    // for useColorsBasedOnValues
+    // if useColorsBasedOnValues is true
     const dataValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([first]) => first) : undefined;
     const colorValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([, second]) => [...chroma(second).rgb(), Math.floor(options.alpha * 2.55)]) : undefined;
+
+    // if useClasses is true
+    const dataClasses = options.useColorClasses ? options.colorClasses.map(([first]) => first) : undefined;
+    const colorClasses = options.useColorClasses ? options.colorClasses.map(([, second]) => [...chroma(second).rgb(), Math.floor(options.alpha * 2.55)]) : undefined;
 
     for (let i = 0; i < arrayLength; i += 4) {
       let pixelColor = options.nullColor;
@@ -362,6 +370,12 @@ export default class GeoImage {
               pixelColor = colorValues[index];
             } else pixelColor = options.unidentifiedColor;
           }
+          if (options.useColorClasses) {
+            const index = this.findClassIndex(dataArray[pixel], dataClasses);
+            if (index > -1) {
+              pixelColor = colorClasses[index];
+            } else pixelColor = options.unidentifiedColor;
+          }
           if (options.useSingleColor) {
             // FIXME - Is this compatible with chroma.color?
             pixelColor = options.color;
@@ -379,6 +393,17 @@ export default class GeoImage {
       pixel += numOfChannels;
     }
     return colorsArray;
+  }
+
+  findClassIndex(number, classes) {
+    // returns index of the first class to which the number belongs
+    for (let idx = 0; idx < classes.length; idx++) {
+      const [min, max] = classes[idx];
+      if (number >= min && number <= max) {
+        return idx;
+      }
+    }
+    return -1;
   }
 
   getDefaultColor(size, nullColor) {
