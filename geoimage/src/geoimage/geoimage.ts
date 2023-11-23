@@ -25,7 +25,7 @@ export type GeoImageOptions = {
     colorScale?: Array<string> | Array<chroma.Color>,
     colorScaleValueRange?: number[],
     colorsBasedOnValues? : [number|undefined, chroma.Color][],
-    colorClasses? : [[number, number], chroma.Color][],
+    colorClasses? : [chroma.Color, [number, number], [boolean, boolean]?][],
     alpha?: number,
     noDataValue?: number
     numOfChannels?: number,
@@ -347,8 +347,13 @@ export default class GeoImage {
     const colorValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([, second]) => [...chroma(second).rgb(), Math.floor(options.alpha * 2.55)]) : undefined;
 
     // if useClasses is true
-    const dataClasses = options.useColorClasses ? options.colorClasses.map(([first]) => first) : undefined;
-    const colorClasses = options.useColorClasses ? options.colorClasses.map(([, second]) => [...chroma(second).rgb(), Math.floor(options.alpha * 2.55)]) : undefined;
+    const colorClasses = options.useColorClasses ? options.colorClasses.map(([color]) => [...chroma(color).rgb(), Math.floor(options.alpha * 2.55)]) : undefined;
+    const dataIntervals = options.useColorClasses ? options.colorClasses.map(([, interval]) => interval) : undefined;
+    const dataIntervalBounds = options.useColorClasses ? options.colorClasses.map(([, , bounds], index) => {
+      if (bounds !== undefined) return bounds;
+      if (index === 0) return [true, true];
+      return [false, true];
+    }) : undefined;
 
     for (let i = 0; i < arrayLength; i += 4) {
       let pixelColor = options.nullColor;
@@ -371,7 +376,7 @@ export default class GeoImage {
             } else pixelColor = options.unidentifiedColor;
           }
           if (options.useColorClasses) {
-            const index = this.findClassIndex(dataArray[pixel], dataClasses);
+            const index = this.findClassIndex(dataArray[pixel], dataIntervals, dataIntervalBounds);
             if (index > -1) {
               pixelColor = colorClasses[index];
             } else pixelColor = options.unidentifiedColor;
@@ -395,11 +400,13 @@ export default class GeoImage {
     return colorsArray;
   }
 
-  findClassIndex(number, classes) {
+  findClassIndex(number, intervals, bounds) {
     // returns index of the first class to which the number belongs
-    for (let idx = 0; idx < classes.length; idx++) {
-      const [min, max] = classes[idx];
-      if (number >= min && number <= max) {
+    for (let idx = 0; idx < intervals.length; idx += 1) {
+      const [min, max] = intervals[idx];
+      const [includeEqualMin, includeEqualMax] = bounds[idx];
+      if ((includeEqualMin ? number >= min : number > min)
+          && (includeEqualMax ? number <= max : number < max)) {
         return idx;
       }
     }
