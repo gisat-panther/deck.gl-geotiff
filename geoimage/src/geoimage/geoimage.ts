@@ -351,8 +351,8 @@ export default class GeoImage {
     const dataIntervals = options.useColorClasses ? options.colorClasses.map(([, interval]) => interval) : undefined;
     const dataIntervalBounds = options.useColorClasses ? options.colorClasses.map(([, , bounds], index) => {
       if (bounds !== undefined) return bounds;
-      if (index === 0) return [true, true];
-      return [false, true];
+      if (index === options.colorClasses.length - 1) return [true, true];
+      return [true, false];
     }) : undefined;
 
     for (let i = 0; i < arrayLength; i += 4) {
