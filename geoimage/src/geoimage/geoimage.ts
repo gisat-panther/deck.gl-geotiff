@@ -12,6 +12,7 @@ export type GeoImageOptions = {
     format?: 'uint8' | 'uint16' | 'uint32' |'int8' | 'int16' | 'int32' | 'float32' | 'float64'
     useHeatMap?: boolean,
     useColorsBasedOnValues? : boolean,
+    useColorClasses? : boolean,
     useAutoRange?: boolean,
     useDataForOpacity?: boolean,
     useChannel?: number | null,
@@ -24,6 +25,7 @@ export type GeoImageOptions = {
     colorScale?: Array<string> | Array<chroma.Color>,
     colorScaleValueRange?: number[],
     colorsBasedOnValues? : [number|undefined, chroma.Color][],
+    colorClasses? : [chroma.Color, [number, number], [boolean, boolean]?][],
     alpha?: number,
     noDataValue?: number
     numOfChannels?: number,
@@ -41,6 +43,7 @@ const DefaultGeoImageOptions: GeoImageOptions = {
   useAutoRange: false,
   useDataForOpacity: false,
   useSingleColor: false,
+  useColorClasses: false,
   blurredTexture: true,
   clipLow: null,
   clipHigh: null,
@@ -49,6 +52,7 @@ const DefaultGeoImageOptions: GeoImageOptions = {
   colorScale: chroma.brewer.YlOrRd,
   colorScaleValueRange: [0, 255],
   colorsBasedOnValues: null,
+  colorClasses: null,
   alpha: 100,
   useChannel: null,
   noDataValue: undefined,
@@ -70,6 +74,7 @@ export default class GeoImage {
   ) => ((num - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 
   async setUrl(url: string) {
+    // TODO - not tested
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     const tiff = await fromArrayBuffer(arrayBuffer);
@@ -112,6 +117,8 @@ export default class GeoImage {
     let height: number;
 
     if (typeof (input) === 'string') {
+      // TODO not tested
+      // input is type of object
       await this.setUrl(input);
 
       rasters = (await this.data!.readRasters()) as TypedArray[];
@@ -178,6 +185,8 @@ export default class GeoImage {
     let height: number;
 
     if (typeof (input) === 'string') {
+      // TODO not tested
+      // input is type of object
       await this.setUrl(input);
       rasters = (await this.data!.readRasters()) as TypedArray[];
       channels = rasters.length;
@@ -333,9 +342,18 @@ export default class GeoImage {
     let pixel:number = options.useChannel === null ? 0 : options.useChannel;
     const colorsArray = new Array(arrayLength);
 
-    // for useColorsBasedOnValues
+    // if useColorsBasedOnValues is true
     const dataValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([first]) => first) : undefined;
     const colorValues = options.colorsBasedOnValues ? options.colorsBasedOnValues.map(([, second]) => [...chroma(second).rgb(), Math.floor(options.alpha * 2.55)]) : undefined;
+
+    // if useClasses is true
+    const colorClasses = options.useColorClasses ? options.colorClasses.map(([color]) => [...chroma(color).rgb(), Math.floor(options.alpha * 2.55)]) : undefined;
+    const dataIntervals = options.useColorClasses ? options.colorClasses.map(([, interval]) => interval) : undefined;
+    const dataIntervalBounds = options.useColorClasses ? options.colorClasses.map(([, , bounds], index) => {
+      if (bounds !== undefined) return bounds;
+      if (index === options.colorClasses.length - 1) return [true, true];
+      return [true, false];
+    }) : undefined;
 
     for (let i = 0; i < arrayLength; i += 4) {
       let pixelColor = options.nullColor;
@@ -357,6 +375,12 @@ export default class GeoImage {
               pixelColor = colorValues[index];
             } else pixelColor = options.unidentifiedColor;
           }
+          if (options.useColorClasses) {
+            const index = this.findClassIndex(dataArray[pixel], dataIntervals, dataIntervalBounds);
+            if (index > -1) {
+              pixelColor = colorClasses[index];
+            } else pixelColor = options.unidentifiedColor;
+          }
           if (options.useSingleColor) {
             // FIXME - Is this compatible with chroma.color?
             pixelColor = options.color;
@@ -374,6 +398,19 @@ export default class GeoImage {
       pixel += numOfChannels;
     }
     return colorsArray;
+  }
+
+  findClassIndex(number, intervals, bounds) {
+    // returns index of the first class to which the number belongs
+    for (let idx = 0; idx < intervals.length; idx += 1) {
+      const [min, max] = intervals[idx];
+      const [includeEqualMin, includeEqualMax] = bounds[idx];
+      if ((includeEqualMin ? number >= min : number > min)
+          && (includeEqualMax ? number <= max : number < max)) {
+        return idx;
+      }
+    }
+    return -1;
   }
 
   getDefaultColor(size, nullColor) {

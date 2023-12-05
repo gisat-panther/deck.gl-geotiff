@@ -1,7 +1,7 @@
 /* eslint 'max-len': [1, { code: 100, comments: 999, ignoreStrings: true, ignoreUrls: true }] */
 // COG loading
 import { CogTiff, CogTiffImage } from '@cogeotiff/core';
-import { SourceUrl } from '@chunkd/source-url';
+import { SourceHttp } from '@chunkd/source-http';
 
 // Image compression support
 import { inflate } from 'pako';
@@ -41,14 +41,14 @@ class CogTiles {
   }
 
   async initializeCog(url: string) {
-    // Set native fetch instead node-fetch to SourceUrl
-    SourceUrl.fetch = async (input, init) => {
+    // Set native fetch instead node-fetch to SourceHttp
+    SourceHttp.fetch = async (input, init) => {
       const res = await fetch(input, init);
       return res;
     };
 
-    const sourceUrl = new SourceUrl(url);
-    this.cog = await CogTiff.create(sourceUrl);
+    const source = new SourceHttp(url);
+    this.cog = await CogTiff.create(source);
 
     this.cog.images.forEach((image:CogTiffImage) => {
       image.loadGeoTiffTags();

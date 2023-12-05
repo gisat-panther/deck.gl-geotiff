@@ -34,7 +34,9 @@
 - `colorScaleValueRange: number[]` - set min and max range values or set any array of values to set exact colors to values, **if useAutoRange is false**, **(default [0,255])**
 - `useColorsBasedOnValues: boolean` - assign pixels colors based on defined data values **(default false)**
 - `colorsBasedOnValues : [number, chroma.Color][]` - array of value-color pairs, used **if useColorsBasedOnValues is true**, supports chroma.js color definition such as `'red'`, `[255,0,0]`, `'#FF0000'`, etc.
-- `unidentifiedColor: chroma.Color` - set color for not identified values **if useColorsBasedOnValues is true**, **(default [0, 0, 0, 0])**
+- `useColorClasses: boolean` - determines whether pixel colors are assigned based on predefined data classes (intervals) **(default false)**
+- `colorClasses : [chroma.Color, [number, number], [boolean, boolean]?][]` - array of color-interval(-intervalBounds) triples, where the color is defined as chroma.js color; interval is defined as [min, max] array; and optional inteval bound as [boolean, boolean] array (default is [true, false] for all intervals except the last one which is [false, true]; used **if useColorClasses is true**, the values that don't belong to any interval are visualized as `unidentifiedColor`
+- `unidentifiedColor: chroma.Color` - set color for not identified values **if useColorsBasedOnValues or useColorClasses is true**, **(default [0, 0, 0, 0])**
 - `nullColor : chroma.Color` - set color for noData values **(default [0, 0, 0, 0])**
 - `useSingleColor : boolean` - display data values only with single color **(default false)**
 - `color : chroma.Color` - set color when **if useSingleColor is true**, **(default [255, 0, 255, 255])**
