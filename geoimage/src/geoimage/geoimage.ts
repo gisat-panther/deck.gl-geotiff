@@ -31,6 +31,7 @@ export type GeoImageOptions = {
     unidentifiedColor?: Array<number> | chroma.Color,
     clippedColor?: Array<number> | chroma.Color,
     clampToTerrain?: ClampToTerrainOptions | boolean, // terrainDrawMode: 'drape',
+    terrainMinValue?:number,
 }
 
 const DefaultGeoImageOptions: GeoImageOptions = {
@@ -56,6 +57,7 @@ const DefaultGeoImageOptions: GeoImageOptions = {
   nullColor: [0, 0, 0, 0],
   unidentifiedColor: [0, 0, 0, 0],
   clippedColor: [0, 0, 0, 0],
+  terrainMinValue: undefined,
 };
 
 export default class GeoImage {
@@ -145,7 +147,8 @@ export default class GeoImage {
       //  height image calculation based on:
       //  https://deck.gl/docs/api-reference/geo-layers/terrain-layer
 
-      const elevationValue = channel[pixel] * options.multiplier!;
+      const elevationValue = (options.noDataValue && channel[pixel] === options.noDataValue && options.terrainMinValue) ? options.terrainMinValue : channel[pixel] * options.multiplier!;
+      // const elevationValue = channel[pixel] * options.multiplier!;
       const colorValue = Math.floor((elevationValue + 10000) / 0.1);
       imageData.data[i] = Math.floor(colorValue / (256 * 256));
       imageData.data[i + 1] = Math.floor((colorValue / 256) % 256);
