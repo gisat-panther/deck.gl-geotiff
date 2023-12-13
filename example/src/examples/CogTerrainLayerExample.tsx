@@ -2,6 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
 import { readPixelsToArray } from '@luma.gl/core';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
+import { PolygonLayer, BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
 // import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import {
   MVTLayer,
@@ -9,7 +10,6 @@ import {
   _WMSLayer as WMSLayer,
 } from '@deck.gl/geo-layers';
 import { MVTLoader } from '@loaders.gl/mvt';
-import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
 import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
@@ -107,20 +107,24 @@ const cogLayer = new CogTerrainLayer(
   'CogTerrainLayer',
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
-    'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/copdem_cog/copdem_cog_deflate_float32_zoom16_levels8.tif',
-  { type: 'terrain', multiplier: 1, useChannel: null },
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
+  {
+    type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 0,
+  },
   // 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
 );
 
-const coBitmapLayer = new CogBitmapLayer(
+const cogBitmapLayer = new CogBitmapLayer(
   'CogBitmapLayer',
-  'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate_in16_zoom16_levels8.tif',
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
   {
     type: 'image',
     useChannel: 0,
     useHeatMap: true,
-    colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'],
-    colorScaleValueRange: [1, 100, 200, 300, 366],
+    colorScale: ['white', 'black'],
+    alpha: 20,
+    useDataOpacity: false,
+    colorScaleValueRange: [196, 540],
     clampToTerrain: {
       terrainDrawMode: 'drape',
     },
@@ -173,10 +177,36 @@ class CogTerrainLayerExample extends React.Component<{}> {
       layers: ['OSM-WMS'],
     });
 
-    const verticalProfileLayer = new BitmapLayer({
-      id: 'myBitmapLayer',
-      bounds: [[85.548504, 27.833295, -1000], [85.548504, 27.833295, 6000], [85.702454, 27.850170, 6000], [85.702454, 27.850170, -1000]],
-      image: './test_profile.png'
+    const verticalProfileLayer_R3_1 = new BitmapLayer({
+      id: 'verticalProfileLayer_R3_1',
+      bounds: [[14.092778594270721, 50.756831358565449, 365 - 110], [14.092778594270721, 50.756831358565449, 365], [14.09067918253672, 50.760145086145982, 365], [14.09067918253672, 50.760145086145982, 365 - 110]],
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/R3-1.png',
+    });
+
+    // const verticalVectorProfileLayer = new PolygonLayer({
+    //   id: 'polygon-layer',
+    //   data: './vertical_json.json',
+    //   stroked: true,
+    //   filled: true,
+    //   lineWidthMinPixels: 1,
+    //   getLineColor: [80, 80, 80],
+    //   getLineWidth: 1,
+    //   getPolygon: (d) => d.contour,
+    //   getFillColor: [23, 234, 85],
+    // });
+
+    const lines = new GeoJsonLayer({
+      id: 'rezy-line-layer',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_wgs84.geojson',
+      stroked: false,
+      pointType: 'circle',
+      lineWidthScale: 20,
+      lineWidthMinPixels: 2,
+      getLineColor: [255, 0, 0, 255],
+      getLineWidth: 1,
+      clampToTerrain: {
+        terrainDrawMode: 'drape',
+      },
     });
     /*
     const vectorLayer = new MVTLayer({
@@ -222,7 +252,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
         });
       }
 
-      console.log(item, image, item?.pixelColor);
+      // console.log(item, image, item?.pixelColor);
     };
 
     return (
@@ -234,13 +264,14 @@ class CogTerrainLayerExample extends React.Component<{}> {
             initialViewState={initialViewState}
             controller
             layers={[
-              // tileLayer,
+              tileLayer,
               // WMSlayer,
-              verticalProfileLayer,
+              verticalProfileLayer_R3_1,
+              lines,
+              // verticalVectorProfileLayer,
               cogLayer,
-              // coBitmapLayer,
+              cogBitmapLayer,
               // WMSlayerMapped,
-
               // vectorLayer,
             ]}
             views={[
