@@ -109,7 +109,7 @@ const cogLayer = new CogTerrainLayer(
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
   'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
   {
-    type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 0,
+    type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 0, operation: 'terrain+draw', alpha: 20,
   },
   // 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
 );
@@ -177,10 +177,16 @@ class CogTerrainLayerExample extends React.Component<{}> {
       layers: ['OSM-WMS'],
     });
 
-    const verticalProfileLayer_R3_1 = new BitmapLayer({
-      id: 'verticalProfileLayer_R3_1',
-      bounds: [[14.092778594270721, 50.756831358565449, 365 - 110], [14.092778594270721, 50.756831358565449, 365], [14.09067918253672, 50.760145086145982, 365], [14.09067918253672, 50.760145086145982, 365 - 110]],
-      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/R3-1.png',
+    const verticalProfileLayer_Decin_R3_1 = new BitmapLayer({
+      id: 'verticalProfileLayer_Decin_R3_1',
+      bounds: [[14.092778594270721, 50.756831358565449, 366 - 110], [14.092778594270721, 50.756831358565449, 366], [14.09067918253672, 50.760145086145982, 366], [14.09067918253672, 50.760145086145982, 366 - 110]],
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R3-1.png',
+    });
+
+    const verticalProfileLayer_Decin_R4_1 = new BitmapLayer({
+      id: 'verticalProfileLayer_Decin_R4_1',
+      bounds: [[14.095333525668964, 50.757766881494845, 333 - 76], [14.095333525668964, 50.757766881494845, 333 + 42], [14.093227847353772, 50.76080220810416, 333 + 42], [14.093227847353772, 50.76080220810416, 333 - 76]],
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R4_1.png',
     });
 
     // const verticalVectorProfileLayer = new PolygonLayer({
@@ -204,9 +210,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
       lineWidthMinPixels: 2,
       getLineColor: [255, 0, 0, 255],
       getLineWidth: 1,
-      clampToTerrain: {
-        terrainDrawMode: 'drape',
-      },
+      extensions: [new TerrainExtension()],
     });
     /*
     const vectorLayer = new MVTLayer({
@@ -266,11 +270,12 @@ class CogTerrainLayerExample extends React.Component<{}> {
             layers={[
               tileLayer,
               // WMSlayer,
-              verticalProfileLayer_R3_1,
+              verticalProfileLayer_Decin_R3_1,
+              verticalProfileLayer_Decin_R4_1,
               lines,
               // verticalVectorProfileLayer,
               cogLayer,
-              cogBitmapLayer,
+              // cogBitmapLayer,
               // WMSlayerMapped,
               // vectorLayer,
             ]}
