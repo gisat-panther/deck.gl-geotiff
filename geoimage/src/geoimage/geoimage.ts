@@ -32,9 +32,11 @@ export type GeoImageOptions = {
     clippedColor?: Array<number> | chroma.Color,
     clampToTerrain?: ClampToTerrainOptions | boolean, // terrainDrawMode: 'drape',
     terrainMinValue?:number,
+    terrainColor?: Array<number> | chroma.Color,
+    terrainSkirtHeight?: number,
 }
 
-const DefaultGeoImageOptions: GeoImageOptions = {
+export const DefaultGeoImageOptions: GeoImageOptions = {
   type: 'image',
   format: 'uint8',
   useHeatMap: true,
@@ -58,6 +60,8 @@ const DefaultGeoImageOptions: GeoImageOptions = {
   unidentifiedColor: [0, 0, 0, 0],
   clippedColor: [0, 0, 0, 0],
   terrainMinValue: undefined,
+  terrainColor: [133, 133, 133, 255],
+  terrainSkirtHeight: 2000,
 };
 
 export default class GeoImage {

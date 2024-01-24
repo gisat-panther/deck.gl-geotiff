@@ -109,9 +109,21 @@ const cogLayer = new CogTerrainLayer(
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
   'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
   {
-    type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 0, operation: 'terrain+draw', alpha: 20,
+    type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 100, operation: 'terrain+draw', alpha: 50, terrainSkirtHeight: 7,
   },
   // 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
+  // { alpha: 60 },
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
+  {
+    type: 'image',
+    useChannel: 0,
+    useHeatMap: true,
+    colorScale: ['red', 'blue'],
+    // colorScale: chroma.brewer.RdYIGn,
+    alpha: 90,
+    useDataOpacity: false,
+    colorScaleValueRange: [196, 540],
+  },
 );
 
 const cogBitmapLayer = new CogBitmapLayer(
