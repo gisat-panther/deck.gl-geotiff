@@ -224,6 +224,32 @@ class CogTerrainLayerExample extends React.Component<{}> {
       getLineWidth: 1,
       extensions: [new TerrainExtension()],
     });
+
+    const vrstevniceZduraznena = new MVTLayer({
+      id: 'vrstevnice_zduraznena',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vrstevnice/vyrovna/vrstevnice_zduraznena_mvt_z12_14/{z}/{x}/{y}.pbf',
+      binary: false,
+      minZoom: 12,
+      maxZoom: 14,
+      stroked: true,
+      filled: true,
+      getLineColor: [130, 130, 130],
+      getLineWidth: 1,
+      extensions: [new TerrainExtension()],
+    });
+
+    const vrstevniceZakladni = new MVTLayer({
+      id: 'vrstevnice_zakladni',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vrstevnice/vyrovna/vrstevnice_zakladni_mvt_z14/{z}/{x}/{y}.pbf',
+      binary: false,
+      minZoom: 14,
+      maxZoom: 14,
+      stroked: true,
+      filled: true,
+      getLineColor: [160, 160, 160],
+      getLineWidth: 0.5,
+      extensions: [new TerrainExtension()],
+    });
     /*
     const vectorLayer = new MVTLayer({
       extensions: [new TerrainExtension()],
@@ -287,6 +313,8 @@ class CogTerrainLayerExample extends React.Component<{}> {
               lines,
               // verticalVectorProfileLayer,
               cogLayer,
+              vrstevniceZduraznena,
+              vrstevniceZakladni,
               // cogBitmapLayer,
               // WMSlayerMapped,
               // vectorLayer,
