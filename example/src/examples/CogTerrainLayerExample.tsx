@@ -12,6 +12,7 @@ import {
 import { MVTLoader } from '@loaders.gl/mvt';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
+import chroma from 'chroma-js';
 import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
 
@@ -25,6 +26,27 @@ function hexToRgb(hex: string) {
     ];
   }
   return [];
+}
+
+//                     __
+//    imageHeight?    |                     |
+//                    |                __   |______
+//                    |               |     |      \
+//                    | profileHeight |     |       \___________________________
+//                    |__             |__   |___________________________________\
+//                                        [leftX, leftY, leftProfileHeight]      rightX, rightY]
+//
+//
+//
+
+function getVerticalProfileBounds(leftX: number, leftY: number, rightX: number, rightY: number, leftProfileHeight: number, profileHeight: number, imageHeight?: number) {
+  const heightAboveProfile = imageHeight ? imageHeight - profileHeight : 0;
+  return [
+    [leftX, leftY, leftProfileHeight - profileHeight],
+    [leftX, leftY, leftProfileHeight + heightAboveProfile],
+    [rightX, rightY, leftProfileHeight + heightAboveProfile],
+    [rightX, rightY, leftProfileHeight - profileHeight],
+  ];
 }
 
 const styleClasses = [
@@ -118,9 +140,9 @@ const cogLayer = new CogTerrainLayer(
     type: 'image',
     useChannel: 0,
     useHeatMap: true,
-    colorScale: ['red', 'blue'],
-    // colorScale: chroma.brewer.RdYIGn,
-    alpha: 90,
+    // colorScale: ['red', 'blue'],
+    colorScale: ['#1a9850', '#66bd63', '#a6d96a', '#d9ef8b', '#ffffbf', '#fee08b', '#fdae61', '#f46d43', '#d73027'],
+    alpha: 80,
     useDataOpacity: false,
     colorScaleValueRange: [196, 540],
   },
@@ -191,14 +213,32 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     const verticalProfileLayer_Decin_R3_1 = new BitmapLayer({
       id: 'verticalProfileLayer_Decin_R3_1',
-      bounds: [[14.092778594270721, 50.756831358565449, 366 - 110], [14.092778594270721, 50.756831358565449, 366], [14.09067918253672, 50.760145086145982, 366], [14.09067918253672, 50.760145086145982, 366 - 110]],
+      bounds: getVerticalProfileBounds(14.092778594270721, 50.756831358565449, 14.09067918253672, 50.760145086145982, 366, 110),
       image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R3-1.png',
     });
 
     const verticalProfileLayer_Decin_R4_1 = new BitmapLayer({
       id: 'verticalProfileLayer_Decin_R4_1',
-      bounds: [[14.095333525668964, 50.757766881494845, 333 - 76], [14.095333525668964, 50.757766881494845, 333 + 42], [14.093227847353772, 50.76080220810416, 333 + 42], [14.093227847353772, 50.76080220810416, 333 - 76]],
-      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R4_1.png',
+      bounds: getVerticalProfileBounds(14.095333525668964, 50.757766881494845, 14.093227847353772, 50.76080220810416, 333, 76, 118),
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R4-1.png',
+    });
+
+    const verticalProfileLayer_Decin_R11_a = new BitmapLayer({
+      id: 'verticalProfileLayer_Decin_R11-a',
+      bounds: getVerticalProfileBounds(14.112568896598429, 50.75908013365067, 14.112182666854412, 50.760860099395813, 299, 72, 140),
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R11crit_1-a.png',
+    });
+
+    const verticalProfileLayer_Decin_R11_b = new BitmapLayer({
+      id: 'verticalProfileLayer_Decin_R11-b',
+      bounds: getVerticalProfileBounds(14.112182666854412, 50.760860099395813, 14.112801228445084, 50.7621494828214422, 299, 72, 140),
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R11crit_1-b.png',
+    });
+
+    const verticalProfileLayer_Decin_R12 = new BitmapLayer({
+      id: 'verticalProfileLayer_Decin_R12',
+      bounds: getVerticalProfileBounds(14.117314655464686, 50.757397623493432, 14.111939262010219, 50.762276051184848, 330, 102, 180),
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R12-1.png',
     });
 
     // const verticalVectorProfileLayer = new PolygonLayer({
@@ -310,6 +350,9 @@ class CogTerrainLayerExample extends React.Component<{}> {
               // WMSlayer,
               verticalProfileLayer_Decin_R3_1,
               verticalProfileLayer_Decin_R4_1,
+              verticalProfileLayer_Decin_R11_a,
+              verticalProfileLayer_Decin_R11_b,
+              verticalProfileLayer_Decin_R12,
               lines,
               // verticalVectorProfileLayer,
               cogLayer,
