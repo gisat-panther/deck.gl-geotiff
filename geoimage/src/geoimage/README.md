@@ -30,7 +30,7 @@
 
 - `clipHigh : number | null`- generate only data less than this **(default null)**
 - `clippedColor: chroma.Color` - set color for clipped values when using `clipLow` or `clipHigh`, **(default [0, 0, 0, 0])**
-- `colorScale:chroma.Color[]` - array of colors, supports chroma.js color definition such as `'red'`, `[255,0,0]`, `'#FF0000'`, etc. and [Color Brewer pallete names](https://www.datanovia.com/en/wp-content/uploads/dn-tutorials/ggplot2/figures/0101-rcolorbrewer-palette-rcolorbrewer-palettes-colorblind-friendly-1.png) in this format: `chroma.brewer.Greens`
+- `colorScale:chroma.Color[]` - array of colors, supports chroma.js color definition (more below)
 - `colorScaleValueRange: number[]` - set min and max range values or set any array of values to set exact colors to values, **if useAutoRange is false**, **(default [0,255])**
 - `useColorsBasedOnValues: boolean` - assign pixels colors based on defined data values **(default false)**
 - `colorsBasedOnValues : [number, chroma.Color][]` - array of value-color pairs, used **if useColorsBasedOnValues is true**, supports chroma.js color definition such as `'red'`, `[255,0,0]`, `'#FF0000'`, etc.
@@ -41,6 +41,22 @@
 - `useSingleColor : boolean` - display data values only with single color **(default false)**
 - `color : chroma.Color` - set color when **if useSingleColor is true**, **(default [255, 0, 255, 255])**
 - `blurredTexture : boolean` - define blurring behaviour for textures when zoomed in = magnification filter parameter (`gl.TEXTURE_MAG_FILTER`). Default is `true` for blurry textures (corresponds to `GL.LINEAR`), to not blur textures use `false` (corresponds to `GL.NEAREST`)
+
+#### Chroma.Color definition
+Type `chroma.Color` means any color definition that is supported by chroma.js such as `'red'`, `[255,0,0]`, `[255,0,0, 180]`, `'#FF0000'`, 
+etc. and [Color Brewer pallete names](https://www.datanovia.com/en/wp-content/uploads/dn-tutorials/ggplot2/figures/0101-rcolorbrewer-palette-rcolorbrewer-palettes-colorblind-friendly-1.png) 
+in this format: `chroma.brewer.Greens`
+
+#### Additional terrain processing options
+- `terrainMinValue: number` - noData value retreived from input file's metadata is subsitute by this value **(default 0)**
+- `terrainSkirtHeight: number` - defines height of individual tiles edges, so there are no white spaces between individual 3D tiles **(default 100)**
+- `terrainColor: chroma.Color` - color of terrain model **(default [133, 133, 133, 255])**
+
+- Setting **opacity for terrain layers**: when using a terrain layer without defining a bitmap overlay, 
+setting the opacity of the model is straightforward: set `alpha` in terrainOptions (0-100). 
+However, if a bitmap overlay is defined (`bitmapUrl` and `bitmapOptions`), the opacity for 
+the overlay is taken from its definition in `bitmapOptions`, not from `terrainOptions` 
+(which is recommended to be set to 100 unless the opacities are combined). 
 
 ### Return options
 **Method returns Image DataUrl**
