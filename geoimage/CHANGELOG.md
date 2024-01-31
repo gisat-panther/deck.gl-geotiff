@@ -1,3 +1,16 @@
+# v1.9.1 (Wed Jan 31 2024)
+
+#### 🐾 Patch
+
+- Feature/terrain options update [#40](https://github.com/gisat-panther/deck.gl-geotiff/pull/40) (mariana.kecova@gisat.cz [@MariDani](https://github.com/MariDani))
+
+#### Authors: 2
+
+- Mariana Kecová ([@MariDani](https://github.com/MariDani))
+- Mariana Kecova (mariana.kecova@gisat.cz)
+
+---
+
 # v1.9.0 (Tue Dec 05 2023)
 
 #### 🚀 Enhancement
