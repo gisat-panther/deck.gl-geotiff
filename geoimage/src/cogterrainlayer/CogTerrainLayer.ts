@@ -1,6 +1,6 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { TileLayer, TerrainLayer } from '@deck.gl/geo-layers';
-import chroma from "chroma-js";
+import chroma from 'chroma-js';
 
 // FIXME
 // eslint-disable-next-line
@@ -8,7 +8,6 @@ import { getTileUrl, isCogUrl, isTileServiceUrl } from '../utilities/tileurls.ts
 import CogTiles from '../cogtiles/cogtiles.ts';
 
 import { GeoImageOptions, DefaultGeoImageOptions } from '../geoimage/geoimage.ts';
-import { getColorFromChromaType } from '../geoimage/geoimage.js';
 
 class CogTerrainLayer extends CompositeLayer<any> {
   static layerName = 'CogTerrainLayer';
