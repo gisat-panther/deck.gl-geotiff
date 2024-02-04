@@ -1280,6 +1280,29 @@
     h3-js "^3.7.0"
     long "^3.2.0"
 
+"@deck.gl/geo-layers@^8.9.18":
+  version "8.9.34"
+  resolved "https://registry.yarnpkg.com/@deck.gl/geo-layers/-/geo-layers-8.9.34.tgz#3da2db3e5927ca7f6db4d64c65582ff598a04621"
+  integrity sha512-oXOdNByo8QHNrqjREeIX0btVzsj3aFzJcplatBpdLg6vr/iV8ZdsbRv8WO4CJJI3N6oVKIug2gHWogdIjpxHTg==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    "@loaders.gl/3d-tiles" "^3.4.13"
+    "@loaders.gl/gis" "^3.4.13"
+    "@loaders.gl/loader-utils" "^3.4.13"
+    "@loaders.gl/mvt" "^3.4.13"
+    "@loaders.gl/schema" "^3.4.13"
+    "@loaders.gl/terrain" "^3.4.13"
+    "@loaders.gl/tiles" "^3.4.13"
+    "@loaders.gl/wms" "^3.4.13"
+    "@luma.gl/constants" "^8.5.21"
+    "@luma.gl/experimental" "^8.5.21"
+    "@math.gl/core" "^3.6.2"
+    "@math.gl/culling" "^3.6.2"
+    "@math.gl/web-mercator" "^3.6.2"
+    "@types/geojson" "^7946.0.8"
+    h3-js "^3.7.0"
+    long "^3.2.0"
+
 "@deck.gl/layers@8.9.30":
   version "8.9.30"
   resolved "https://registry.yarnpkg.com/@deck.gl/layers/-/layers-8.9.30.tgz#22f430e7be4220fe1fd8bc144024bd395225e60f"

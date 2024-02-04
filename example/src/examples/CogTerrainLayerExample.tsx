@@ -3,7 +3,7 @@ import DeckGL from '@deck.gl/react';
 import { readPixelsToArray } from '@luma.gl/core';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
 import { PolygonLayer, BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
-// import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
+import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import {
   MVTLayer,
   TileLayer,
@@ -129,13 +129,13 @@ const cogLayer = new CogTerrainLayer(
   'CogTerrainLayer',
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
-  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
   {
     type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 100, operation: 'terrain+draw', alpha: 50, terrainSkirtHeight: 7,
   },
   // 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
   // { alpha: 60 },
-  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
   {
     type: 'image',
     useChannel: 0,
@@ -150,7 +150,7 @@ const cogLayer = new CogTerrainLayer(
 
 const cogBitmapLayer = new CogBitmapLayer(
   'CogBitmapLayer',
-  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
   {
     type: 'image',
     useChannel: 0,
@@ -190,9 +190,9 @@ class CogTerrainLayerExample extends React.Component<{}> {
     });
 
     const initialViewState: InitialViewStateProps = {
-      longitude: 0,
-      latitude: 0,
-      zoom: 1,
+      longitude: 14.111939262010219,
+      latitude: 50.762276051184848,
+      zoom: 12,
     };
     /*
     const WMSlayerMapped = new WMSLayer({
@@ -214,31 +214,31 @@ class CogTerrainLayerExample extends React.Component<{}> {
     const verticalProfileLayer_Decin_R3_1 = new BitmapLayer({
       id: 'verticalProfileLayer_Decin_R3_1',
       bounds: getVerticalProfileBounds(14.092778594270721, 50.756831358565449, 14.09067918253672, 50.760145086145982, 366, 110),
-      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R3-1.png',
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/rezy_png/Decin-R3-1.png',
     });
 
     const verticalProfileLayer_Decin_R4_1 = new BitmapLayer({
       id: 'verticalProfileLayer_Decin_R4_1',
       bounds: getVerticalProfileBounds(14.095333525668964, 50.757766881494845, 14.093227847353772, 50.76080220810416, 333, 76, 118),
-      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R4-1.png',
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/rezy_png/Decin-R4-1.png',
     });
 
     const verticalProfileLayer_Decin_R11_a = new BitmapLayer({
       id: 'verticalProfileLayer_Decin_R11-a',
       bounds: getVerticalProfileBounds(14.112568896598429, 50.75908013365067, 14.112182666854412, 50.760860099395813, 299, 72, 140),
-      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R11crit_1-a.png',
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/rezy_png/Decin-R11crit_1-a.png',
     });
 
     const verticalProfileLayer_Decin_R11_b = new BitmapLayer({
       id: 'verticalProfileLayer_Decin_R11-b',
       bounds: getVerticalProfileBounds(14.112182666854412, 50.760860099395813, 14.112801228445084, 50.7621494828214422, 299, 72, 140),
-      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R11crit_1-b.png',
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/rezy_png/Decin-R11crit_1-b.png',
     });
 
     const verticalProfileLayer_Decin_R12 = new BitmapLayer({
       id: 'verticalProfileLayer_Decin_R12',
       bounds: getVerticalProfileBounds(14.117314655464686, 50.757397623493432, 14.111939262010219, 50.762276051184848, 330, 102, 180),
-      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_png/Decin-R12-1.png',
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/rezy_png/Decin-R12-1.png',
     });
 
     // const verticalVectorProfileLayer = new PolygonLayer({
@@ -255,7 +255,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     const lines = new GeoJsonLayer({
       id: 'rezy-line-layer',
-      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/rezy_wgs84.geojson',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/rezy_wgs84.geojson',
       stroked: false,
       pointType: 'circle',
       lineWidthScale: 20,
@@ -267,7 +267,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     const vrstevniceZduraznena = new MVTLayer({
       id: 'vrstevnice_zduraznena',
-      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vrstevnice/vyrovna/vrstevnice_zduraznena_mvt_z12_14/{z}/{x}/{y}.pbf',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/vrstevnice_zduraznena_mvt_z12_14/{z}/{x}/{y}.pbf',
       binary: false,
       minZoom: 12,
       maxZoom: 14,
@@ -280,7 +280,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     const vrstevniceZakladni = new MVTLayer({
       id: 'vrstevnice_zakladni',
-      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vrstevnice/vyrovna/vrstevnice_zakladni_mvt_z14/{z}/{x}/{y}.pbf',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/vrstevnice_zakladni_mvt_z14/{z}/{x}/{y}.pbf',
       binary: false,
       minZoom: 14,
       maxZoom: 14,
