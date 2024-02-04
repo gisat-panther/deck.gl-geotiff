@@ -148,6 +148,24 @@ const cogLayer = new CogTerrainLayer(
   },
 );
 
+const cogLayerD8_DEM = new CogTerrainLayer(
+    'CogTerrainLayerD8Dem',
+    'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/RSD_DEM_5m_wgs84_cog_nodata.tif',
+    {
+      type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 100, operation: 'terrain+draw', alpha: 100, terrainSkirtHeight: 7,
+    },
+    'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/RSD_DEM_5m_wgs84_cog_nodata.tif',
+    {
+      type: 'image',
+      useChannel: 0,
+      useHeatMap: true,
+      colorScale: ['#1a9850', '#66bd63', '#a6d96a', '#d9ef8b', '#ffffbf', '#fee08b', '#fdae61', '#f46d43', '#d73027'],
+      alpha: 80,
+      useDataOpacity: false,
+      colorScaleValueRange: [196, 540],
+    },
+);
+
 const cogBitmapLayer = new CogBitmapLayer(
   'CogBitmapLayer',
   'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
@@ -356,6 +374,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
               lines,
               // verticalVectorProfileLayer,
               cogLayer,
+              cogLayerD8_DEM,
               vrstevniceZduraznena,
               vrstevniceZakladni,
               // cogBitmapLayer,
