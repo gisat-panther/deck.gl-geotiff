@@ -1,12 +1,11 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { TileLayer, TerrainLayer } from '@deck.gl/geo-layers';
+import chroma from 'chroma-js';
 
 // FIXME
 // eslint-disable-next-line
-import chroma from "chroma-js";
 import { getTileUrl, isCogUrl, isTileServiceUrl } from '../utilities/tileurls.ts';
 import CogTiles from '../cogtiles/cogtiles.ts';
-import { getColorFromChromaType } from '../geoimage/geoimage.js';
 
 import { GeoImageOptions, DefaultGeoImageOptions } from '../geoimage/geoimage.ts';
 
@@ -49,14 +48,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
     super({});
     this.id = id;
     const mergedTerrainOptions = { ...DefaultGeoImageOptions, ...terrainOptions };
-    if (bitmapOptions) {
-      const mergedBitmapOptions = { ...DefaultGeoImageOptions, ...bitmapOptions };
-      if (mergedBitmapOptions.alpha !== 100) {
-        this.terrainOpacity = mergedBitmapOptions.alpha / 100;
-      }
-    } else {
-      this.terrainOpacity = mergedTerrainOptions.alpha / 100;
-    }
+    this.terrainOpacity = mergedTerrainOptions.alpha / 100;
     this.terrainColor = chroma(mergedTerrainOptions.terrainColor.slice(0, 3)).rgb();
     this.terrainSkirtHeight = mergedTerrainOptions.terrainSkirtHeight;
 
