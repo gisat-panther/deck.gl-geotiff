@@ -160,7 +160,7 @@ const cogLayerD8_DEM = new CogTerrainLayer(
     useChannel: 0,
     useHeatMap: true,
     colorScale: ['#1a9850', '#66bd63', '#a6d96a', '#d9ef8b', '#ffffbf', '#fee08b', '#fdae61', '#f46d43', '#d73027'],
-    alpha: 100,
+    alpha: 80,
     useDataOpacity: false,
     colorScaleValueRange: [196, 540],
   },
@@ -208,8 +208,8 @@ class CogTerrainLayerExample extends React.Component<{}> {
     });
 
     const initialViewState: InitialViewStateProps = {
-      longitude: 14.111939262010219,
-      latitude: 50.762276051184848,
+      longitude: 14.015511800867504,
+      latitude: 50.571906640192161,
       zoom: 12,
     };
     /*
@@ -271,15 +271,25 @@ class CogTerrainLayerExample extends React.Component<{}> {
     //   getFillColor: [23, 234, 85],
     // });
 
+    const verticalProfileLayer_D8_Stab_L1 = new BitmapLayer({
+      id: 'verticalProfileLayer_D8_Stab_L1',
+      bounds: getVerticalProfileBounds(14.013260045082852, 50.570548652164057, 14.028419600527943, 50.570945823734725,444, 220, 230),
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/png_profiles/Stab-L1.png',
+    });
+
     const lines = new GeoJsonLayer({
       id: 'rezy-line-layer',
       data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/rezy_wgs84.geojson',
-      stroked: false,
-      pointType: 'circle',
-      lineWidthScale: 20,
-      lineWidthMinPixels: 2,
       getLineColor: [255, 0, 0, 255],
-      getLineWidth: 1,
+      getLineWidth: 3,
+      extensions: [new TerrainExtension()],
+    });
+
+    const profileLinesD8 = new GeoJsonLayer({
+      id: 'profile-lines-D8-layer',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/RezyD8selected_WGS84.geojson',
+      getLineColor: [255, 0, 0, 255],
+      getLineWidth: 3,
       extensions: [new TerrainExtension()],
     });
 
@@ -384,7 +394,9 @@ class CogTerrainLayerExample extends React.Component<{}> {
               verticalProfileLayer_Decin_R11_a,
               verticalProfileLayer_Decin_R11_b,
               verticalProfileLayer_Decin_R12,
+              verticalProfileLayer_D8_Stab_L1,
               lines,
+              profileLinesD8,
               // verticalVectorProfileLayer,
               cogLayer,
               cogLayerD8_DEM,
