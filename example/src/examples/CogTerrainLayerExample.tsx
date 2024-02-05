@@ -149,21 +149,21 @@ const cogLayer = new CogTerrainLayer(
 );
 
 const cogLayerD8_DEM = new CogTerrainLayer(
-    'CogTerrainLayerD8Dem',
-    'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/RSD_DEM_5m_wgs84_cog_nodata.tif',
-    {
-      type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 100, operation: 'terrain+draw', alpha: 100, terrainSkirtHeight: 7,
-    },
-    'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/RSD_DEM_5m_wgs84_cog_nodata.tif',
-    {
-      type: 'image',
-      useChannel: 0,
-      useHeatMap: true,
-      colorScale: ['#1a9850', '#66bd63', '#a6d96a', '#d9ef8b', '#ffffbf', '#fee08b', '#fdae61', '#f46d43', '#d73027'],
-      alpha: 80,
-      useDataOpacity: false,
-      colorScaleValueRange: [196, 540],
-    },
+  'CogTerrainLayerD8Dem',
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/RSD_DEM_5m_wgs84_cog_nodata.tif',
+  {
+    type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 100, operation: 'terrain+draw', alpha: 100, terrainSkirtHeight: 7,
+  },
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/RSD_DEM_5m_wgs84_cog_nodata.tif',
+  {
+    type: 'image',
+    useChannel: 0,
+    useHeatMap: true,
+    colorScale: ['#1a9850', '#66bd63', '#a6d96a', '#d9ef8b', '#ffffbf', '#fee08b', '#fdae61', '#f46d43', '#d73027'],
+    alpha: 100,
+    useDataOpacity: false,
+    colorScaleValueRange: [196, 540],
+  },
 );
 
 const cogBitmapLayer = new CogBitmapLayer(
@@ -308,6 +308,19 @@ class CogTerrainLayerExample extends React.Component<{}> {
       getLineWidth: 0.5,
       extensions: [new TerrainExtension()],
     });
+
+    const vrstevniceD8 = new MVTLayer({
+      id: 'vrstevnice_d8',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/d8_contours_z13_14/{z}/{x}/{y}.pbf',
+      binary: false,
+      minZoom: 13,
+      maxZoom: 14,
+      stroked: true,
+      filled: true,
+      getLineColor: [160, 160, 160],
+      getLineWidth: (d) => ((d.properties.Layer === 'HLAVNI_VRST') ? 1 : 0.5),
+      extensions: [new TerrainExtension()],
+    });
     /*
     const vectorLayer = new MVTLayer({
       extensions: [new TerrainExtension()],
@@ -377,6 +390,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
               cogLayerD8_DEM,
               vrstevniceZduraznena,
               vrstevniceZakladni,
+              vrstevniceD8,
               // cogBitmapLayer,
               // WMSlayerMapped,
               // vectorLayer,
