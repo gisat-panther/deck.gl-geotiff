@@ -273,8 +273,15 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     const verticalProfileLayer_D8_Stab_L1 = new BitmapLayer({
       id: 'verticalProfileLayer_D8_Stab_L1',
-      bounds: getVerticalProfileBounds(14.013260045082852, 50.570548652164057, 14.028419600527943, 50.570945823734725,444, 220, 230),
+      bounds: getVerticalProfileBounds(14.015445, 50.570605, 14.028419600527943, 50.570945823734725,370, 220, 230),
       image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/png_profiles/Stab-L1.png',
+    });
+
+    const verticalProfileLayer_D8_Stab_S2 = new BitmapLayer({
+      id: 'verticalProfileLayer_D8_Stab_S2',
+      // bounds: getVerticalProfileBounds(14.015511800867504, 50.571906640192161, 14.024536314607264, 50.573370691630018,353, 220, 230),
+      bounds: getVerticalProfileBounds(14.015511800867504, 50.571906640192161, 14.024536314607264, 50.573370691630018,353, 220, 230),
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/png_profiles/Stab-S2.png',
     });
 
     const lines = new GeoJsonLayer({
@@ -389,20 +396,21 @@ class CogTerrainLayerExample extends React.Component<{}> {
             layers={[
               tileLayer,
               // WMSlayer,
-              verticalProfileLayer_Decin_R3_1,
-              verticalProfileLayer_Decin_R4_1,
-              verticalProfileLayer_Decin_R11_a,
-              verticalProfileLayer_Decin_R11_b,
-              verticalProfileLayer_Decin_R12,
+              // verticalProfileLayer_Decin_R3_1,
+              // verticalProfileLayer_Decin_R4_1,
+              // verticalProfileLayer_Decin_R11_a,
+              // verticalProfileLayer_Decin_R11_b,
+              // verticalProfileLayer_Decin_R12,
               verticalProfileLayer_D8_Stab_L1,
+              verticalProfileLayer_D8_Stab_S2,
               lines,
               profileLinesD8,
               // verticalVectorProfileLayer,
-              cogLayer,
+              // cogLayer,
               cogLayerD8_DEM,
-              vrstevniceZduraznena,
-              vrstevniceZakladni,
-              vrstevniceD8,
+              // vrstevniceZduraznena,
+              // vrstevniceZakladni,
+              // vrstevniceD8,
               // cogBitmapLayer,
               // WMSlayerMapped,
               // vectorLayer,
