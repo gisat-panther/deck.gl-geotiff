@@ -49,6 +49,10 @@ function getVerticalProfileBounds(leftX: number, leftY: number, rightX: number, 
   ];
 }
 
+const colorScale = chroma
+  .scale(['#fda34b', '#ff7882', '#c8699e', '#7046aa', '#0c1db8', '#2eaaac'])
+  .domain([-60, 60]);
+
 const styleClasses = [
   {
     fill: '#b1001d',
@@ -326,6 +330,48 @@ class CogTerrainLayerExample extends React.Component<{}> {
       extensions: [new TerrainExtension()],
     });
 
+    const bodyInSARTrim44 = new MVTLayer({
+      id: 'body_InSAR_trim_44',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_44_upd3_psd_los_4326/{z}/{x}/{y}.pbf',
+      binary: false,
+      minZoom: 8,
+      maxZoom: 14,
+      stroked: false,
+      filled: true,
+      pointType: 'circle',
+      getFillColor: (d) => [...colorScale(d.properties.vel_rel).rgb(), 255],
+      getPointRadius: (d) => d.properties.coh * 10, // coh interval (0.13-0.98)
+      extensions: [new TerrainExtension()],
+    });
+
+    const bodyInSARTrim95 = new MVTLayer({
+      id: 'body_InSAR_trim_95',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_95_upd3_psd_los_4326/{z}/{x}/{y}.pbf',
+      binary: false,
+      minZoom: 8,
+      maxZoom: 14,
+      stroked: false,
+      filled: true,
+      pointType: 'circle',
+      getFillColor: (d) => [...colorScale(d.properties.vel_rel).rgb(), 255],
+      getPointRadius: (d) => d.properties.coh * 10, // coh interval (0.13-0.98)
+      extensions: [new TerrainExtension()],
+    });
+
+    const bodyInSARTrim146 = new MVTLayer({
+      id: 'body_InSAR_trim_146',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_146_upd3_psd_los_4326/{z}/{x}/{y}.pbf',
+      binary: false,
+      minZoom: 8,
+      maxZoom: 14,
+      stroked: false,
+      filled: true,
+      pointType: 'circle',
+      getFillColor: (d) => [...colorScale(d.properties.vel_rel).rgb(), 255],
+      getPointRadius: (d) => d.properties.coh * 10, // coh interval (0.13-0.98)
+      extensions: [new TerrainExtension()],
+    });
+
     const vrstevniceD8 = new MVTLayer({
       id: 'vrstevnice_d8',
       data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/d8_contours_z13_14/{z}/{x}/{y}.pbf',
@@ -404,6 +450,9 @@ class CogTerrainLayerExample extends React.Component<{}> {
               verticalProfileLayer_D8_Stab_L1,
               verticalProfileLayer_D8_Stab_S2,
               lines,
+              bodyInSARTrim44,
+              bodyInSARTrim95,
+              bodyInSARTrim146,
               profileLinesD8,
               // verticalVectorProfileLayer,
               // cogLayer,
