@@ -283,9 +283,20 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     const verticalProfileLayer_D8_Stab_S2 = new BitmapLayer({
       id: 'verticalProfileLayer_D8_Stab_S2',
-      // bounds: getVerticalProfileBounds(14.015511800867504, 50.571906640192161, 14.024536314607264, 50.573370691630018,353, 220, 230),
-      bounds: getVerticalProfileBounds(14.015511800867504, 50.571906640192161, 14.024536314607264, 50.573370691630018,353, 220, 230),
+      bounds: getVerticalProfileBounds(14.015511800867504, 50.571906640192161, 14.024536314607264, 50.573370691630018, 353, 153, 163),
       image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/png_profiles/Stab-S2.png',
+    });
+
+    const verticalProfileLayer_D8_Def_L1 = new BitmapLayer({
+      id: 'verticalProfileLayer_D8_Def_L1',
+      bounds: getVerticalProfileBounds(14.015445, 50.570605, 14.028419600527943, 50.570945823734725, 370, 220, 230),
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/png_profiles/Def-L1.png',
+    });
+
+    const verticalProfileLayer_D8_Def_S2 = new BitmapLayer({
+      id: 'verticalProfileLayer_D8_Def_S2',
+      bounds: getVerticalProfileBounds(14.015511800867504, 50.571906640192161, 14.024536314607264, 50.573370691630018, 353, 153, 163),
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/png_profiles/Def-S2.png',
     });
 
     const lines = new GeoJsonLayer({
@@ -462,6 +473,8 @@ class CogTerrainLayerExample extends React.Component<{}> {
               // verticalProfileLayer_Decin_R12,
               verticalProfileLayer_D8_Stab_L1,
               verticalProfileLayer_D8_Stab_S2,
+              verticalProfileLayer_D8_Def_L1,
+              verticalProfileLayer_D8_Def_S2,
               lines,
               bodyInSARTrim44,
               bodyInSARTrim95,
