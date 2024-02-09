@@ -372,6 +372,19 @@ class CogTerrainLayerExample extends React.Component<{}> {
       extensions: [new TerrainExtension()],
     });
 
+    const terrainEdgesD8 = new MVTLayer({
+      id: 'terrain_edges_d8',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/d8_terrain-edges_z13_14/{z}/{x}/{y}.pbf',
+      binary: false,
+      minZoom: 13,
+      maxZoom: 14,
+      stroked: true,
+      filled: true,
+      getLineColor: [0, 0, 0],
+      getLineWidth: (d) => ((d.properties.Layer === 'HLAVNI_VRST') ? 1 : 0.5),
+      extensions: [new TerrainExtension()],
+    });
+
     const vrstevniceD8 = new MVTLayer({
       id: 'vrstevnice_d8',
       data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/d8_contours_z13_14/{z}/{x}/{y}.pbf',
@@ -460,6 +473,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
               // vrstevniceZduraznena,
               // vrstevniceZakladni,
               // vrstevniceD8,
+              terrainEdgesD8,
               // cogBitmapLayer,
               // WMSlayerMapped,
               // vectorLayer,
