@@ -1,9 +1,14 @@
 import React, { useCallback, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
 import { readPixelsToArray } from '@luma.gl/core';
+import {COORDINATE_SYSTEM} from '@deck.gl/core';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
-import { PolygonLayer, BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
-import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
+import { PolygonLayer, BitmapLayer, GeoJsonLayer, PointCloudLayer } from '@deck.gl/layers';
+import { _TerrainExtension as TerrainExtension, ClipExtension } from '@deck.gl/extensions';
+import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
+import { OBJLoader } from '@loaders.gl/obj';
+import {CubeGeometry} from '@luma.gl/core';
+import {Matrix4} from '@math.gl/core';
 import {
   MVTLayer,
   TileLayer,
@@ -15,6 +20,10 @@ import { AnyARecord } from 'dns';
 import chroma from 'chroma-js';
 import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
+
+const WORLD_SIZE = 512;
+
+const WORLD_SIZE = 512;
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -51,7 +60,7 @@ function getVerticalProfileBounds(leftX: number, leftY: number, rightX: number, 
 
 const colorScale = chroma
   .scale(['#fda34b', '#ff7882', '#c8699e', '#7046aa', '#0c1db8', '#2eaaac'])
-  .domain([-60, 60]);
+  .domain([-30, 30]);
 
 const styleClasses = [
   {
@@ -164,7 +173,7 @@ const cogLayerD8_DEM = new CogTerrainLayer(
     useChannel: 0,
     useHeatMap: true,
     colorScale: ['#1a9850', '#66bd63', '#a6d96a', '#d9ef8b', '#ffffbf', '#fee08b', '#fdae61', '#f46d43', '#d73027'],
-    alpha: 80,
+    alpha: 100,
     useDataOpacity: false,
     colorScaleValueRange: [196, 540],
   },
@@ -277,7 +286,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     const verticalProfileLayer_D8_Stab_L1 = new BitmapLayer({
       id: 'verticalProfileLayer_D8_Stab_L1',
-      bounds: getVerticalProfileBounds(14.015445, 50.570605, 14.028419600527943, 50.570945823734725,370, 220, 230),
+      bounds: getVerticalProfileBounds(14.015445, 50.570605, 14.028419600527943, 50.570945823734725, 370, 220, 230),
       image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/png_profiles/Stab-L1.png',
     });
 
@@ -408,6 +417,76 @@ class CogTerrainLayerExample extends React.Component<{}> {
       getLineWidth: (d) => ((d.properties.Layer === 'HLAVNI_VRST') ? 1 : 0.5),
       extensions: [new TerrainExtension()],
     });
+
+    const inSARGeojson = new GeoJsonLayer({
+      id: 'body_InSAR_trim_44_geojson_test',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_95_upd3_psd_los_4326_selectedProp.geojson',
+      stroked: false,
+      filled: true,
+      pointType: 'circle',
+      getFillColor: (d) =>[255,0,0],
+      getPointRadius: (d) => 5, // coh interval (0.13-0.98)
+      extensions: [new TerrainExtension()],
+    });
+
+    const inSARMesh = new SimpleMeshLayer({
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_95_upd3_psd_los_4326_selectedProp_test.json',
+      id: 'body_InSAR_trim_44_test',
+      mesh: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/arrow_v2.obj',
+      getColor: d => [...colorScale(d.properties.vel_rel).rgb(), 255],
+      getOrientation: d => [0, d.properties.az_ang, d.properties.inc_ang],
+      getPosition: d => d.geometry.coordinates,
+      getScale: d => [0.4, 0.4, (d.properties.vel_rel + 60) * 0.02],
+      sizeScale: 1,
+      loaders: [OBJLoader],
+      pickable: true,
+      extensions: [new TerrainExtension()],
+    });
+
+    const bodyInSARTrim44Arrow = new MVTLayer({
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_95_upd3_psd_los_4326/{z}/{x}/{y}.pbf',
+      binary: false,
+      renderSubLayers: (props) => {
+        if (props.data) {
+
+          const {x, y, z} = props.tile.index;
+          const worldScale = Math.pow(2, z);
+
+          const xScale = WORLD_SIZE / worldScale;
+          const yScale = -xScale;
+
+          const xOffset = (WORLD_SIZE * x) / worldScale;
+          const yOffset = WORLD_SIZE * (1 - y / worldScale);
+
+          const modelMatrix = new Matrix4().scale([xScale, yScale, 1]);
+
+          props.autoHighlight = false;
+
+          props.modelMatrix = modelMatrix;
+          props.coordinateOrigin = [xOffset, yOffset, 0];
+          props.coordinateSystem = COORDINATE_SYSTEM.CARTESIAN;
+          props.extensions = [...(props.extensions || []), new ClipExtension()];
+
+          return new SimpleMeshLayer({
+            ...props,
+            id: `${props.id}-mvt-simple-mesh`,
+            getColor: (d) => [...colorScale(d.properties.vel_rel).rgb(), 255],
+            // mesh: new CubeGeometry(),
+            mesh: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/arrow_v2.obj',
+            getOrientation: d => [0, 0, 0],
+            getPosition: d => d.geometry.coordinates,
+            getScale: [0.001, 0.001, 1.25],
+            // getTranslation: (d) => [2, 0, 0],
+            loaders: [OBJLoader],
+          });
+        }
+        return null;
+      },
+      minZoom: 8,
+      maxZoom: 14,
+      // extensions: [new TerrainExtension()],
+    });
+
     /*
     const vectorLayer = new MVTLayer({
       extensions: [new TerrainExtension()],
@@ -471,22 +550,27 @@ class CogTerrainLayerExample extends React.Component<{}> {
               // verticalProfileLayer_Decin_R11_a,
               // verticalProfileLayer_Decin_R11_b,
               // verticalProfileLayer_Decin_R12,
-              verticalProfileLayer_D8_Stab_L1,
-              verticalProfileLayer_D8_Stab_S2,
+              // verticalProfileLayer_D8_Stab_L1,
               verticalProfileLayer_D8_Def_L1,
+              // verticalProfileLayer_D8_Stab_S2,
               verticalProfileLayer_D8_Def_S2,
               lines,
-              bodyInSARTrim44,
-              bodyInSARTrim95,
-              bodyInSARTrim146,
+              // bodyInSARTrim44,
+              // bodyInSARTrim95,
+              // bodyInSARTrim146,
+              bodyInSARTrim44Arrow,
               profileLinesD8,
+              // inSARMesh,
+              inSARGeojson,
               // verticalVectorProfileLayer,
               // cogLayer,
-              cogLayerD8_DEM,
+              // cogLayerD8_DEM,
+              // cogLayerD8_DEM_CGS,
+              // cogLayerD8_DEM_CUZK,
               // vrstevniceZduraznena,
               // vrstevniceZakladni,
               // vrstevniceD8,
-              terrainEdgesD8,
+              // terrainEdgesD8,
               // cogBitmapLayer,
               // WMSlayerMapped,
               // vectorLayer,

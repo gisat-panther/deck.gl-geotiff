@@ -8,10 +8,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@deck.gl/react": "^8.9.18",
     "@deck.gl/geo-layers": "^8.9.18",
+    "@deck.gl/mesh-layers": "^8.9.34",
+    "@deck.gl/react": "^8.9.18",
     "@fortawesome/free-solid-svg-icons": "^6.0.0",
     "@fortawesome/react-fontawesome": "^0.1.17",
+    "@loaders.gl/obj": "^4.0.6",
+    "@math.gl/core": "^4.0.0",
     "@types/node": "^17.0.18",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
