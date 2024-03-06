@@ -1,3 +1,15 @@
+# v1.9.2 (Wed Mar 06 2024)
+
+#### 🐾 Patch
+
+- Feature/fix terrain [#41](https://github.com/gisat-panther/deck.gl-geotiff/pull/41) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v1.9.1 (Wed Jan 31 2024)
 
 #### 🐾 Patch
