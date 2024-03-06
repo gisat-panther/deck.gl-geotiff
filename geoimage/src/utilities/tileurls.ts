@@ -1,5 +1,5 @@
 function isTileServiceUrl(url:string) {
-  if (url.includes('{x}') && url.includes('{y}') && url.includes('{z}')) {
+  if (url && url.includes('{x}') && url.includes('{y}') && url.includes('{z}')) {
     return true;
   }
   return false;

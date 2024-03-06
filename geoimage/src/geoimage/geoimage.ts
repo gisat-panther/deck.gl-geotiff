@@ -390,6 +390,9 @@ export default class GeoImage {
             pixelColor[3] = this.scale(dataArray[pixel], options.colorScaleValueRange[0]!, options.colorScaleValueRange.slice(-1)[0]!, 0, 255);
           }
         }
+        // If pixel has null value
+      } else if (Number.isNaN(dataArray[pixel])) {
+        pixelColor = [0, 0, 0, 0];
       }
       // FIXME
       // eslint-disable-next-line

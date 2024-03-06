@@ -59,12 +59,20 @@ class CogTerrainLayer extends CompositeLayer<any> {
     this.terrainUrl = terrainUrl;
   }
 
-  initializeState() {
-    this.state = {
+  async initializeState() {
+    super.initializeState();
+    this.setState({
       initialized: false,
-    };
+    });
 
-    this.init(this.terrainUrl);
+    await this.init(this.terrainUrl);
+  }
+
+  shouldUpdateState() {
+    if (this.internalState?.subLayers.length === 0) {
+      return true;
+    }
+    return false;
   }
 
   async init(terrainUrl: string) {
