@@ -1228,10 +1228,10 @@
   resolved "https://registry.npmjs.org/@csstools/selector-specificity/-/selector-specificity-2.2.0.tgz"
   integrity sha512-+OJ9konv95ClSTOJCmMZqpd5+YGsB2S+x6w3E1oaM8UuR5j8nTNHYSz8c9BEPGDOCMQYIEEGlVPj/VY64iTbGw==
 
-"@deck.gl/core@8.9.30":
-  version "8.9.30"
-  resolved "https://registry.yarnpkg.com/@deck.gl/core/-/core-8.9.30.tgz#7d8efa3b356df24dc2a6d534fabcf55f57f35744"
-  integrity sha512-cgaqJ25IxKVtQ7zapICF6WedAy4Lh0Kv9rX40lqgc5zfYFH/QdB0JkGB6CzHMpCSp+vO5uDSh6lfu+2Q0oAlcA==
+"@deck.gl/core@^8.9.34":
+  version "8.9.35"
+  resolved "https://registry.yarnpkg.com/@deck.gl/core/-/core-8.9.35.tgz#50b660a7e22b6001a4f838120a3b034517553d8a"
+  integrity sha512-xOASWScUCB5fpfuSjPaJrwas8pCJpbKXNIfwQElhvnfP3Yk8GGkAcRbPgiPNCfpkbEno7eDpAWJt6+6UJsSp9g==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@loaders.gl/core" "^3.4.13"
@@ -1249,18 +1249,18 @@
     math.gl "^3.6.2"
     mjolnir.js "^2.7.0"
 
-"@deck.gl/extensions@8.9.30":
-  version "8.9.30"
-  resolved "https://registry.yarnpkg.com/@deck.gl/extensions/-/extensions-8.9.30.tgz#5d8ee7a4b5321a03c9c3de5c96ed14dd07e6e6da"
-  integrity sha512-OTECUkSx8KLltuvpp3iSrqwx8fWTJijKT/0i0c4cvTyb6AWztimZVZs2BF587Rl9mvehP5mV+OjlUfU5gm6RQA==
+"@deck.gl/extensions@^8.9.34":
+  version "8.9.35"
+  resolved "https://registry.yarnpkg.com/@deck.gl/extensions/-/extensions-8.9.35.tgz#90cff4bb9163d8ccbf7e0adfef51496144fd09bb"
+  integrity sha512-qMZzeQpvtcw4zbh4HJJIF8Q73/u0Unwwe8aSC2r+apjuyUVPQInwlCil++LznBY3JA37M7SvW2TSK6IgCuaSyA==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@luma.gl/shadertools" "^8.5.21"
 
-"@deck.gl/geo-layers@8.9.30":
-  version "8.9.30"
-  resolved "https://registry.yarnpkg.com/@deck.gl/geo-layers/-/geo-layers-8.9.30.tgz#bf3b4ad08cdb042e6f86891b261ff5629f6fb0ce"
-  integrity sha512-1uVMJn9pBhfeMmpJq/AtfIFM6b2wvAL6bxkxgYhHlNUgYwPYL8BLLLhNRJJvEGZgO5N8XJ5p+4OYaDmgja96Xg==
+"@deck.gl/geo-layers@^8.9.34":
+  version "8.9.35"
+  resolved "https://registry.yarnpkg.com/@deck.gl/geo-layers/-/geo-layers-8.9.35.tgz#3b76ba236c8ff145a64bcac317f8e908bf3670ca"
+  integrity sha512-7sczznSjC7GjpDxuXPvPN7/WbVgSYHnFNNyWr8hMGm/WlUMK4z9QpZo6UFvrHL5rQ5Uudd4vD56xB1fs3b2lMA==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@loaders.gl/3d-tiles" "^3.4.13"
@@ -1280,10 +1280,10 @@
     h3-js "^3.7.0"
     long "^3.2.0"
 
-"@deck.gl/layers@8.9.30":
-  version "8.9.30"
-  resolved "https://registry.yarnpkg.com/@deck.gl/layers/-/layers-8.9.30.tgz#22f430e7be4220fe1fd8bc144024bd395225e60f"
-  integrity sha512-qz12cAyMF0/G1Fom0XdxdHbx58etrTpZ7bnL9ofHUjgUbMa7LHf28gjVxZ0kZ+jNLvX1TNtzOUSSw05g2D0wNQ==
+"@deck.gl/layers@^8.9.34":
+  version "8.9.35"
+  resolved "https://registry.yarnpkg.com/@deck.gl/layers/-/layers-8.9.35.tgz#805684b3b6c4bd3303cbca59a0822bf9eedbbc3d"
+  integrity sha512-4amaGO+tGvaCNi2KZ90twmajGh5xUAaQzBIyh42dnM10GRj/62sOIYD9uT032oV/KpjKY+TfOstx5ooXBGKDjg==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@loaders.gl/images" "^3.4.13"
@@ -1295,10 +1295,10 @@
     "@math.gl/web-mercator" "^3.6.2"
     earcut "^2.2.4"
 
-"@deck.gl/mesh-layers@8.9.30":
-  version "8.9.30"
-  resolved "https://registry.yarnpkg.com/@deck.gl/mesh-layers/-/mesh-layers-8.9.30.tgz#8f5518ddfc78d0aa151fe8e1ee097c92a1e4d991"
-  integrity sha512-KjoTXqD3WiMUi1WXGD9jF/Hy1M+au6SR6IishhWtlNoraugcRp3nHJhcuo6sIKNLETnFMLDtP2xWwzwAu0LuPg==
+"@deck.gl/mesh-layers@^8.9.34":
+  version "8.9.35"
+  resolved "https://registry.yarnpkg.com/@deck.gl/mesh-layers/-/mesh-layers-8.9.35.tgz#4dee5429e15e7f61c187d7995446d2ab3b881c35"
+  integrity sha512-0l7+zi/6bkYVz7zZ0J4+WLoxOh+hFMPUQKCujTOcqYWbvJ2fEQze0Z1ZHCAG0RQOFJITEMamDigo9dN2BMxPBA==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@loaders.gl/gltf" "^3.4.13"
@@ -1306,17 +1306,17 @@
     "@luma.gl/experimental" "^8.5.21"
     "@luma.gl/shadertools" "^8.5.21"
 
-"@deck.gl/react@8.9.30":
-  version "8.9.30"
-  resolved "https://registry.yarnpkg.com/@deck.gl/react/-/react-8.9.30.tgz#9018a715feabce6dc04a671a6b0c3654c1da1599"
-  integrity sha512-AUSd6WYoLOPWo9N8Ma8TTFzGjHZFoepFOZu5o9bnd+ho65Z9vEriqIuLTmrYupmOlv0fc00Gi/tuvXrINcdDUA==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-
 "@deck.gl/react@^8.9.18":
   version "8.9.19"
   resolved "https://registry.npmjs.org/@deck.gl/react/-/react-8.9.19.tgz"
   integrity sha512-ddoCiVRrbC+c7tosKX3tsmRXJUL32NUmIwgOl0NPsVfJqtfsDRLrBZNDQOATboCa3vdT6gvySsoF+9zQpIxi2Q==
+
+"@deck.gl/react@^8.9.34":
+  version "8.9.35"
+  resolved "https://registry.yarnpkg.com/@deck.gl/react/-/react-8.9.35.tgz#75ed69f78f15c37e6bc1ab6df22f3bc6cee54926"
+  integrity sha512-eDwYCeBBzHXIpgZbAxcAEnpjnAoMiWcec8rMgYot7VOB+RnBTPYUaO3GPPImlk1uiezNGQel0YK4OLI1f6cDHg==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
 
 "@emotion/is-prop-valid@^1.1.0":
   version "1.2.0"
