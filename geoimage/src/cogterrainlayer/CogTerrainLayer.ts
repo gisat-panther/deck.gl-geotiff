@@ -1,12 +1,13 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { TileLayer, TerrainLayer } from '@deck.gl/geo-layers';
+import chroma from 'chroma-js';
 
 // FIXME
 // eslint-disable-next-line
 import { getTileUrl, isCogUrl, isTileServiceUrl } from '../utilities/tileurls.ts';
 import CogTiles from '../cogtiles/cogtiles.ts';
 
-import { GeoImageOptions } from '../geoimage/geoimage.ts';
+import { GeoImageOptions, DefaultGeoImageOptions } from '../geoimage/geoimage.ts';
 
 class CogTerrainLayer extends CompositeLayer<any> {
   static layerName = 'CogTerrainLayer';
@@ -29,6 +30,12 @@ class CogTerrainLayer extends CompositeLayer<any> {
 
   terrainUrl: string;
 
+  terrainOpacity: number;
+
+  terrainColor: Array<number>;
+
+  terrainSkirtHeight: number;
+
   static displayName: string;
 
   constructor(
@@ -40,15 +47,21 @@ class CogTerrainLayer extends CompositeLayer<any> {
   ) {
     super({});
     this.id = id;
+    const mergedTerrainOptions = { ...DefaultGeoImageOptions, ...terrainOptions };
+    this.terrainOpacity = mergedTerrainOptions.alpha / 100;
+    this.terrainColor = chroma(mergedTerrainOptions.terrainColor.slice(0, 3)).rgb();
+    this.terrainSkirtHeight = mergedTerrainOptions.terrainSkirtHeight;
 
     if (bitmapUrl) {
       if (isTileServiceUrl(bitmapUrl)) {
         this.bitmapUrl = bitmapUrl;
         this.urlType = 'tile';
+        this.terrainColor = [0, 0, 0, 0];
       } else if (isCogUrl(bitmapUrl)) {
         this.bitmapCogTiles = new CogTiles(bitmapOptions!);
         this.bitmapCogTiles.initializeCog(bitmapUrl);
         this.urlType = 'cog';
+        this.terrainColor = [0, 0, 0, 0];
       } else {
         console.warn('URL needs to point to a valid cog file, or needs to be in the {x}{y}{z} format.');
       }
@@ -152,17 +165,19 @@ class CogTerrainLayer extends CompositeLayer<any> {
               },
               elevationData: props.data,
               texture: bitmapTile,
+              opacity: this.terrainOpacity,
               bounds: [props.tile.bbox.west,
                 props.tile.bbox.south,
                 props.tile.bbox.east,
                 props.tile.bbox.north,
               ],
+              color: this.terrainColor,
               operation: 'terrain+draw',
               minZoom: this.minZoom,
               maxZoom: this.maxZoom,
               loadOptions: {
                 terrain: {
-                  skirtHeight: 2000,
+                  skirtHeight: this.terrainSkirtHeight,
                   tesselator: 'martini',
                 },
               },

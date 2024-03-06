@@ -1,3 +1,34 @@
+# v1.9.1 (Wed Jan 31 2024)
+
+#### 🐾 Patch
+
+- Feature/terrain options update [#40](https://github.com/gisat-panther/deck.gl-geotiff/pull/40) (mariana.kecova@gisat.cz [@MariDani](https://github.com/MariDani))
+
+#### Authors: 2
+
+- Mariana Kecová ([@MariDani](https://github.com/MariDani))
+- Mariana Kecova (mariana.kecova@gisat.cz)
+
+---
+
+# v1.9.0 (Tue Dec 05 2023)
+
+#### 🚀 Enhancement
+
+- Color Classes Visualization [#39](https://github.com/gisat-panther/deck.gl-geotiff/pull/39) ([@vdubr](https://github.com/vdubr) mariana.kecova@gisat.cz [@MariDani](https://github.com/MariDani))
+
+#### 🐾 Patch
+
+- Bump package versions [#37](https://github.com/gisat-panther/deck.gl-geotiff/pull/37) ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 3
+
+- Mariana Kecová ([@MariDani](https://github.com/MariDani))
+- Mariana Kecova (mariana.kecova@gisat.cz)
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v1.8.1 (Thu Sep 21 2023)
 
 #### 🐾 Patch
