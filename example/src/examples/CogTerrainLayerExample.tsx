@@ -6,14 +6,17 @@ import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
 import {
   MVTLayer,
   TileLayer,
+  Tile3DLayer,
   _WMSLayer as WMSLayer,
 } from '@deck.gl/geo-layers';
 import { MVTLoader } from '@loaders.gl/mvt';
-import { BitmapLayer } from '@deck.gl/layers';
+import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
 import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
+import ContoursLayer from '@gisatcz/deckgl-geolib/src/ContoursLayer.ts';
+import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -103,6 +106,46 @@ const styleClasses = [
   )
   */
 
+const PrahaDEM = new CogTerrainLayer(
+  'CogTerrainLayer',
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/3dtiles/gs_geotechnika_tin_base_4326_cog_nodata.tif',
+  {
+    type: 'terrain', multiplier: 1.0, useChannel: null, terrainMinValue: 200,
+  },
+  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/3dtiles/gs_geotechnika_tin_base_4326_cog_nodata.tif',
+  {
+    type: 'image', useHeatMap: true, colorScale: ['white', 'black'], colorScaleValueRange: [200, 300],
+  },
+);
+
+const PrahaBudovy = new Tile3DLayer({
+  id: 'tile-3d-layer',
+  // data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/3dtiles/Praha_3D_Tiles/tileset.json',
+  data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/3dtiles/Prah_6-4_3D_Tiles/tileset.json',
+  // loader: Tiles3DLoader,
+  onTilesetLoad: (tileset) => {
+    const { cartographicCenter, zoom } = tileset;
+    this.setState({
+      viewState: {
+        ...this.state.viewState,
+        longitude: cartographicCenter[0],
+        latitude: cartographicCenter[1],
+        zoom,
+      },
+    });
+  },
+  // override scenegraph subLayer prop
+  _subLayerProps: {
+    scenegraph: {
+      // _lighting: 'flat',
+      getColor: (d) => {
+        console.log(d);
+        return [255, 0, 0, 255];
+      },
+    },
+  },
+});
+
 const cogLayer = new CogTerrainLayer(
   'CogTerrainLayer',
   'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
@@ -110,6 +153,23 @@ const cogLayer = new CogTerrainLayer(
   { type: 'terrain', multiplier: 0.1, useChannel: null },
   'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
 );
+//
+const contoursLayer = new ContoursLayer({
+  contoursUrl: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/vrstevnice_zakladni_mvt_z14/{z}/{x}/{y}.pbf',
+  indexContoursUrl: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/vrstevnice_zduraznena_mvt_z12_14/{z}/{x}/{y}.pbf',
+  labelsUrl: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/vrstevnice_popis_mvt_z14/{z}/{x}/{y}.pbf',
+});
+
+const lines = new GeoJsonLayer({
+  id: 'rezy-line-layer',
+  data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/rezy_wgs84.geojson',
+  stroked: false,
+  pointType: 'circle',
+  lineWidthScale: 20,
+  lineWidthMinPixels: 2,
+  getLineColor: [255, 0, 0, 255],
+  getLineWidth: 1,
+});
 
 const coBitmapLayer = new CogBitmapLayer(
   'CogBitmapLayer',
@@ -151,9 +211,9 @@ class CogTerrainLayerExample extends React.Component<{}> {
     });
 
     const initialViewState: InitialViewStateProps = {
-      longitude: 0,
-      latitude: 0,
-      zoom: 1,
+      longitude: 14.111939262010219,
+      latitude: 50.762276051184848,
+      zoom: 14,
     };
     /*
     const WMSlayerMapped = new WMSLayer({
@@ -229,8 +289,12 @@ class CogTerrainLayerExample extends React.Component<{}> {
             layers={[
               // tileLayer,
               WMSlayer,
-              cogLayer,
-              coBitmapLayer,
+              contoursLayer,
+              lines,
+              PrahaDEM,
+              PrahaBudovy,
+              // cogLayer,
+              // coBitmapLayer,
               // WMSlayerMapped,
 
               // vectorLayer,
