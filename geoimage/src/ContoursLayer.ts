@@ -1,8 +1,8 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { MVTLayer } from '@deck.gl/geo-layers';
-import { TextLayer, GeoJsonLayer } from '@deck.gl/layers';
+import { TextLayer } from '@deck.gl/layers';
 import chroma from 'chroma-js';
-// import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
+import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 
 type ContoursProps = {
   // intermediate / zakladni
@@ -63,7 +63,7 @@ export default class ContoursLayer extends CompositeLayer<any> {
         filled: true,
         getLineColor: this.options.contoursColor,
         getLineWidth: 0.5,
-        // extensions: [new TerrainExtension()],
+        extensions: [new TerrainExtension()],
       }),
       // Index contours
       new MVTLayer({
@@ -76,7 +76,7 @@ export default class ContoursLayer extends CompositeLayer<any> {
         filled: true,
         getLineColor: this.options.contoursColor,
         getLineWidth: 1,
-        // extensions: [new TerrainExtension()],
+        extensions: [new TerrainExtension()],
       }),
       //   contour lines labels
       new MVTLayer({
@@ -96,13 +96,14 @@ export default class ContoursLayer extends CompositeLayer<any> {
               getAngle: (d) => d.properties.ROTATE,
               getTextAnchor: 'middle',
               getAlignmentBaseline: 'center',
+              // billboard: false,
             });
           }
           return null;
         },
         minZoom: 14,
         maxZoom: 14,
-        // extensions: [new TerrainExtension()],
+        extensions: [new TerrainExtension()],
       }),
     ];
   }

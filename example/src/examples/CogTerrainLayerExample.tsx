@@ -160,6 +160,14 @@ const contoursLayer = new ContoursLayer({
   labelsUrl: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/vrstevnice_popis_mvt_z14/{z}/{x}/{y}.pbf',
 });
 
+const vyrovnaDEM = new CogTerrainLayer(
+    'vyrovnaDEM-CogTerrainLayer',
+    'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
+    {
+      type: 'terrain', multiplier: 1.0, useChannel: null, operation: 'terrain+draw'
+    },
+);
+
 const lines = new GeoJsonLayer({
   id: 'rezy-line-layer',
   data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/rezy_wgs84.geojson',
@@ -293,6 +301,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
               lines,
               PrahaDEM,
               PrahaBudovy,
+              vyrovnaDEM,
               // cogLayer,
               // coBitmapLayer,
               // WMSlayerMapped,
