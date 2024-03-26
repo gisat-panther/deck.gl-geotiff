@@ -2,6 +2,8 @@ import React, { useCallback, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
 import { readPixelsToArray } from '@luma.gl/core';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
+import {SimpleMeshLayer} from '@deck.gl/mesh-layers';
+import {OBJLoader} from '@loaders.gl/obj';
 // import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import {
   MVTLayer,
@@ -110,7 +112,7 @@ const PrahaDEM = new CogTerrainLayer(
   'CogTerrainLayer',
   'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/3dtiles/gs_geotechnika_tin_base_4326_cog_nodata.tif',
   {
-    type: 'terrain', multiplier: 1.0, useChannel: null, terrainMinValue: 200,
+    type: 'terrain', multiplier: 1.0, useChannel: null, terrainMinValue: 200, operation: 'terrain+draw'
   },
   'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/3dtiles/gs_geotechnika_tin_base_4326_cog_nodata.tif',
   {
@@ -121,7 +123,7 @@ const PrahaDEM = new CogTerrainLayer(
 const PrahaBudovy = new Tile3DLayer({
   id: 'tile-3d-layer',
   // data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/3dtiles/Praha_3D_Tiles/tileset.json',
-  data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/3dtiles/Prah_6-4_3D_Tiles/tileset.json',
+  data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/3dtiles/Prah_6-4_3D_Tiles_v2/tileset.json',
   // loader: Tiles3DLoader,
   onTilesetLoad: (tileset) => {
     const { cartographicCenter, zoom } = tileset;
@@ -179,6 +181,19 @@ const lines = new GeoJsonLayer({
   getLineWidth: 1,
 });
 
+const objBridge = new SimpleMeshLayer({
+  id: 'obj-bridge-layer',
+  data:[{position: [14.4562189, 50.0382764], angle: 0, color: [93, 140, 174]}],
+  mesh: 'obj/10077_Tower Bridge_v1_L3.obj',
+  loaders: [OBJLoader],
+  getPosition: d => d.position,
+  getColor: d => d.color,
+  sizeScale: 0.02,
+  getOrientation: d => [0, 0, 0],
+  extensions: [new TerrainExtension()]
+});
+
+
 const coBitmapLayer = new CogBitmapLayer(
   'CogBitmapLayer',
   'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate_in16_zoom16_levels8.tif',
@@ -219,9 +234,9 @@ class CogTerrainLayerExample extends React.Component<{}> {
     });
 
     const initialViewState: InitialViewStateProps = {
-      longitude: 14.111939262010219,
-      latitude: 50.762276051184848,
-      zoom: 14,
+      longitude: 14.4562189,
+      latitude: 50.0382764,
+      zoom: 13,
     };
     /*
     const WMSlayerMapped = new WMSLayer({
@@ -283,7 +298,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
         });
       }
 
-      console.log(item, image, item?.pixelColor);
+      // console.log(item, image, item?.pixelColor);
     };
 
     return (
@@ -297,11 +312,12 @@ class CogTerrainLayerExample extends React.Component<{}> {
             layers={[
               // tileLayer,
               WMSlayer,
-              contoursLayer,
-              lines,
+              // contoursLayer,
+              // lines,
               PrahaDEM,
               PrahaBudovy,
-              vyrovnaDEM,
+              objBridge,
+              // vyrovnaDEM,
               // cogLayer,
               // coBitmapLayer,
               // WMSlayerMapped,

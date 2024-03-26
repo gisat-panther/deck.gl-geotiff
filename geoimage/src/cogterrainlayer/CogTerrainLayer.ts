@@ -181,7 +181,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
                   tesselator: 'martini',
                 },
               },
-              meshMaxError: 12,
+              meshMaxError: 1,
             });
           }
           return null;

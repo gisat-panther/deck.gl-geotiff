@@ -1783,6 +1783,15 @@
     "@loaders.gl/worker-utils" "3.4.14"
     "@probe.gl/stats" "^4.0.1"
 
+"@loaders.gl/loader-utils@4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/loader-utils/-/loader-utils-4.1.4.tgz#5bfbdf35db71cae5b541b704cc7d66e66ed8bdad"
+  integrity sha512-H4JefiK3plFqQxENWx/Mzlx6WtkIvQ21if4VV+UQ/OB3bbq6QuLFHrWBHUx2z4z9QSBj1johiF1KGplgi/unWA==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+    "@loaders.gl/worker-utils" "4.1.4"
+    "@probe.gl/stats" "^4.0.2"
+
 "@loaders.gl/math@3.4.14":
   version "3.4.14"
   resolved "https://registry.yarnpkg.com/@loaders.gl/math/-/math-3.4.14.tgz#c27993f0dbe5a88f3ffa07e5240ce27ea5e92392"
@@ -1803,10 +1812,26 @@
     "@math.gl/polygon" "^3.5.1"
     pbf "^3.2.1"
 
+"@loaders.gl/obj@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/obj/-/obj-4.1.4.tgz#4606991d5d1695d169367cda2133d74176802b1e"
+  integrity sha512-dwglZ1Mmym1NCsRShrOKEcMftcPXLB4yWr6xTNRPoeIirfQi9n9uH2fv4kxGnusAgtqRrUAMMMbJBMOM3rOriA==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+    "@loaders.gl/loader-utils" "4.1.4"
+    "@loaders.gl/schema" "4.1.4"
+
 "@loaders.gl/schema@3.4.14", "@loaders.gl/schema@^3.4.13":
   version "3.4.14"
   resolved "https://registry.yarnpkg.com/@loaders.gl/schema/-/schema-3.4.14.tgz#6f145065a2abaf402aa419cfa25ec7f1fdeed487"
   integrity sha512-r6BEDfUvbvzgUnh/MtkR5RzrkIwo1x1jtPFRTSJVsIZO7arXXlu3blffuv5ppEkKpNZ1Xzd9WtHp/JIkuctsmw==
+  dependencies:
+    "@types/geojson" "^7946.0.7"
+
+"@loaders.gl/schema@4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/schema/-/schema-4.1.4.tgz#951a6c04891dea992a7111ba41e4f46ff9bddc72"
+  integrity sha512-Y9FoM/HdBvAVrGi213Z7+dvSBEvDEc9va38RFzXA5HtTcUqOz1Rsu2wStNmY7oL7xjnNF856Wyq0Nty7I24V4g==
   dependencies:
     "@types/geojson" "^7946.0.7"
 
@@ -1864,6 +1889,13 @@
   version "3.4.14"
   resolved "https://registry.yarnpkg.com/@loaders.gl/worker-utils/-/worker-utils-3.4.14.tgz#5391a416a3d60e03b9edcedb285af44312d40d2e"
   integrity sha512-PUSwxoAYbskisXd0KfYEQ902b0igBA2UAWdP6PzPvY+tJmobfh74dTNwrrBQ1rGXQxxmGx6zc6/ksX6mlIzIrg==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+
+"@loaders.gl/worker-utils@4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/worker-utils/-/worker-utils-4.1.4.tgz#bc68dfa027cc09a8eb5e5b75e287713f6018586e"
+  integrity sha512-6SsOcS+aoI7/f/ak1vlpwlhzDXMbO8ivUIyDmCazPpRMnpFP7ig/H2yctvlGnUTUhsv1oJCRt4vPnhKefhCFvg==
   dependencies:
     "@babel/runtime" "^7.3.1"
 
@@ -2172,6 +2204,11 @@
   integrity sha512-SDuSY/D4yDL6LQDa69l/GCcnZLRiGYdyvYkxWb0CgnzTPdPrcdrzGkzkvpC3zsA4fEFw2smlDje370QGHwlisg==
   dependencies:
     "@babel/runtime" "^7.0.0"
+
+"@probe.gl/stats@^4.0.2":
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/@probe.gl/stats/-/stats-4.0.9.tgz#3a175c1a0207d54bf911bd01f4f5414b9f3e6f2a"
+  integrity sha512-Q9Xt/sJUQaMsbjRKjOscv2t7wXIymTrOEJ4a3da4FTCn7bkKvcdxdyFAQySCrtPxE+YZ5I5lXpWPgv9BwmpE1g==
 
 "@remix-run/router@1.5.0":
   version "1.5.0"
