@@ -1,3 +1,14 @@
+# v1.10.0 (Wed Apr 03 2024)
+
+#### 🚀 Enhancement
+
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v1.9.2 (Wed Mar 06 2024)
 
 #### 🐾 Patch
