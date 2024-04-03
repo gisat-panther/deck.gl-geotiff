@@ -25,8 +25,10 @@ const cogLayer = new CogBitmapLayer(
   //   'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/DEM_COP30_float32_wgs84_deflate_cog_float32.tif',
 
   //    heatmap
-  //    'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
-  // { type:"image", useChannel: 30, useHeatMap:true, colorScaleValueRange: [0, 3], clipLow: 1, colorScale: chroma.brewer.Blues}
+  'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
+  {
+    type: 'image', useChannel: 30, useHeatMap: true, colorScaleValueRange: [0, 3], clipLow: 1, colorScale: chroma.brewer.Blues,
+  },
 
   //     colors based on values
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
@@ -35,10 +37,10 @@ const cogLayer = new CogBitmapLayer(
   // },
 
   // color classes
-  'https://gisat-gis.eu-central-1.linodeobjects.com/esaBsadri/app4ForestMonitoring/md_z1_density.tif',
-  {
-    type: 'image', useColorClasses: true, colorClasses: [['pink', [-452, 633], [true, false]], ['blue', [633, 1719], [true, false]], ['orange', [1719, 2805], [true, false]], ['red', [2805, 3891], [true, true]]],
-  },
+  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaBsadri/app4ForestMonitoring/md_z1_density.tif',
+  // {
+  //   type: 'image', useColorClasses: true, colorClasses: [['pink', [-452, 633], [true, false]], ['blue', [633, 1719], [true, false]], ['orange', [1719, 2805], [true, false]], ['red', [2805, 3891], [true, true]]],
+  // },
 
   // single color
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
