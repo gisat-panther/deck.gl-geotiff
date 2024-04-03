@@ -1,6 +1,6 @@
 /* eslint 'max-len': [1, { code: 100, comments: 999, ignoreStrings: true, ignoreUrls: true }] */
 // COG loading
-import { CogTiff, CogTiffImage } from '@cogeotiff/core';
+import { Tiff, TiffImage } from '@cogeotiff/core';
 import { SourceHttp } from '@chunkd/source-http';
 
 // Image compression support
@@ -16,7 +16,7 @@ const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
 
 class CogTiles {
-  cog: CogTiff;
+  cog: Tiff;
 
   zoomRange = [0, 0];
 
@@ -48,9 +48,9 @@ class CogTiles {
     };
 
     const source = new SourceHttp(url);
-    this.cog = await CogTiff.create(source);
+    this.cog = await Tiff.create(source);
 
-    this.cog.images.forEach((image:CogTiffImage) => {
+    this.cog.images.forEach((image:TiffImage) => {
       image.loadGeoTiffTags();
     });
 
@@ -76,11 +76,11 @@ class CogTiles {
     return this.cog;
   }
 
-  getTileSize(cog: CogTiff) {
+  getTileSize(cog: Tiff) {
     return cog.images[cog.images.length - 1].tileSize.width;
   }
 
-  getZoomRange(cog: CogTiff) {
+  getZoomRange(cog: Tiff) {
     const img = cog.images[cog.images.length - 1];
 
     const minZoom = this.getZoomLevelFromResolution(
@@ -92,7 +92,7 @@ class CogTiles {
     return [minZoom, maxZoom];
   }
 
-  getBoundsAsLatLon(cog: CogTiff) {
+  getBoundsAsLatLon(cog: Tiff) {
     const { bbox } = cog.images[cog.images.length - 1];
 
     // console.log(bbox)
@@ -108,12 +108,12 @@ class CogTiles {
     return [minXYDeg[0], minXYDeg[1], maxXYDeg[0], maxXYDeg[1]] as [number, number, number, number];
   }
 
-  getOriginAsLatLon(cog: CogTiff) {
+  getOriginAsLatLon(cog: Tiff) {
     const { origin } = cog.images[cog.images.length - 1];
     return this.getLatLon(origin);
   }
 
-  getImageTileIndex(img: CogTiffImage) {
+  getImageTileIndex(img: TiffImage) {
     const ax = EARTH_HALF_CIRCUMFERENCE + img.origin[0];
     const ay = -(EARTH_HALF_CIRCUMFERENCE + (img.origin[1] - EARTH_CIRCUMFERENCE));
     // let mpt = img.resolution[0] * img.tileSize.width;
