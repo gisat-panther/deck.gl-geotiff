@@ -23,8 +23,6 @@ import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapL
 
 const WORLD_SIZE = 512;
 
-const WORLD_SIZE = 512;
-
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (result) {
@@ -179,6 +177,19 @@ const cogLayerD8_DEM = new CogTerrainLayer(
   },
 );
 
+const objBridge = new SimpleMeshLayer({
+  id: 'obj-bridge-layer',
+  data:[{position: [14.02101263826977, 50.5715443548494, 310], angle: 0, color: [93, 140, 174]}],
+  mesh: 'obj/mari_most_4.obj',
+  // mesh: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/arrow_v2.obj',
+  loaders: [OBJLoader],
+  getPosition: d => d.position,
+  getColor: d => d.color,
+  sizeScale: 1,
+  getOrientation: d => [0, 7, 0],
+  // extensions: [new TerrainExtension()]
+});
+
 const cogBitmapLayer = new CogBitmapLayer(
   'CogBitmapLayer',
   'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/vyrovna/USTIL_5g_spline_pnts1-20_p140_2m_wgs84_cog_nodata.tif',
@@ -287,7 +298,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
     const verticalProfileLayer_D8_Stab_L1 = new BitmapLayer({
       id: 'verticalProfileLayer_D8_Stab_L1',
       bounds: getVerticalProfileBounds(14.015445, 50.570605, 14.028419600527943, 50.570945823734725, 370, 220, 230),
-      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/png_profiles/Stab-L1.png',
+      image: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/png_profiles/Stab-L1 .png',
     });
 
     const verticalProfileLayer_D8_Stab_S2 = new BitmapLayer({
@@ -551,22 +562,21 @@ class CogTerrainLayerExample extends React.Component<{}> {
               // verticalProfileLayer_Decin_R11_b,
               // verticalProfileLayer_Decin_R12,
               // verticalProfileLayer_D8_Stab_L1,
-              verticalProfileLayer_D8_Def_L1,
+              // verticalProfileLayer_D8_Def_L1,
               // verticalProfileLayer_D8_Stab_S2,
-              verticalProfileLayer_D8_Def_S2,
+              // verticalProfileLayer_D8_Def_S2,
               lines,
               // bodyInSARTrim44,
               // bodyInSARTrim95,
               // bodyInSARTrim146,
-              bodyInSARTrim44Arrow,
+              // bodyInSARTrim44Arrow,
               profileLinesD8,
               inSARGeojson,
-              inSARArrowsMesh,
+              // inSARArrowsMesh,
+              objBridge,
               // verticalVectorProfileLayer,
               // cogLayer,
-              // cogLayerD8_DEM,
-              // cogLayerD8_DEM_CGS,
-              // cogLayerD8_DEM_CUZK,
+              cogLayerD8_DEM,
               // vrstevniceZduraznena,
               // vrstevniceZakladni,
               // vrstevniceD8,
