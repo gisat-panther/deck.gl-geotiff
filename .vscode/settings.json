@@ -1,7 +1,7 @@
 {
   "eslint.format.enable": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "eslint.validate": ["javascript", "typescript"],
@@ -12,8 +12,8 @@
     "editor.defaultFormatter": "dbaeumer.vscode-eslint",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll.eslint": "explicit"
     }
   },
-  "eslint.workingDirectories":  [ "./cogterrainlayer", "./cogtiles" ]
+  "eslint.workingDirectories": ["./cogterrainlayer", "./cogtiles"]
 }
