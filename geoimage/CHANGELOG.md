@@ -1,3 +1,16 @@
+# v1.10.1 (Wed Apr 10 2024)
+
+#### ⚠️ Pushed to `master`
+
+- Merge commit '85fae06e06afa2bc9f0069163e7f51918d93e669' ([@vdubr](https://github.com/vdubr))
+- Fix deck update ([@vdubr](https://github.com/vdubr))
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v1.10.0 (Wed Apr 03 2024)
 
 #### 🚀 Enhancement
