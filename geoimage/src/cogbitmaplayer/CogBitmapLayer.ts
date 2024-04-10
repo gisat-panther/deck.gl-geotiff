@@ -3,6 +3,8 @@ import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from '@deck.gl/layers';
 import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import { GL } from '@luma.gl/constants';
+// import GL from '@luma.gl/constants';
+// GL.GL.CLIP_DISTANCE0_WEBGL
 import CogTiles from '../cogtiles/cogtiles.ts';
 
 import { GeoImageOptions } from '../geoimage/geoimage.ts';

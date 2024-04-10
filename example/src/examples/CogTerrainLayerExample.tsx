@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
-// import { readPixelsToArray } from '@luma.gl/core';
+// import { readPixelsToArray } from '@luma.gl/webgl-legacy';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
 // import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import {
@@ -113,15 +113,18 @@ const cogLayer = new CogTerrainLayer(
 
 const coBitmapLayer = new CogBitmapLayer(
   'CogBitmapLayer',
-  'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate_in16_zoom16_levels8.tif',
+  'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
+  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate_in16_zoom16_levels8.tif',
   {
     type: 'image',
-    useChannel: 0,
+    useChannel: null,
+    multiplier: 0.1,
     useHeatMap: true,
+    terrainMinValue: 100,
     colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'],
     colorScaleValueRange: [1, 100, 200, 300, 366],
     clampToTerrain: {
-      terrainDrawMode: 'drape',
+      terrainDrawMode: 'terrain+draw',
     },
   },
 );
@@ -151,9 +154,10 @@ class CogTerrainLayerExample extends React.Component<{}> {
     });
 
     const initialViewState: InitialViewStateProps = {
-      longitude: 0,
-      latitude: 0,
-      zoom: 1,
+      longitude: 14.03014071313204,
+      latitude: 50.566048665612065,
+      zoom: 18,
+
     };
     /*
     const WMSlayerMapped = new WMSLayer({
@@ -206,14 +210,16 @@ class CogTerrainLayerExample extends React.Component<{}> {
       // existuje pouze item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.elevationData z toho by asi šla hodnota dekodovat
       // item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.image
       const image = item?.tile?.layers?.[0]?.props?.tile?.layers?.[0]?.props?.image;
-      // if (image) {
-      //   item.pixelColor = readPixelsToArray(image, {
-      //     sourceX: event?.bitmap?.pixel?.[0],
-      //     sourceY: event?.bitmap?.pixel?.[1],
-      //     sourceWidth: 1,
-      //     sourceHeight: 1,
-      //   });
-      // }
+      if (image) {
+        console.log('xxx', image);
+
+        // item.pixelColor = readPixelsToArray(image, {
+        //   sourceX: event?.bitmap?.pixel?.[0],
+        //   sourceY: event?.bitmap?.pixel?.[1],
+        //   sourceWidth: 1,
+        //   sourceHeight: 1,
+        // });
+      }
 
       console.log(item, image, item?.pixelColor);
     };
