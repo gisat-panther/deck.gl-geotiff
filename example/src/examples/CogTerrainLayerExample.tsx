@@ -441,7 +441,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
     const inSARArrowsMesh = new SimpleMeshLayer({
       data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_DESC_upd3_psd_los_4326_arrows.geojson',
       id: 'trim_d8_DESC_arrows',
-      mesh: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/arrow_v2.obj',
+      mesh: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/arrow_v3.obj',
       getColor: d => [...colorScale(d.properties.vel_rel).rgb(), 255],
       getOrientation: d => [0, d.properties.az_ang, d.properties.inc_ang],
       getPosition: d => d.geometry.coordinates,
@@ -570,7 +570,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
               // bodyInSARTrim44Arrow,
               profileLinesD8,
               inSARGeojson,
-              // inSARArrowsMesh,
+              inSARArrowsMesh,
               objBridge,
               // verticalVectorProfileLayer,
               // cogLayer,
