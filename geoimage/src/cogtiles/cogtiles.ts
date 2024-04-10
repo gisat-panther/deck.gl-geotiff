@@ -12,6 +12,8 @@ import LZWDecoder from './lzw';
 // Bitmap styling
 import GeoImage, { GeoImageOptions } from '../geoimage/geoimage.ts'; // TODO: remove absolute path
 
+export type Bounds = [minX: number, minY: number, maxX: number, maxY: number];
+
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
 
@@ -156,7 +158,7 @@ class CogTiles {
     return cartographicPositionAdjusted;
   }
 
-  async getTile(x: number, y: number, z: number) {
+  async getTile(x: number, y: number, z: number, bounds:Bounds) {
     const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
     const img = this.cog.getImageByResolution(wantedMpp);
     // await img.loadGeoTiffTags(1)
@@ -211,7 +213,7 @@ img.tags.get(339).value as Array<number>,
     // console.log("Single channel pixel format: " + bitsPerSample/)
 
     if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
-      // console.log("getting tile: " + [x - ox, y - oy]);
+      // console.log(`getting tile: ${[x - ox, y - oy]}`);
       const tile = await img.getTile((x - ox), (y - oy));
       // console.time("Request to data time: ")
 
@@ -254,10 +256,13 @@ img.tags.get(339).value as Array<number>,
 
       // console.log(decompressedFormatted)
 
+      // const { meshMaxError, bounds, elevationDecoder } = this.options;
+
       decompressed = await this.geo.getMap({
         rasters: [decompressedFormatted],
         width: this.tileSize,
         height: this.tileSize,
+        bounds,
       }, this.options);
 
       // console.log(decompressed.length)

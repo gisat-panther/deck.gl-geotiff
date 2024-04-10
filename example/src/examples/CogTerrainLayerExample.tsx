@@ -2,18 +2,21 @@ import React, { useCallback, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
 // import { readPixelsToArray } from '@luma.gl/webgl-legacy';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
-// import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
+// import { TerrainLayer } from '@deck.gl/geo-layers';
+import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 import {
   MVTLayer,
   TileLayer,
   _WMSLayer as WMSLayer,
 } from '@deck.gl/geo-layers';
-import { MVTLoader } from '@loaders.gl/mvt';
+// import { MVTLoader } from '@loaders.gl/mvt';
 import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
-import { AnyARecord } from 'dns';
-import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
+// import { AnyARecord } from 'dns';
+// import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
+import { CogTerrainLoader } from '@gisatcz/deckgl-geolib/src/loaders/CogTerrainLoader';
+import TerrainLayer from '@gisatcz/deckgl-geolib/src/terrain-layer';
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -103,31 +106,65 @@ const styleClasses = [
   )
   */
 
-const cogLayer = new CogTerrainLayer(
-  'CogTerrainLayer',
-  'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
-  // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
-  { type: 'terrain', multiplier: 0.1, useChannel: null },
-  'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
-);
+// const cogLayer = new CogTerrainLayer(
+//   'CogTerrainLayer',
+//   'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
+//   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/DEMs/pamzam_10m_Mercator_COG_DEFLATE.tif',
+//   { type: 'terrain', multiplier: 0.1, useChannel: null },
+//   'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
+// );
 
-const coBitmapLayer = new CogBitmapLayer(
-  'CogBitmapLayer',
-  'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
-  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate_in16_zoom16_levels8.tif',
-  {
-    type: 'image',
-    useChannel: null,
-    multiplier: 0.1,
-    useHeatMap: true,
-    terrainMinValue: 100,
-    colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'],
-    colorScaleValueRange: [1, 100, 200, 300, 366],
-    clampToTerrain: {
-      terrainDrawMode: 'terrain+draw',
-    },
-  },
-);
+// const cogLayer = new TerrainLayer({
+//   elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/DMT-Prackovice_1m-verze2_4326_cog_nodata.tif',
+//   loaders: [CogTerrainLoader],
+// });
+
+const cogLayer = new TerrainLayer({
+  elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/LITC52_53_4g_5m_4326_cog_nodata.tif',
+  minZoom: 12,
+  maxZoom: 14,
+  meshMaxError: 5,
+
+  // elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/DMT-Prackovice_1m-verze2_4326_cog_nodata.tif',
+  // minZoom: 9,
+  // maxZoom: 17,
+  // meshMaxError: 1,
+
+  // elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
+  // minZoom: 0,
+  // maxZoom: 9,
+  // meshMaxError: 20,
+
+  opacity: 1,
+  isTiled: true,
+  useChannel: null,
+  tileSize: 256,
+  multiplier: 1.0,
+
+  operation: 'terrain+draw',
+  // loaders: [CogTerrainLoader],
+  // elevationData: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/terrain.png',
+}, {
+  type: 'terrain', multiplier: 1, useChannel: null, terrainSkirtHeight: 1,
+});
+
+// const coBitmapLayer = new CogBitmapLayer(
+//   'CogBitmapLayer',
+//   'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
+//   // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate_in16_zoom16_levels8.tif',
+//   {
+//     type: 'image',
+//     useChannel: null,
+//     multiplier: 0.1,
+//     useHeatMap: true,
+//     terrainMinValue: 100,
+//     colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'],
+//     colorScaleValueRange: [1, 100, 200, 300, 366],
+//     clampToTerrain: {
+//       terrainDrawMode: 'terrain+draw',
+//     },
+//   },
+// );
 
 class CogTerrainLayerExample extends React.Component<{}> {
   render() {
@@ -137,6 +174,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
       minZoom: 0,
       maxZoom: 19,
       tileSize: 256,
+      extensions: [new TerrainExtension()],
 
       renderSubLayers: (props) => {
         const {
@@ -169,12 +207,15 @@ class CogTerrainLayerExample extends React.Component<{}> {
       terrainDrawMode: 'drape',
     });
     */
-    const WMSlayer = new WMSLayer({
-      id: 'WMSlayer',
-      data: 'https://ows.terrestris.de/osm/service',
-      serviceType: 'wms',
-      layers: ['OSM-WMS'],
-    });
+    // const WMSlayer = new WMSLayer({
+    //   id: 'WMSlayer',
+    //   data: 'https://ows.terrestris.de/osm/service',
+    //   serviceType: 'wms',
+    //   layers: ['OSM-WMS'],
+    //   extensions: [new TerrainExtension()],
+    //   // terrainDrawMode: 'drape',
+    //   terrainDrawMode: 'terrain+draw',
+    // });
     /*
     const vectorLayer = new MVTLayer({
       extensions: [new TerrainExtension()],
@@ -233,10 +274,10 @@ class CogTerrainLayerExample extends React.Component<{}> {
             initialViewState={initialViewState}
             controller
             layers={[
-              // tileLayer,
-              WMSlayer,
+              tileLayer,
+              // WMSlayer,
               cogLayer,
-              coBitmapLayer,
+              // coBitmapLayer,
               // WMSlayerMapped,
 
               // vectorLayer,

@@ -3,7 +3,15 @@
 // import { ExtentsLeftBottomRightTop } from '@deck.gl/core/utils/positions';
 import { fromArrayBuffer, GeoTIFFImage, TypedArray } from 'geotiff';
 import chroma from 'chroma-js';
+import Martini from '@mapbox/martini';
+import { getMeshBoundingBox } from '@loaders.gl/schema';
+import { addSkirt } from './helpers/skirt.ts';
+import Delatin from './delatin/index.ts';
 
+export type Bounds = [minX: number, minY: number, maxX: number, maxY: number];
+
+const tesselator = 'martini';
+// const tesselator = 'delatin';
 export type ClampToTerrainOptions = {
   terrainDrawMode?: string
 }
@@ -94,11 +102,13 @@ export default class GeoImage {
     input: string | {
         width: number,
         height: number,
-        rasters: any[]
+        rasters: any[],
+        bounds: Bounds
         },
     options: GeoImageOptions,
   ) {
     const mergedOptions = { ...DefaultGeoImageOptions, ...options };
+    console.log('xxx_mergedOptions', mergedOptions);
 
     switch (mergedOptions.type) {
       case 'image':
@@ -113,6 +123,7 @@ export default class GeoImage {
   // GetHeightmap uses only "useChannel" and "multiplier" options
   async getHeightmap(
     input: string | {
+        bounds: Bounds,
         width: number,
         height: number,
         rasters: any[] },
@@ -140,37 +151,136 @@ export default class GeoImage {
 
     if (options.useChannel != null) {
       if (rasters[options.useChannel]) {
-        channel = rasters[options.useChannel];
+        channel = rasters[options.useChannel]; // length = 65536
       }
     }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const c = canvas.getContext('2d');
-    const imageData = c!.createImageData(width, height);
+    // const canvas = document.createElement('canvas');
+    // canvas.width = width;
+    // canvas.height = height;
+    // // const c = canvas.getContext('2d');
+    // // const imageData = c!.createImageData(width, height);
+
+    // const terrain = new Float32Array((width + 1) * (height + 1));
+    const terrain = new Float32Array((width + 1) * (height + 1)); // length = 66049
 
     const numOfChannels = channel.length / (width * height);
-    const size: number = width * height * 4;
+
+    // return mesh data
+
+    // const size: number = width * height * 4;
+    const size: number = width * height;
+    console.log('xxx_size', size);
+
     let pixel:number = options.useChannel === null ? 0 : options.useChannel;
 
-    for (let i = 0; i < size; i += 4) {
-      //  height image calculation based on:
-      //  https://deck.gl/docs/api-reference/geo-layers/terrain-layer
-      const elevationValue = (options.noDataValue && channel[pixel] === options.noDataValue) ? options.terrainMinValue : channel[pixel] * options.multiplier!;
-      const colorValue = Math.floor((elevationValue + 10000) / 0.1);
-      imageData.data[i] = Math.floor(colorValue / (256 * 256));
-      imageData.data[i + 1] = Math.floor((colorValue / 256) % 256);
-      imageData.data[i + 2] = colorValue % 256;
-      imageData.data[i + 3] = 255;
-
-      pixel += numOfChannels;
+    for (let i = 0, y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++, i++) {
+        const elevationValue = (options.noDataValue && channel[pixel] === options.noDataValue) ? options.terrainMinValue : channel[pixel] * options.multiplier!;
+        terrain[i + y] = elevationValue;
+        pixel += numOfChannels;
+      }
     }
 
-    c!.putImageData(imageData, 0, 0);
-    const imageUrl = canvas.toDataURL('image/png');
+    // for (let i = 0; i < size; i++) {
+    //   //  height image calculation based on:
+    //   //  https://deck.gl/docs/api-reference/geo-layers/terrain-layer
+    //   const elevationValue = (options.noDataValue && channel[pixel] === options.noDataValue) ? options.terrainMinValue : channel[pixel] * options.multiplier!;
+    //   terrain[i] = elevationValue;
+    //   // const colorValue = Math.floor((elevationValue + 10000) / 0.1);
+    //   // imageData.data[i] = Math.floor(colorValue / (256 * 256));
+    //   // imageData.data[i + 1] = Math.floor((colorValue / 256) % 256);
+    //   // imageData.data[i + 2] = colorValue % 256;
+    //   // imageData.data[i + 3] = 255;
+
+    //   pixel += numOfChannels;
+    // }
+
+    // c!.putImageData(imageData, 0, 0);
+    // const imageUrl = canvas.toDataURL('image/png');
     // console.log('Heightmap generated.');
-    return imageUrl;
+    console.log('xxx_terrain', terrain);
+
+    if (terrain[0] > 0) {
+      debugger;
+    }
+
+    if (tesselator === 'martini') {
+    // backfill bottom border
+      for (let i = (width + 1) * width, x = 0; x < width; x++, i++) {
+        terrain[i] = terrain[i - width - 1];
+      }
+      // backfill right border
+      for (let i = height, y = 0; y < height + 1; y++, i += height + 1) {
+        terrain[i] = terrain[i - 1];
+      }
+    }
+
+    // getMesh
+    const { terrainSkirtHeight } = options;
+    console.log('xxx_bounds_0', input.bounds);
+
+    let mesh;
+    switch (tesselator) {
+      case 'martini':
+        mesh = getMartiniTileMesh(terrainSkirtHeight, width, terrain);
+
+        break;
+      case 'delatin':
+        mesh = getDelatinTileMesh(meshMaxError, width, height, terrain);
+        break;
+
+      default:
+        if (width === height && !(height && (width - 1))) {
+          // fixme get terrain to separate method
+          // terrain = getTerrain(data, width, height, elevationDecoder, 'martini');
+          mesh = getMartiniTileMesh(terrainSkirtHeight, width, terrain);
+        } else {
+          // fixme get terrain to separate method
+          // terrain = getTerrain(data, width, height, elevationDecoder, 'delatin');
+          mesh = getDelatinTileMesh(meshMaxError, width, height, terrain);
+        }
+        break;
+    }
+
+    // Martini
+    // Martini
+
+    // Delatin
+    // Delatin
+
+    const { vertices } = mesh;
+    let { triangles } = mesh;
+    let attributes = getMeshAttributes(vertices, terrain, width, height, input.bounds);
+    // Compute bounding box before adding skirt so that z values are not skewed
+    const boundingBox = getMeshBoundingBox(attributes);
+
+    // FIXME uncomment and add skirt
+    console.log('xxx_skirtHeight', terrainSkirtHeight);
+
+    if (terrainSkirtHeight) {
+      const { attributes: newAttributes, triangles: newTriangles } = addSkirt(
+        attributes,
+        triangles,
+        terrainSkirtHeight,
+      );
+      attributes = newAttributes;
+      triangles = newTriangles;
+    }
+
+    return {
+      // Data return by this loader implementation
+      loaderData: {
+        header: {},
+      },
+      header: {
+        vertexCount: triangles.length,
+        boundingBox,
+      },
+      mode: 4, // TRIANGLES
+      indices: { value: Uint32Array.from(triangles), size: 1 },
+      attributes,
+    };
   }
 
   async getBitmap(
@@ -213,6 +323,7 @@ export default class GeoImage {
     let r; let g; let b; let
       a;
     const size = width * height * 4;
+    // const size = width * height;
 
     if (!options.noDataValue) {
       console.log('Missing noData value. Raster might be displayed incorrectly.');
@@ -439,4 +550,82 @@ export default class GeoImage {
   hasPixelsNoData(pixels, noDataValue) {
     return noDataValue !== undefined && pixels.every((pixel) => pixel === noDataValue);
   }
+}
+
+//
+//
+//
+
+/**
+ * Get Martini generated vertices and triangles
+ *
+ * @param {number} meshMaxError threshold for simplifying mesh
+ * @param {number} width width of the input data
+ * @param {number[] | Float32Array} terrain elevation data
+ * @returns {{vertices: Uint16Array, triangles: Uint32Array}} vertices and triangles data
+ */
+function getMartiniTileMesh(meshMaxError, width, terrain) {
+  const gridSize = width + 1;
+  const martini = new Martini(gridSize);
+  const tile = martini.createTile(terrain);
+  const { vertices, triangles } = tile.getMesh(meshMaxError);
+
+  return { vertices, triangles };
+}
+
+function getMeshAttributes(
+  vertices,
+  terrain: Uint8Array,
+  width: number,
+  height: number,
+  bounds: number[],
+) {
+  const gridSize = width + 1;
+  const numOfVerticies = vertices.length / 2;
+  // vec3. x, y in pixels, z in meters
+  const positions = new Float32Array(numOfVerticies * 3);
+  // vec2. 1 to 1 relationship with position. represents the uv on the texture image. 0,0 to 1,1.
+  const texCoords = new Float32Array(numOfVerticies * 2);
+  console.log('xxx_bounds', bounds);
+
+  const [minX, minY, maxX, maxY] = bounds || [0, 0, width, height];
+  const xScale = (maxX - minX) / width;
+  const yScale = (maxY - minY) / height;
+
+  for (let i = 0; i < numOfVerticies; i++) {
+    const x = vertices[i * 2];
+    const y = vertices[i * 2 + 1];
+    const pixelIdx = y * gridSize + x;
+
+    positions[3 * i + 0] = x * xScale + minX;
+    positions[3 * i + 1] = -y * yScale + maxY;
+    positions[3 * i + 2] = terrain[pixelIdx];
+
+    texCoords[2 * i + 0] = x / width;
+    texCoords[2 * i + 1] = y / height;
+  }
+
+  return {
+    POSITION: { value: positions, size: 3 },
+    TEXCOORD_0: { value: texCoords, size: 2 },
+    // NORMAL: {}, - optional, but creates the high poly look with lighting
+  };
+}
+
+/**
+ * Get Delatin generated vertices and triangles
+ *
+ * @param {number} meshMaxError threshold for simplifying mesh
+ * @param {number} width width of the input data array
+ * @param {number} height height of the input data array
+ * @param {number[] | Float32Array} terrain elevation data
+ * @returns {{vertices: number[], triangles: number[]}} vertices and triangles data
+ */
+function getDelatinTileMesh(meshMaxError, width, height, terrain) {
+  const tin = new Delatin(terrain, width + 1, height + 1);
+  tin.run(meshMaxError);
+  // @ts-expect-error
+  const { coords, triangles } = tin;
+  const vertices = coords;
+  return { vertices, triangles };
 }

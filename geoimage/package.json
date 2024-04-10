@@ -38,6 +38,7 @@
     "@deck.gl/react": "^9.0.4",
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@luma.gl/constants": "^9.0.9",
+    "@mapbox/martini": "^0.2.0",
     "@math.gl/web-mercator": "^4.0.1",
     "chroma-js": "^2.4.2",
     "geotiff": "^2.1.3",

@@ -95,7 +95,7 @@ class CogTerrainLayer extends CompositeLayer<any> {
     this.tileSize = this.terrainCogTiles.getTileSize(cog);
 
     const zoomRange = this.terrainCogTiles.getZoomRange(cog);
-    [this.minZoom, this.maxZoom] = zoomRange;
+    [this.props.minZoom, this.props.maxZoom] = zoomRange;
 
     this.setState({ initialized: true });
   }
