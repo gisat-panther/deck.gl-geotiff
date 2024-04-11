@@ -14,9 +14,9 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { MapView } from '@deck.gl/core';
 // import { AnyARecord } from 'dns';
 // import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
-import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
-import { CogTerrainLoader } from '@gisatcz/deckgl-geolib/src/loaders/CogTerrainLoader';
-import TerrainLayer from '@gisatcz/deckgl-geolib/src/terrain-layer';
+// import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
+// import { CogTerrainLoader } from '@gisatcz/deckgl-geolib/src/loaders/CogTerrainLoader';
+import TerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
