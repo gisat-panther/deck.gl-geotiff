@@ -1,6 +1,5 @@
 import { Mesh } from '@loaders.gl/schema';
-import type { LoaderContext, LoaderWithParser } from '@loaders.gl/loader-utils';
-import { parseFromContext } from '@loaders.gl/loader-utils';
+import type { LoaderContext, LoaderWithParser, parseFromContext } from '@loaders.gl/loader-utils';
 // import { TerrainLoader as TerrainWorkerLoader, TerrainLoaderOptions } from './terrain-loader';
 // TerrainLoader
 

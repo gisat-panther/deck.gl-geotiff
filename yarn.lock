@@ -2126,6 +2126,15 @@
     "@loaders.gl/worker-utils" "4.1.4"
     "@probe.gl/stats" "^4.0.2"
 
+"@loaders.gl/loader-utils@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/loader-utils/-/loader-utils-4.2.0.tgz#cb8ec688687ab5cfd06daceb57d133c17b6e4e8e"
+  integrity sha512-kWM3yMTGLqkBwb/CdWhzQU6P17PZelyFvUm5LtPm1LHo1tVuxutBeo5wl0FuAraJIx4O4/oCR0iNdb4l58wKRg==
+  dependencies:
+    "@loaders.gl/schema" "4.2.0"
+    "@loaders.gl/worker-utils" "4.2.0"
+    "@probe.gl/stats" "^4.0.2"
+
 "@loaders.gl/math@4.1.4":
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/@loaders.gl/math/-/math-4.1.4.tgz#582f61d30fcf2f3e60b9efcc9f9f6931dcbb8e64"
@@ -2151,6 +2160,13 @@
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/@loaders.gl/schema/-/schema-4.1.4.tgz#951a6c04891dea992a7111ba41e4f46ff9bddc72"
   integrity sha512-Y9FoM/HdBvAVrGi213Z7+dvSBEvDEc9va38RFzXA5HtTcUqOz1Rsu2wStNmY7oL7xjnNF856Wyq0Nty7I24V4g==
+  dependencies:
+    "@types/geojson" "^7946.0.7"
+
+"@loaders.gl/schema@4.2.0", "@loaders.gl/schema@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/schema/-/schema-4.2.0.tgz#87c1da01aa15a45060ea54010504bc0c87689d38"
+  integrity sha512-xM5PY3k9UvyXz6rgCyouGSIbfzdsmrR2zYEhI5prFYwgjnOJX0D5Wz4TpsuNQaVpsAGC6cZXgQU6nmhScQYJyQ==
   dependencies:
     "@types/geojson" "^7946.0.7"
 
@@ -2209,6 +2225,11 @@
   integrity sha512-6SsOcS+aoI7/f/ak1vlpwlhzDXMbO8ivUIyDmCazPpRMnpFP7ig/H2yctvlGnUTUhsv1oJCRt4vPnhKefhCFvg==
   dependencies:
     "@babel/runtime" "^7.3.1"
+
+"@loaders.gl/worker-utils@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/worker-utils/-/worker-utils-4.2.0.tgz#8dc31b2aac6bc2a5ae80b174aca370926c9f3d3f"
+  integrity sha512-sTfalI6utDO7/0i89bE5Ex+uXK6Kull7U3IozkDNPSn6JhNwCvkujhcmQWEFxEPY0CQRVZBq95pjbCYbYYLJpQ==
 
 "@loaders.gl/xml@4.1.4":
   version "4.1.4"
