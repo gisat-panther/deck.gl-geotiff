@@ -18,6 +18,7 @@ import { MVTLoader } from '@loaders.gl/mvt';
 import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
 import chroma from 'chroma-js';
+import { scaleLog } from 'd3-scale';
 import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
 
@@ -424,7 +425,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
       filled: true,
       getLineColor: [113, 79, 60, 255],
       getLineWidth: (d) => ((d.properties.Layer === 'HLAVNI_VRST') ? 1 : 0.5),
-      extensions: [new TerrainExtension()],
+      // extensions: [new TerrainExtension()],
     });
 
     const inSARGeojson = new GeoJsonLayer({
@@ -438,15 +439,39 @@ class CogTerrainLayerExample extends React.Component<{}> {
       extensions: [new TerrainExtension()],
     });
 
+    const scaleTail = scaleLog([0.1, 20], [0.1, 2]);
+    const scaleTip = scaleLog([0.1, 20], [0.1, 1]);
+
+    const ARROW_SIZE = 67; // eyeball measured, only for this object: https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/arrow_v3.obj
+
     const inSARArrowsMesh = new SimpleMeshLayer({
-      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_DESC_upd3_psd_los_4326_arrows.geojson',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_DESC_upd3_psd_los_4326_selected_arrows.geojson',
       id: 'trim_d8_DESC_arrows',
       mesh: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/arrow_v3.obj',
-      getColor: d => [...colorScale(d.properties.vel_rel).rgb(), 255],
-      getOrientation: d => [0, d.properties.az_ang, d.properties.inc_ang],
-      getPosition: d => d.geometry.coordinates,
-      getScale: d => [0.4, 0.4, (d.properties.vel_rel + 60) * 0.02],
-      sizeScale: 1,
+      getColor: (d) => [...colorScale(d.properties.vel_rel).rgb(), 255],
+      getOrientation: (d) => {
+        if (d.properties.vel_rel > 0) {
+          return [0, d.properties.az_ang, 180 + d.properties.inc_ang];
+        } else {return [0, d.properties.az_ang, d.properties.inc_ang]};
+      },
+      getTranslation: (d) => {
+        if (d.properties.vel_rel > 0) {
+          const inc_ang_rad = d.properties.inc_ang * Math.PI / 180;
+          const az_ang_rad = d.properties.az_ang * Math.PI / 180;
+          return [
+            Math.sin(inc_ang_rad) * Math.sin(az_ang_rad) * ARROW_SIZE * scaleTail(d.properties.vel_rel),
+            -Math.sin(inc_ang_rad) * Math.cos(az_ang_rad) * ARROW_SIZE * scaleTail(d.properties.vel_rel),
+            Math.cos(inc_ang_rad) * ARROW_SIZE * scaleTail(d.properties.vel_rel)];
+        } else {return [0,0,0]}
+      },
+      getPosition: (d) => d.geometry.coordinates,
+      wireframe: true,
+      getScale: (d) => {
+        if (d.properties.vel_rel > 0) {
+          return [scaleTip(d.properties.vel_rel), scaleTip(d.properties.vel_rel), scaleTail(d.properties.vel_rel)];
+        }
+        return [scaleTip(Math.abs(d.properties.vel_rel)), scaleTip(Math.abs(d.properties.vel_rel)), scaleTail(Math.abs(d.properties.vel_rel))];
+      },
       loaders: [OBJLoader],
       pickable: true,
       extensions: [new TerrainExtension()],
