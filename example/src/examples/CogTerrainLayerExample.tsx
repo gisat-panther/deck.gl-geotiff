@@ -422,7 +422,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
       maxZoom: 14,
       stroked: true,
       filled: true,
-      getLineColor: [160, 160, 160],
+      getLineColor: [113, 79, 60, 255],
       getLineWidth: (d) => ((d.properties.Layer === 'HLAVNI_VRST') ? 1 : 0.5),
       extensions: [new TerrainExtension()],
     });
