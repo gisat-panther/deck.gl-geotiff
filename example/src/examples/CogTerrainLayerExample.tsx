@@ -1,21 +1,22 @@
 import React, { useCallback, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
-import { readPixelsToArray } from '@luma.gl/core';
-import {COORDINATE_SYSTEM} from '@deck.gl/core';
+import { readPixelsToArray, CubeGeometry } from '@luma.gl/core';
+import { COORDINATE_SYSTEM, MapView } from '@deck.gl/core';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
-import { PolygonLayer, BitmapLayer, GeoJsonLayer, PointCloudLayer } from '@deck.gl/layers';
+import {
+  PolygonLayer, BitmapLayer, GeoJsonLayer, PointCloudLayer,
+} from '@deck.gl/layers';
 import { _TerrainExtension as TerrainExtension, ClipExtension } from '@deck.gl/extensions';
 import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
 import { OBJLoader } from '@loaders.gl/obj';
-import {CubeGeometry} from '@luma.gl/core';
-import {Matrix4} from '@math.gl/core';
+
+import { Matrix4 } from '@math.gl/core';
 import {
   MVTLayer,
   TileLayer,
   _WMSLayer as WMSLayer,
 } from '@deck.gl/geo-layers';
 import { MVTLoader } from '@loaders.gl/mvt';
-import { MapView } from '@deck.gl/core';
 import { AnyARecord } from 'dns';
 import chroma from 'chroma-js';
 import { scaleLog } from 'd3-scale';
@@ -166,7 +167,8 @@ const cogLayerD8_DEM = new CogTerrainLayer(
   {
     type: 'terrain', multiplier: 1, useChannel: null, terrainMinValue: 100, operation: 'terrain+draw', alpha: 100, terrainSkirtHeight: 7,
   },
-  'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/RSD_DEM_5m_wgs84_cog_nodata.tif',
+  'https://ags.cuzk.cz/arcgis1/rest/services/ORTOFOTO_WM/MapServer/WMTS/tile/1.0.0/ORTOFOTO_WM/default/GoogleMapsCompatible/{z}/{y}/{x}',
+  // 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/RSD_DEM_5m_wgs84_cog_nodata.tif',
   {
     type: 'image',
     useChannel: 0,
@@ -434,7 +436,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
       stroked: false,
       filled: true,
       pointType: 'circle',
-      getFillColor: (d) =>[255,0,0],
+      getFillColor: (d) => [255, 0, 0],
       getPointRadius: (d) => 5, // coh interval (0.13-0.98)
       extensions: [new TerrainExtension()],
     });
@@ -482,9 +484,8 @@ class CogTerrainLayerExample extends React.Component<{}> {
       binary: false,
       renderSubLayers: (props) => {
         if (props.data) {
-
-          const {x, y, z} = props.tile.index;
-          const worldScale = Math.pow(2, z);
+          const { x, y, z } = props.tile.index;
+          const worldScale = 2 ** z;
 
           const xScale = WORLD_SIZE / worldScale;
           const yScale = -xScale;
@@ -507,8 +508,8 @@ class CogTerrainLayerExample extends React.Component<{}> {
             getColor: (d) => [...colorScale(d.properties.vel_rel).rgb(), 255],
             // mesh: new CubeGeometry(),
             mesh: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/arrow_v2.obj',
-            getOrientation: d => [0, 0, 0],
-            getPosition: d => d.geometry.coordinates,
+            getOrientation: (d) => [0, 0, 0],
+            getPosition: (d) => d.geometry.coordinates,
             getScale: [0.001, 0.001, 1.25],
             // getTranslation: (d) => [2, 0, 0],
             loaders: [OBJLoader],
@@ -577,7 +578,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
             initialViewState={initialViewState}
             controller
             layers={[
-              tileLayer,
+              // tileLayer,
               // WMSlayer,
               // verticalProfileLayer_Decin_R3_1,
               // verticalProfileLayer_Decin_R4_1,
@@ -593,16 +594,16 @@ class CogTerrainLayerExample extends React.Component<{}> {
               // bodyInSARTrim95,
               // bodyInSARTrim146,
               // bodyInSARTrim44Arrow,
-              profileLinesD8,
+              // profileLinesD8,
               inSARGeojson,
               inSARArrowsMesh,
-              objBridge,
+              // objBridge,
               // verticalVectorProfileLayer,
               // cogLayer,
-              cogLayerD8_DEM,
+              // cogLayerD8_DEM,
               // vrstevniceZduraznena,
               // vrstevniceZakladni,
-              // vrstevniceD8,
+              vrstevniceD8,
               // terrainEdgesD8,
               // cogBitmapLayer,
               // WMSlayerMapped,
