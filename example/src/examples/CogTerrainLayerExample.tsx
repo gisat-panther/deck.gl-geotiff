@@ -179,13 +179,13 @@ const cogLayerD8_DEM = new CogTerrainLayer(
 
 const objBridge = new SimpleMeshLayer({
   id: 'obj-bridge-layer',
-  data:[{position: [14.020866826697615, 50.571360954173208, 302.7], angle: 0, color: [93, 140, 174]}],
+  data: [{ position: [14.020866826697615, 50.571360954173208, 302.7], angle: 0, color: [93, 140, 174] }],
   mesh: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/prackovicky_most.obj',
   loaders: [OBJLoader],
-  getPosition: d => d.position,
-  getColor: d => d.color,
-  sizeScale: 1,
-  getOrientation: d => [0, 0, 0],
+  getPosition: (d) => d.position,
+  getColor: (d) => d.color,
+  sizeScale: 0.634,
+  getOrientation: (d) => [0, 0, 0],
 });
 
 const cogBitmapLayer = new CogBitmapLayer(
