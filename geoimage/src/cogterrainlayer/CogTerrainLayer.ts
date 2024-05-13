@@ -190,25 +190,28 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 	  zRange?: ZRange | null;
 	};
 
-  constructor(props: TerrainLayerProps & ExtraPropsT, terrainOptions: GeoImageOptions) {
-    super(props);
-    console.log('xxx_terrainOptions', terrainOptions);
-
-    this.terrainCogTiles = new CogTiles(terrainOptions);
-  }
+  // constructor(props: TerrainLayerProps & ExtraPropsT, terrainOptions: GeoImageOptions) {
+  //   super(props);
+  //   console.log('xxx_terrainOptions', terrainOptions);
+  // }
 
   async initializeState(context: any) {
     super.initializeState(context);
+    console.log('xxx_initializeState_terrain');
+
+    this.terrainCogTiles = new CogTiles(this.props.terrainOptions);
     this.setState({
       initialized: false,
     });
 
+    // XXX
     await this.init(this.terrainUrl);
   }
 
   async init(terrainUrl: string) {
     console.log('xxx_LAYER INITIALIZE STATE');
 
+    // XXX
     const cog = await this.terrainCogTiles.initializeCog(this.props.elevationData);
     console.log('xxx_LAYER INITIALIZE STATE', cog);
     // this.tileSize = this.terrainCogTiles.getTileSize(cog);
@@ -342,7 +345,7 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 	  const bounds: Bounds = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]];
 	  // const bounds: Bounds = [0, 100, 100, 100];
 	  // const bounds: Bounds = [tile.bbox.west, tile.bbox.south, tile.bbox.east, tile.bbox.north];
-
+    // XXX
     const terrain = await this.terrainCogTiles.getTile(
       tile.index.x,
       tile.index.y,
@@ -453,6 +456,7 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
           id: 'tiles',
 		  }),
 		  {
+        // XXX
           getTileData: this.getTiledTerrainData.bind(this),
           renderSubLayers: this.renderSubLayers.bind(this),
           updateTriggers: {
