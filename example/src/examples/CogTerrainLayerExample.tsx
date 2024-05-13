@@ -144,8 +144,9 @@ const cogLayer = new TerrainLayer({
   operation: 'terrain+draw',
   // loaders: [CogTerrainLoader],
   // elevationData: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/terrain.png',
-}, {
-  type: 'terrain', multiplier: 1, useChannel: null, terrainSkirtHeight: 1,
+  terrainOptions: {
+    type: 'terrain', multiplier: 1, useChannel: null, terrainSkirtHeight: 1,
+  },
 });
 
 // const coBitmapLayer = new CogBitmapLayer(

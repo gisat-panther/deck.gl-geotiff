@@ -176,7 +176,7 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 
   static layerName = 'TerrainLayer';
 
-  terrainCogTiles: CogTiles;
+  // terrainCogTiles: CogTiles;
 
   terrainUrl: string;
 
@@ -199,8 +199,8 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
     super.initializeState(context);
     console.log('xxx_initializeState_terrain');
 
-    this.terrainCogTiles = new CogTiles(this.props.terrainOptions);
     this.setState({
+      terrainCogTiles: new CogTiles(this.props.terrainOptions),
       initialized: false,
     });
 
@@ -212,11 +212,11 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
     console.log('xxx_LAYER INITIALIZE STATE');
 
     // XXX
-    const cog = await this.terrainCogTiles.initializeCog(this.props.elevationData);
+    const cog = await this.state.terrainCogTiles.initializeCog(this.props.elevationData);
     console.log('xxx_LAYER INITIALIZE STATE', cog);
     // this.tileSize = this.terrainCogTiles.getTileSize(cog);
 
-    const zoomRange = this.terrainCogTiles.getZoomRange(cog);
+    const zoomRange = this.state.terrainCogTiles.getZoomRange(cog);
     console.log('xxx_LAYER INITIALIZE STATE', zoomRange);
     [this.minZoom, this.maxZoom] = zoomRange;
 
@@ -346,7 +346,7 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 	  // const bounds: Bounds = [0, 100, 100, 100];
 	  // const bounds: Bounds = [tile.bbox.west, tile.bbox.south, tile.bbox.east, tile.bbox.north];
     // XXX
-    const terrain = await this.terrainCogTiles.getTile(
+    const terrain = await this.state.terrainCogTiles.getTile(
       tile.index.x,
       tile.index.y,
       tile.index.z,
