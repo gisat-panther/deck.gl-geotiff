@@ -15,7 +15,6 @@ import { MapView } from '@deck.gl/core';
 // import { AnyARecord } from 'dns';
 // import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 // import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
-// import { CogTerrainLoader } from '@gisatcz/deckgl-geolib/src/loaders/CogTerrainLoader';
 import TerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 
 function hexToRgb(hex: string) {
@@ -114,11 +113,6 @@ const styleClasses = [
 //   'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoiam9ldmVjeiIsImEiOiJja3lpcms5N3ExZTAzMm5wbWRkeWFuNTA3In0.dHgiiwOgD-f7gD7qP084rg',
 // );
 
-// const cogLayer = new TerrainLayer({
-//   elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/DMT-Prackovice_1m-verze2_4326_cog_nodata.tif',
-//   loaders: [CogTerrainLoader],
-// });
-
 const cogLayer = new TerrainLayer({
   elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/LITC52_53_4g_5m_4326_cog_nodata.tif',
   minZoom: 12,
@@ -142,7 +136,6 @@ const cogLayer = new TerrainLayer({
   multiplier: 1.0,
 
   operation: 'terrain+draw',
-  // loaders: [CogTerrainLoader],
   // elevationData: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/terrain.png',
   terrainOptions: {
     type: 'terrain', multiplier: 1, useChannel: null, terrainSkirtHeight: 1,

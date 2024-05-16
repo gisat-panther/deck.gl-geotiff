@@ -10,6 +10,7 @@ import Delatin from './delatin/index.ts';
 
 export type Bounds = [minX: number, minY: number, maxX: number, maxY: number];
 
+// FIXME - tesselator as a parameter
 const tesselator = 'martini';
 // const tesselator = 'delatin';
 export type ClampToTerrainOptions = {
@@ -108,7 +109,6 @@ export default class GeoImage {
     options: GeoImageOptions,
   ) {
     const mergedOptions = { ...DefaultGeoImageOptions, ...options };
-    console.log('xxx_mergedOptions', mergedOptions);
 
     switch (mergedOptions.type) {
       case 'image':
@@ -155,22 +155,9 @@ export default class GeoImage {
       }
     }
 
-    // const canvas = document.createElement('canvas');
-    // canvas.width = width;
-    // canvas.height = height;
-    // // const c = canvas.getContext('2d');
-    // // const imageData = c!.createImageData(width, height);
-
-    // const terrain = new Float32Array((width + 1) * (height + 1));
-    const terrain = new Float32Array((width + 1) * (height + 1)); // length = 66049
+    const terrain = new Float32Array((width + 1) * (height + 1));
 
     const numOfChannels = channel.length / (width * height);
-
-    // return mesh data
-
-    // const size: number = width * height * 4;
-    const size: number = width * height;
-    console.log('xxx_size', size);
 
     let pixel:number = options.useChannel === null ? 0 : options.useChannel;
 
@@ -180,29 +167,6 @@ export default class GeoImage {
         terrain[i + y] = elevationValue;
         pixel += numOfChannels;
       }
-    }
-
-    // for (let i = 0; i < size; i++) {
-    //   //  height image calculation based on:
-    //   //  https://deck.gl/docs/api-reference/geo-layers/terrain-layer
-    //   const elevationValue = (options.noDataValue && channel[pixel] === options.noDataValue) ? options.terrainMinValue : channel[pixel] * options.multiplier!;
-    //   terrain[i] = elevationValue;
-    //   // const colorValue = Math.floor((elevationValue + 10000) / 0.1);
-    //   // imageData.data[i] = Math.floor(colorValue / (256 * 256));
-    //   // imageData.data[i + 1] = Math.floor((colorValue / 256) % 256);
-    //   // imageData.data[i + 2] = colorValue % 256;
-    //   // imageData.data[i + 3] = 255;
-
-    //   pixel += numOfChannels;
-    // }
-
-    // c!.putImageData(imageData, 0, 0);
-    // const imageUrl = canvas.toDataURL('image/png');
-    // console.log('Heightmap generated.');
-    console.log('xxx_terrain', terrain);
-
-    if (terrain[0] > 0) {
-      debugger;
     }
 
     if (tesselator === 'martini') {
@@ -218,7 +182,6 @@ export default class GeoImage {
 
     // getMesh
     const { terrainSkirtHeight } = options;
-    console.log('xxx_bounds_0', input.bounds);
 
     let mesh;
     switch (tesselator) {
@@ -254,9 +217,6 @@ export default class GeoImage {
     let attributes = getMeshAttributes(vertices, terrain, width, height, input.bounds);
     // Compute bounding box before adding skirt so that z values are not skewed
     const boundingBox = getMeshBoundingBox(attributes);
-
-    // FIXME uncomment and add skirt
-    console.log('xxx_skirtHeight', terrainSkirtHeight);
 
     if (terrainSkirtHeight) {
       const { attributes: newAttributes, triangles: newTriangles } = addSkirt(
@@ -586,7 +546,6 @@ function getMeshAttributes(
   const positions = new Float32Array(numOfVerticies * 3);
   // vec2. 1 to 1 relationship with position. represents the uv on the texture image. 0,0 to 1,1.
   const texCoords = new Float32Array(numOfVerticies * 2);
-  console.log('xxx_bounds', bounds);
 
   const [minX, minY, maxX, maxY] = bounds || [0, 0, width, height];
   const xScale = (maxX - minX) / width;

@@ -33,13 +33,10 @@ import {
 } from '@deck.gl/core';
 import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
 import type { MeshAttributes } from '@loaders.gl/schema';
-// import { TerrainWorkerLoader } from '@loaders.gl/terrain';
 import {
   TileLayer, TileLayerProps, GeoBoundingBox, _TileLoadProps as TileLoadProps,
   _Tile2DHeader as Tile2DHeader, _getURLFromTemplate as getURLFromTemplate, NonGeoBoundingBox,
 } from '@deck.gl/geo-layers';
-
-import { GeoImageOptions } from '../geoimage/geoimage.ts';
 
 import CogTiles from '../cogtiles/cogtiles.ts';
 
@@ -168,6 +165,10 @@ export type TerrainLayerProps = _TerrainLayerProps &
 	workerUrl?: string;
   };
 
+// TODO remove elevationDecoder
+// TODO use meshMaxError
+// TODO - pass signal to getTile
+
 /** Render mesh surfaces from height map images. */
 export default class TerrainLayer<ExtraPropsT extends {} = {}> extends CompositeLayer<
 	ExtraPropsT & Required<_TerrainLayerProps & Required<TileLayerProps<MeshAndTexture>>>
@@ -190,34 +191,22 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 	  zRange?: ZRange | null;
 	};
 
-  // constructor(props: TerrainLayerProps & ExtraPropsT, terrainOptions: GeoImageOptions) {
-  //   super(props);
-  //   console.log('xxx_terrainOptions', terrainOptions);
-  // }
-
   async initializeState(context: any) {
     super.initializeState(context);
-    console.log('xxx_initializeState_terrain');
 
     this.setState({
       terrainCogTiles: new CogTiles(this.props.terrainOptions),
       initialized: false,
     });
 
-    // XXX
     await this.init(this.terrainUrl);
   }
 
   async init(terrainUrl: string) {
-    console.log('xxx_LAYER INITIALIZE STATE');
-
-    // XXX
     const cog = await this.state.terrainCogTiles.initializeCog(this.props.elevationData);
-    console.log('xxx_LAYER INITIALIZE STATE', cog);
     // this.tileSize = this.terrainCogTiles.getTileSize(cog);
 
     const zoomRange = this.state.terrainCogTiles.getZoomRange(cog);
-    console.log('xxx_LAYER INITIALIZE STATE', zoomRange);
     [this.minZoom, this.maxZoom] = zoomRange;
 
     this.setState({ initialized: true });
@@ -275,51 +264,12 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
       },
 	  };
 	  const { fetch } = this.props;
-    console.log('xxx_loaddata');
 
 	  return fetch(elevationData, {
       propName: 'elevationData', layer: this, loadOptions, signal,
     });
   }
-  // OLD version
-  // getTiledTerrainData(tile: TileLoadProps): Promise<MeshAndTexture> {
-  //   const {
-  //     elevationData, fetch, texture, elevationDecoder, meshMaxError,
-  //   } = this.props;
-  //   const { viewport } = this.context;
-  //   const dataUrl = getURLFromTemplate(elevationData, tile);
-  //   const textureUrl = texture && getURLFromTemplate(texture, tile);
 
-  //   const { signal } = tile;
-  //   let bottomLeft = [0, 0] as [number, number];
-  //   let topRight = [0, 0] as [number, number];
-  //   if (viewport.isGeospatial) {
-  //     const bbox = tile.bbox as GeoBoundingBox;
-  //     bottomLeft = viewport.projectFlat([bbox.west, bbox.south]);
-  //     topRight = viewport.projectFlat([bbox.east, bbox.north]);
-  //   } else {
-  //     const bbox = tile.bbox as Exclude<TileBoundingBox, GeoBoundingBox>;
-  //     bottomLeft = [bbox.left, bbox.bottom];
-  //     topRight = [bbox.right, bbox.top];
-  //   }
-  //   const bounds: Bounds = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]];
-
-  //   const terrain = this.loadTerrain({
-  //     elevationData: dataUrl,
-  //     bounds,
-  //     elevationDecoder,
-  //     meshMaxError,
-  //     signal,
-  //   });
-  //   const surface = textureUrl
-  //     ? // If surface image fails to load, the tile should still be displayed
-  // 	  fetch(textureUrl, {
-  //       propName: 'texture', layer: this, loaders: [], signal,
-  //     }).catch((_) => null)
-  //     : Promise.resolve(null);
-
-  //   return Promise.all([terrain, surface]);
-  // }
   async getTiledTerrainData(tile: TileLoadProps): Promise<MeshAndTexture> {
 	  const {
       elevationData, fetch, texture, elevationDecoder, meshMaxError,
@@ -333,7 +283,6 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 	  let topRight = [0, 0] as [number, number];
 	  if (viewport.isGeospatial) {
       const bbox = tile.bbox as GeoBoundingBox;
-      console.log('xxx_coords', bbox.west, bbox.south, bbox.east, bbox.north);
 
       bottomLeft = viewport.projectFlat([bbox.west, bbox.south]);
       topRight = viewport.projectFlat([bbox.east, bbox.north]);
@@ -343,30 +292,17 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
       topRight = [bbox.right, bbox.top];
 	  }
 	  const bounds: Bounds = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]];
-	  // const bounds: Bounds = [0, 100, 100, 100];
-	  // const bounds: Bounds = [tile.bbox.west, tile.bbox.south, tile.bbox.east, tile.bbox.north];
-    // XXX
+
+    // TODO - pass signal to getTile
+    // abort request if signal is aborted
     const terrain = await this.state.terrainCogTiles.getTile(
       tile.index.x,
       tile.index.y,
       tile.index.z,
       bounds,
     );
-    console.log(
-      'xxx_TILE',
-      terrain,
-      bounds,
-    );
 
-	  // const terrain = this.loadTerrain({
-    //   elevationData: dataUrl,
-    //   bounds,
-    //   elevationDecoder,
-    //   meshMaxError,
-    //   signal,
-	  // });
-
-	  return Promise.all([terrain]);
+    return Promise.all([terrain]);
   }
 
   renderSubLayers(
@@ -421,7 +357,7 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 	  }
 	  const minZ = Math.min(...ranges.map((x) => x[0]));
 	  const maxZ = Math.max(...ranges.map((x) => x[1]));
-    console.log('xxx_ranges', ranges);
+
 	  if (!zRange || minZ < zRange[0] || maxZ > zRange[1]) {
       this.setState({ zRange: [Number.isFinite(minZ) ? minZ : 0, Number.isFinite(maxZ) ? maxZ : 0] });
 	  }
@@ -448,7 +384,6 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
       maxCacheByteSize,
       refinementStrategy,
 	  } = this.props;
-    console.log('xxx_renderLayers', this.state.initialized);
 
 	  if (this.state.isTiled && this.state.initialized) {
       return new TileLayer<MeshAndTexture>(
@@ -456,7 +391,6 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
           id: 'tiles',
 		  }),
 		  {
-        // XXX
           getTileData: this.getTiledTerrainData.bind(this),
           renderSubLayers: this.renderSubLayers.bind(this),
           updateTriggers: {

@@ -62,14 +62,6 @@ class CogBitmapLayer extends CompositeLayer<any> {
     this.tileSize = this.cogTiles.getTileSize(cog);
     const zoomRange = this.cogTiles.getZoomRange(cog);
     [this.minZoom, this.maxZoom] = zoomRange;
-
-    // console.log(zoomRange)
-
-    // extent = cogTiles.getBoundsAsLatLon(cog)
-
-    // console.log(extent)
-
-    // needsRerender = true;
   }
 
   renderLayers() {
