@@ -307,6 +307,6 @@ img.tags.get(339).value as Array<number>,
     }
     return undefined;
   }
-
+}
 
 export default CogTiles;
