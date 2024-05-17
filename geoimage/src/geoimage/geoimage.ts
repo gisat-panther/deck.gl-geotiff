@@ -107,6 +107,7 @@ export default class GeoImage {
         bounds: Bounds
         },
     options: GeoImageOptions,
+    meshMaxError,
   ) {
     const mergedOptions = { ...DefaultGeoImageOptions, ...options };
 
@@ -114,7 +115,7 @@ export default class GeoImage {
       case 'image':
         return this.getBitmap(input, mergedOptions);
       case 'terrain':
-        return this.getHeightmap(input, mergedOptions);
+        return this.getHeightmap(input, mergedOptions, meshMaxError);
       default:
         return null;
     }
@@ -128,6 +129,7 @@ export default class GeoImage {
         height: number,
         rasters: any[] },
     options: GeoImageOptions,
+    meshMaxError,
   ) {
     let rasters = [];
     let width: number;
@@ -186,7 +188,7 @@ export default class GeoImage {
     let mesh;
     switch (tesselator) {
       case 'martini':
-        mesh = getMartiniTileMesh(terrainSkirtHeight, width, terrain);
+        mesh = getMartiniTileMesh(meshMaxError, width, terrain);
 
         break;
       case 'delatin':
@@ -197,7 +199,7 @@ export default class GeoImage {
         if (width === height && !(height && (width - 1))) {
           // fixme get terrain to separate method
           // terrain = getTerrain(data, width, height, elevationDecoder, 'martini');
-          mesh = getMartiniTileMesh(terrainSkirtHeight, width, terrain);
+          mesh = getMartiniTileMesh(meshMaxError, width, terrain);
         } else {
           // fixme get terrain to separate method
           // terrain = getTerrain(data, width, height, elevationDecoder, 'delatin');

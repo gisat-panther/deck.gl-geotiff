@@ -159,10 +159,15 @@ export type TerrainLayerProps = _TerrainLayerProps &
 	/** Material props for lighting effect. * */
 	material?: Material;
 
+  /**
+   * TODO
+   */
+  terrainOptions: Object
+
 	/**
 	 * @deprecated Use `loadOptions.terrain.workerUrl` instead
 	 */
-	workerUrl?: string;
+  workerUrl?: string;
   };
 
 // TODO remove elevationDecoder
@@ -230,8 +235,8 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 
 	  if (!this.state.isTiled && shouldReload) {
       // When state.isTiled, elevationData cannot be an array
-      const terrain = this.loadTerrain(props as TerrainLoadProps);
-      this.setState({ terrain });
+      // const terrain = this.loadTerrain(props as TerrainLoadProps);
+      // this.setState({ terrain });
 	  }
 
 	  // TODO - remove in v9
@@ -266,7 +271,7 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 	  const { fetch } = this.props;
 
 	  return fetch(elevationData, {
-      propName: 'elevationData', layer: this, loadOptions, signal,
+      propName: 'elevationData', layer: this, loadOptions, signal, loaders: [],
     });
   }
 
@@ -300,6 +305,7 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
       tile.index.y,
       tile.index.z,
       bounds,
+      this.props.meshMaxError,
     );
 
     return Promise.all([terrain]);

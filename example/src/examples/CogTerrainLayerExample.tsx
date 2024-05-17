@@ -114,11 +114,13 @@ const styleClasses = [
 // );
 
 const cogLayer = new TerrainLayer({
-  elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/LITC52_53_4g_5m_4326_cog_nodata.tif',
-  minZoom: 12,
-  maxZoom: 14,
-  meshMaxError: 5,
+  // globální
+  elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
+  minZoom: 0,
+  maxZoom: 9,
+  meshMaxError: 10,
 
+  // elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/LITC52_53_4g_5m_4326_cog_nodata.tif',
   // elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/DMT-Prackovice_1m-verze2_4326_cog_nodata.tif',
   // minZoom: 9,
   // maxZoom: 17,
@@ -133,12 +135,11 @@ const cogLayer = new TerrainLayer({
   isTiled: true,
   useChannel: null,
   tileSize: 256,
-  multiplier: 1.0,
 
   operation: 'terrain+draw',
   // elevationData: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/terrain.png',
   terrainOptions: {
-    type: 'terrain', multiplier: 1, useChannel: null, terrainSkirtHeight: 1,
+    type: 'terrain', multiplier: 0.1, useChannel: null, terrainSkirtHeight: 1,
   },
 });
 

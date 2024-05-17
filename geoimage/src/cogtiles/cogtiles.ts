@@ -143,7 +143,7 @@ class CogTiles {
     return cartographicPositionAdjusted;
   }
 
-  async getTile(x: number, y: number, z: number, bounds:Bounds) {
+  async getTile(x: number, y: number, z: number, bounds:Bounds, meshMaxError: number) {
     const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
     const img = this.cog.getImageByResolution(wantedMpp);
     // await img.loadGeoTiffTags(1)
@@ -248,7 +248,7 @@ img.tags.get(339).value as Array<number>,
         width: this.tileSize,
         height: this.tileSize,
         bounds,
-      }, this.options);
+      }, this.options, meshMaxError);
 
       // console.log(decompressed.length)
 
