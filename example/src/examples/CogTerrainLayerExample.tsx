@@ -19,7 +19,7 @@ import {
 import { MVTLoader } from '@loaders.gl/mvt';
 import { AnyARecord } from 'dns';
 import chroma from 'chroma-js';
-import { scaleLog } from 'd3-scale';
+import { scaleLinear } from 'd3-scale';
 import CogTerrainLayer from '@gisatcz/deckgl-geolib/src/cogterrainlayer/CogTerrainLayer';
 import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
 
@@ -59,8 +59,8 @@ function getVerticalProfileBounds(leftX: number, leftY: number, rightX: number, 
 }
 
 const colorScale = chroma
-  .scale(['#fda34b', '#ff7882', '#c8699e', '#7046aa', '#0c1db8', '#2eaaac'])
-  .domain([-30, 30]);
+  .scale(['#b1001d', '#ca2d2f', '#e25b40', '#ffaa00', '#ffff00', '#a0f000', '#4ce600', '#50d48e', '#00c3ff', '#0f80d1', '#004ca8', '#003e8a'])
+ .domain([-5, 5]);
 
 const styleClasses = [
   {
@@ -419,7 +419,7 @@ class CogTerrainLayerExample extends React.Component<{}> {
 
     const vrstevniceD8 = new MVTLayer({
       id: 'vrstevnice_d8',
-      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/d8_contours_z13_14/{z}/{x}/{y}.pbf',
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/d8_contours_z13_14_v2/{z}/{x}/{y}.pbf',
       binary: false,
       minZoom: 13,
       maxZoom: 14,
@@ -441,8 +441,8 @@ class CogTerrainLayerExample extends React.Component<{}> {
       extensions: [new TerrainExtension()],
     });
 
-    const scaleTail = scaleLog([0.1, 20], [0.1, 2]);
-    const scaleTip = scaleLog([0.1, 20], [0.1, 1]);
+    const scaleXYArrowWidth = scaleLinear([0.1, 20], [0.1 , 0.3]);
+    const scaleZArrowLength = scaleLinear([0.1, 20], [0.05, 2]);
 
     const ARROW_SIZE = 67; // eyeball measured, only for this object: https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/arrow_v3.obj
 
@@ -461,22 +461,43 @@ class CogTerrainLayerExample extends React.Component<{}> {
           const inc_ang_rad = d.properties.inc_ang * Math.PI / 180;
           const az_ang_rad = d.properties.az_ang * Math.PI / 180;
           return [
-            Math.sin(inc_ang_rad) * Math.sin(az_ang_rad) * ARROW_SIZE * scaleTail(d.properties.vel_rel),
-            -Math.sin(inc_ang_rad) * Math.cos(az_ang_rad) * ARROW_SIZE * scaleTail(d.properties.vel_rel),
-            Math.cos(inc_ang_rad) * ARROW_SIZE * scaleTail(d.properties.vel_rel)];
-        } else {return [0,0,0]}
+            Math.sin(inc_ang_rad) * Math.sin(az_ang_rad) * ARROW_SIZE * scaleZArrowLength(d.properties.vel_rel),
+            -Math.sin(inc_ang_rad) * Math.cos(az_ang_rad) * ARROW_SIZE * scaleZArrowLength(d.properties.vel_rel),
+            Math.cos(inc_ang_rad) * ARROW_SIZE * scaleZArrowLength(d.properties.vel_rel)];
+        } return [0, 0, 0];
       },
       getPosition: (d) => d.geometry.coordinates,
-      wireframe: true,
+      // wireframe: true,
       getScale: (d) => {
         if (d.properties.vel_rel > 0) {
-          return [scaleTip(d.properties.vel_rel), scaleTip(d.properties.vel_rel), scaleTail(d.properties.vel_rel)];
+          return [scaleXYArrowWidth(d.properties.vel_rel), scaleXYArrowWidth(d.properties.vel_rel), scaleZArrowLength(d.properties.vel_rel)];
         }
-        return [scaleTip(Math.abs(d.properties.vel_rel)), scaleTip(Math.abs(d.properties.vel_rel)), scaleTail(Math.abs(d.properties.vel_rel))];
+        return [scaleXYArrowWidth(Math.abs(d.properties.vel_rel)), scaleXYArrowWidth(Math.abs(d.properties.vel_rel)), scaleZArrowLength(Math.abs(d.properties.vel_rel))];
       },
       loaders: [OBJLoader],
       pickable: true,
       extensions: [new TerrainExtension()],
+    });
+
+    const bodyInSARSphere = new MVTLayer({
+      data: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/InSAR/trim_d8_95_upd3_psd_los_4326/{z}/{x}/{y}.pbf',
+      binary: false,
+      renderSubLayers: (props) => {
+        if (props.data) {
+          return new PointCloudLayer({
+            ...props,
+            id: `${props.id}-sphere`,
+            pickable: false,
+            sizeUnits: 'meters',
+            pointSize: 7,
+            getPosition: (d) => [...d.geometry.coordinates, 0],
+            getColor: (d) => [...colorScale(d.properties.vel_rel).rgb(), 255],
+          });
+        }
+        return null;
+      },
+      minZoom: 8,
+      maxZoom: 14,
     });
 
     const bodyInSARTrim44Arrow = new MVTLayer({
@@ -595,7 +616,8 @@ class CogTerrainLayerExample extends React.Component<{}> {
               // bodyInSARTrim146,
               // bodyInSARTrim44Arrow,
               // profileLinesD8,
-              inSARGeojson,
+              // bodyInSARSphere,
+              // inSARGeojson,
               inSARArrowsMesh,
               // objBridge,
               // verticalVectorProfileLayer,
