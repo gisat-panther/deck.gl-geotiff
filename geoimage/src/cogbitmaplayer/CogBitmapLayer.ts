@@ -92,7 +92,8 @@ class CogBitmapLayer extends CompositeLayer<any> {
             bounds: [west, south, east, north],
             opacity: 1, // 0.6
             textureParameters: {
-              [GL.TEXTURE_MIN_FILTER]: this.blurredTexture ? GL.LINEAR : GL.NEAREST,
+              minFilter: this.blurredTexture ? 'linear' : 'nearest',
+              magFilter: this.blurredTexture ? 'linear' : 'nearest',
             },
             extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
             ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode
