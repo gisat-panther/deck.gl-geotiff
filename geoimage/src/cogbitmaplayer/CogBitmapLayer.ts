@@ -6,27 +6,27 @@ import {
   Layer,
   LayersList,
   log,
-  Material,
   TextureSource,
   UpdateParameters,
   COORDINATE_SYSTEM,
 } from '@deck.gl/core';
 import {
-  TileLayer,
   TileLayer, TileLayerProps, GeoBoundingBox, _TileLoadProps as TileLoadProps,
   _Tile2DHeader as Tile2DHeader, _getURLFromTemplate as getURLFromTemplate, NonGeoBoundingBox,
 } from '@deck.gl/geo-layers';
-import { BitmapLayer, BitmapLayerProps } from '@deck.gl/layers';
-import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
-import { GL } from '@luma.gl/constants';
+import { BitmapLayer } from '@deck.gl/layers';
+// import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
+// import { GL } from '@luma.gl/constants';
 // import GL from '@luma.gl/constants';
 // GL.GL.CLIP_DISTANCE0_WEBGL
 import type { MeshAttributes } from '@loaders.gl/schema';
-import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
 import CogTiles from '../cogtiles/cogtiles.ts';
 
 import { GeoImageOptions } from '../geoimage/geoimage.ts';
-import { TileBoundingBox, ZRange } from '../cogterrainlayer/CogTerrainLayer.js';
+// import { TileBoundingBox, ZRange } from '../cogterrainlayer/CogTerrainLayer.js';
+export type TileBoundingBox = NonGeoBoundingBox | GeoBoundingBox;
+
+export type ZRange = [minZ: number, maxZ: number];
 
 // let needsRerender: boolean = false;
 // let extent = [0, 0, 0, 0]
@@ -74,9 +74,11 @@ const defaultProps: DefaultProps<CogBitmapLayerProps> = {
   bounds: {
     type: 'array', value: null, optional: true, compare: true,
   },
-  image: urlType,
+  rasterData: urlType,
   // Color to use if texture is unavailable
-  color: { type: 'color', value: [255, 255, 255] },
+  // color: { type: 'color', value: [255, 255, 255] },
+  blurredTexture: true,
+  clampToTerrain: true,
   // Object to decode height data, from (r, g, b) to height in meters
   // elevationDecoder: {
   //   type: 'object',
@@ -114,8 +116,6 @@ export type CogBitmapLayerProps = _CogBitmapLayerProps &
 /** Props added by the CogBitmapLayer */
 type _CogBitmapLayerProps = {
   /** Image url that encodes raster data. * */
-  // image: URLTemplate;
-
   rasterData: URLTemplate;
 
   // /** Image url to use as texture. * */
@@ -127,11 +127,17 @@ type _CogBitmapLayerProps = {
   /** Bounding box of the bitmap image, [minX, minY, maxX, maxY] in world coordinates. * */
   bounds: Bounds | null;
 
-  /** Color to use if texture is unavailable. * */
-  color?: Color;
+  // /** Color to use if texture is unavailable. * */
+  // color?: Color;
 
   // /** Object to decode height data, from (r, g, b) to height in meters. * */
   // elevationDecoder?: ElevationDecoder;
+
+  /** Whether the rendered texture should be blurred or not - effects minFilter and maxFilter * */
+  blurredTexture?: boolean;
+
+  /** Whether the rendered texture should be clamped to terrain * */
+  clampToTerrain?: boolean;
 
   // /** Whether to render the mesh in wireframe mode. * */
   // wireframe?: boolean;
@@ -142,7 +148,7 @@ type _CogBitmapLayerProps = {
   /**
    * TODO
    */
-  cogBitmapOptions: Object
+  cogBitmapOptions: Object;
 
   /**
    * @deprecated Use `loadOptions.terrain.workerUrl` instead
@@ -261,7 +267,7 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
 
     // TODO - pass signal to getTile
     // abort request if signal is aborted
-    const myBitmap = await this.state.bitmapCogTiles.getTile(
+    const cogBitmap = await this.state.bitmapCogTiles.getTile(
       tile.index.x,
       tile.index.y,
       tile.index.z,
@@ -269,7 +275,7 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
       // this.props.meshMaxError,
     );
 
-    return Promise.all([myBitmap]);
+    return Promise.all([cogBitmap]);
   }
 
   renderSubLayers(
@@ -284,7 +290,7 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
 
     // const { color } = this.props;
     console.log(this.props);
-    const { bounds } = this.props;
+    const { bounds, blurredTexture, clampToTerrain } = this.props;
 
     const { data } = props;
 
@@ -295,18 +301,58 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
     // const [raster, texture] = data;
     const [image] = data;
 
+    const {
+      bbox: {
+        west, south, east, north,
+      },
+    } = props.tile;
+
     return new SubLayerClass({ ...props, tileSize: 256 }, {
       data: DUMMY_DATA,
       // data: null,
       image,
       // texture,
       _instanced: false,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+      // coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       // getPosition: (d) => [0, 0, 0],
-      bounds,
+      bounds: [west, south, east, north],
+      // bounds,
       opacity: 1,
-      // getColor: color,
+      textureParameters: {
+        minFilter: blurredTexture ? 'linear' : 'nearest',
+        magFilter: blurredTexture ? 'linear' : 'nearest',
+      },
+      // extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
+      // ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode
+      //   ? { terrainDrawMode: this.cogTiles?.options?.clampToTerrain.terrainDrawMode }
+      //   : {}),
     });
+  }
+
+  // Update zRange of viewport
+  onViewportLoad(tiles?: Tile2DHeader<MeshAndTexture>[]): void {
+    if (!tiles) {
+      return;
+    }
+
+    const { zRange } = this.state;
+    const ranges = tiles
+      .map((tile) => tile.content)
+      .filter((x) => x && x[0])
+      .map((arr) => {
+        // @ts-ignore
+        const bounds = arr[0]?.header?.boundingBox;
+        return bounds?.map((bound) => bound[2]);
+      });
+    if (ranges.length === 0) {
+      return;
+    }
+    const minZ = Math.min(...ranges.map((x) => x[0]));
+    const maxZ = Math.max(...ranges.map((x) => x[1]));
+
+    if (!zRange || minZ < zRange[0] || maxZ > zRange[1]) {
+      this.setState({ zRange: [Number.isFinite(minZ) ? minZ : 0, Number.isFinite(maxZ) ? maxZ : 0] });
+    }
   }
 
   // constructor(id:string, url:string, options:GeoImageOptions) {
@@ -342,9 +388,9 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
   //
   renderLayers(): Layer | null | LayersList {
     const {
-      color,
-      image,
       rasterData,
+      blurredTexture,
+      clampToTerrain,
       tileSize,
       maxZoom,
       minZoom,
@@ -364,44 +410,47 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
       return new TileLayer<any>(this.getSubLayerProps({
         id: 'tiles',
       }), {
-        // getTileData: this.getTiledBitmapData.bind(this),
-        getTileData: (tileData: any) => this.state.bitmapCogTiles.getTile(
-          tileData.index.x,
-          tileData.index.y,
-          tileData.index.z,
-        ),
-        // renderSubLayers: this.renderSubLayers.bind(this),
-        renderSubLayers: (props: any) => {
-          const {
-            bbox: {
-              west, south, east, north,
-            },
-          } = props.tile;
-          console.log(props);
-          return new BitmapLayer(props, {
-            data: null,
-            image: props.data,
-            bounds: [west, south, east, north],
-            opacity: 1, // 0.6
-            // textureParameters: {
-            //   minFilter: this.blurredTexture ? 'linear' : 'nearest',
-            //   magFilter: this.blurredTexture ? 'linear' : 'nearest',
-            // },
-            // extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
-            // ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode
-            //   ? { terrainDrawMode: this.cogTiles?.options?.clampToTerrain.terrainDrawMode }
-            //   : {}),
-          });
-        },
+        getTileData: this.getTiledBitmapData.bind(this),
+        // getTileData: (tileData: any) => this.state.bitmapCogTiles.getTile(
+        //   tileData.index.x,
+        //   tileData.index.y,
+        //   tileData.index.z,
+        // ),
+        renderSubLayers: this.renderSubLayers.bind(this),
+        // renderSubLayers: (props: any) => {
+        //   const {
+        //     bbox: {
+        //       west, south, east, north,
+        //     },
+        //   } = props.tile;
+        //   // MK proc to tady funguje jen s 0?
+        //   console.log(props.data[0]);
+        //   return new BitmapLayer(props, {
+        //     data: DUMMY_DATA,
+        //     image: props.data[0],
+        //     bounds: [west, south, east, north],
+        //     opacity: 1, // 0.6
+        //     textureParameters: {
+        //       minFilter: blurredTexture ? 'linear' : 'nearest',
+        //       magFilter: blurredTexture ? 'linear' : 'nearest',
+        //     },
+        //     // extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
+        //     // ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode
+        //     //   ? { terrainDrawMode: this.cogTiles?.options?.clampToTerrain.terrainDrawMode }
+        //     //   : {}),
+        //   });
+        // },
         updateTriggers: {
           getTileData: {
             rasterData: urlTemplateToUpdateTrigger(rasterData),
+            blurredTexture,
+            clampToTerrain,
             // texture: urlTemplateToUpdateTrigger(texture),
             // meshMaxError,
             // elevationDecoder,
           },
         },
-        // onViewportLoad: this.onViewportLoad.bind(this),
+        onViewportLoad: this.onViewportLoad.bind(this),
         zRange: this.state.zRange || null,
         tileSize,
         maxZoom,
