@@ -8,7 +8,7 @@ import {
   TileLayerProps,
 } from '@deck.gl/geo-layers';
 import {BitmapLayer} from '@deck.gl/layers';
-// import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
+import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 // import { GL } from '@luma.gl/constants';
 // import GL from '@luma.gl/constants';
 // GL.GL.CLIP_DISTANCE0_WEBGL
@@ -53,6 +53,10 @@ export const urlType = {
   },
 };
 
+export type ClampToTerrainOptions = {
+  terrainDrawMode?: string
+}
+
 const defaultProps: DefaultProps<CogBitmapLayerProps> = {
   ...TileLayer.defaultProps,
   // Image url that encodes height data
@@ -70,7 +74,7 @@ const defaultProps: DefaultProps<CogBitmapLayerProps> = {
   // color: { type: 'color', value: [255, 255, 255] },
   blurredTexture: true,
   opacity: 1,
-  clampToTerrain: true,
+  clampToTerrain: false,
   // Object to decode height data, from (r, g, b) to height in meters
   // elevationDecoder: {
   //   type: 'object',
@@ -120,7 +124,7 @@ type _CogBitmapLayerProps = {
   opacity?: number;
 
   /** Whether the rendered texture should be clamped to terrain * */
-  clampToTerrain?: boolean;
+  clampToTerrain?: ClampToTerrainOptions | boolean, // terrainDrawMode: 'drape',
 
   /**
    * TODO
@@ -284,11 +288,11 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
         minFilter: blurredTexture ? 'linear' : 'nearest',
         magFilter: blurredTexture ? 'linear' : 'nearest',
       },
-      //  TODO !!!
-      // extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
-      // ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode
-      //   ? { terrainDrawMode: this.cogTiles?.options?.clampToTerrain.terrainDrawMode }
-      //   : {}),
+      //  TODO check if works!!!
+      extensions: clampToTerrain ? [new TerrainExtension()] : [],
+      ...(clampToTerrain?.terrainDrawMode
+        ? { terrainDrawMode: clampToTerrain.terrainDrawMode }
+        : {}),
     });
   }
 
