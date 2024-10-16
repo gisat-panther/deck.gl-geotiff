@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DeckGL from '@deck.gl/react';
 import { InitialViewStateProps } from '@deck.gl/core/lib/deck';
 import { TileLayer } from '@deck.gl/geo-layers';
@@ -7,7 +7,7 @@ import { MapView } from '@deck.gl/core';
 import chroma from 'chroma-js';
 import CogBitmapLayer from '@gisatcz/deckgl-geolib/src/cogbitmaplayer/CogBitmapLayer';
 
-const cogLayer = new CogBitmapLayer({
+const cogLayerDefinition = {
   id: 'CogBitmapLayer',
   // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif',
   //   'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/MANILA/Manila_S2_Composite_2020022_Mercator_RGB_COG_DEFLATE.tif',
@@ -27,41 +27,39 @@ const cogLayer = new CogBitmapLayer({
   //    heatmap
   rasterData: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
   isTiled: true,
-      blurredTexture: true,
-      opacity: 0.1,
   cogBitmapOptions: {
     type: 'image', useChannel: 30, useHeatMap: true, colorScaleValueRange: [0, 3], clipLow: 1, colorScale: chroma.brewer.Blues,
-    // type: 'image', useChannel: 30, color: "blue", useSingleColor: true,
   },
-},
-  //     colors based on values
-  // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
-  // {
-  //   type: 'image', useChannel: 5, useColorsBasedOnValues: true, clipLow: 0, colorsBasedOnValues: [[1, '#deebf7'], [2, '#9ecae1'], [3, '#3182bd']],
-  // },
+};
+//     colors based on values
+// 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
+// {
+//   type: 'image', useChannel: 5, useColorsBasedOnValues: true, clipLow: 0, colorsBasedOnValues: [[1, '#deebf7'], [2, '#9ecae1'], [3, '#3182bd']],
+// },
 
-  // color classes
-  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaBsadri/app4ForestMonitoring/md_z1_density.tif',
-  // {
-  //   type: 'image', useColorClasses: true, colorClasses: [['pink', [-452, 633], [true, false]], ['blue', [633, 1719], [true, false]], ['orange', [1719, 2805], [true, false]], ['red', [2805, 3891], [true, true]]],
-  // },
+// color classes
+// 'https://gisat-gis.eu-central-1.linodeobjects.com/esaBsadri/app4ForestMonitoring/md_z1_density.tif',
+// {
+//   type: 'image', useColorClasses: true, colorClasses: [['pink', [-452, 633], [true, false]], ['blue', [633, 1719], [true, false]], ['orange', [1719, 2805], [true, false]], ['red', [2805, 3891], [true, true]]],
+// },
 
-  // single color
-  // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
-  // { type:"image", useChannel: 10, useSingleColor: true, clipLow: 2, clipHigh: 3, color: 'red', clippedColor:[245, 245, 220, 80]}
+// single color
+// 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
+// { type:"image", useChannel: 10, useSingleColor: true, clipLow: 2, clipHigh: 3, color: 'red', clippedColor:[245, 245, 220, 80]}
 
-  // Nepal snow cover
-  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/SNOW_3857_2017-2021_cog_deflate.tif',
-  // {
-  //   type: 'image', useChannel: 0, useHeatMap: true, colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], colorScaleValueRange: [1, 100, 200, 300, 366],
-  // },
+// Nepal snow cover
+// 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/SNOW_3857_2017-2021_cog_deflate.tif',
+// {
+//   type: 'image', useChannel: 0, useHeatMap: true, colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], colorScaleValueRange: [1, 100, 200, 300, 366],
+// },
 
-  // Nepal wet snow cover
-  // 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate.tif',
-  // {
-  //   type: 'image', useChannel: 0, useHeatMap: true, colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], colorScaleValueRange: [1, 100, 200, 300, 366],
-  // },
-);
+// Nepal wet snow cover
+// 'https://gisat-gis.eu-central-1.linodeobjects.com/esaGdaAdbNepal23/rasters/snow_cover_cog/WET_SNOW_3857_2017-2021_cog_deflate.tif',
+// {
+//   type: 'image', useChannel: 0, useHeatMap: true, colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], colorScaleValueRange: [1, 100, 200, 300, 366],
+// },
+
+const getCogLayer = (opacity: number) => new CogBitmapLayer({ ...cogLayerDefinition, opacity });
 
 const tileLayer = new TileLayer({
   data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -84,35 +82,57 @@ const tileLayer = new TileLayer({
     });
   },
 });
+const useInterval = (callback, delay) => {
+  const [intervalId, setIntervalId] = useState(null);
 
-class CogBitmapLayerExample extends React.Component<{}> {
-  render() {
-    console.log('REACT RENDER');
+  useEffect(() => {
+    if (delay !== null) {
+      const id = setInterval(callback, delay);
+      setIntervalId(id);
+      return () => clearInterval(id);
+    }
+  }, []);
 
-    const initialViewState: InitialViewStateProps = {
-      longitude: 0,
-      latitude: 0,
-      zoom: 1,
-    };
+  return intervalId;
+};
 
-    return (
-      <DeckGL
-        getCursor={() => 'inherit'}
-        initialViewState={initialViewState}
-        controller
-        layers={[tileLayer, cogLayer]}
-        views={[
-          new MapView({
-            controller: true,
-            id: 'map',
-            height: '100%',
-            top: '100px',
-            width: '100%',
-          }),
-        ]}
-      />
-    );
-  }
+function CogBitmapLayerExample() {
+  const [layer, setLayer] = useState(getCogLayer(1));
+  const [opacity, setOpacity] = useState(1);
+  const opacityRef = useRef(opacity);
+  console.log('xxx_render', opacity);
+
+  // useInterval(() => {
+  //   const newOpacity = opacityRef.current - 0.1;
+  //   setOpacity(newOpacity);
+  //   opacityRef.current = newOpacity;
+  //   setLayer(getCogLayer(newOpacity));
+  //   console.log('Interval tick!');
+  // }, 2000); // 1000ms = 1s
+
+  const initialViewState: InitialViewStateProps = {
+    longitude: 0,
+    latitude: 0,
+    zoom: 1,
+  };
+
+  return (
+    <DeckGL
+      getCursor={() => 'inherit'}
+      initialViewState={initialViewState}
+      controller
+      layers={[tileLayer, layer]}
+      views={[
+        new MapView({
+          controller: true,
+          id: 'map',
+          height: '100%',
+          top: '100px',
+          width: '100%',
+        }),
+      ]}
+    />
+  );
 }
 
 export { CogBitmapLayerExample };

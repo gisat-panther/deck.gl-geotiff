@@ -1,4 +1,6 @@
-import {CompositeLayer, CompositeLayerProps, DefaultProps, log, TextureSource, UpdateParameters,} from '@deck.gl/core';
+import {
+  CompositeLayer, CompositeLayerProps, DefaultProps, log, TextureSource, UpdateParameters,
+} from '@deck.gl/core';
 import {
   _Tile2DHeader as Tile2DHeader,
   _TileLoadProps as TileLoadProps,
@@ -7,15 +9,15 @@ import {
   TileLayer,
   TileLayerProps,
 } from '@deck.gl/geo-layers';
-import {BitmapLayer} from '@deck.gl/layers';
+import { BitmapLayer } from '@deck.gl/layers';
 import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 // import { GL } from '@luma.gl/constants';
 // import GL from '@luma.gl/constants';
 // GL.GL.CLIP_DISTANCE0_WEBGL
-import type {MeshAttributes} from '@loaders.gl/schema';
+import type { MeshAttributes } from '@loaders.gl/schema';
 import CogTiles from '../cogtiles/cogtiles.ts';
 
-import {GeoImageOptions} from '../geoimage/geoimage.ts';
+import { GeoImageOptions } from '../geoimage/geoimage.ts';
 // import { TileBoundingBox, ZRange } from '../cogterrainlayer/CogTerrainLayer.js';
 export type TileBoundingBox = NonGeoBoundingBox | GeoBoundingBox;
 
@@ -246,12 +248,12 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
 
     // TODO - pass signal to getTile
     // abort request if signal is aborted
-      return await this.state.bitmapCogTiles.getTile(
-        tile.index.x,
-        tile.index.y,
-        tile.index.z,
-        // bounds,
-        // this.props.meshMaxError,
+    return await this.state.bitmapCogTiles.getTile(
+      tile.index.x,
+      tile.index.y,
+      tile.index.z,
+      // bounds,
+      // this.props.meshMaxError,
     );
   }
 
@@ -264,9 +266,9 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
   ) {
     const SubLayerClass = this.getSubLayerClass('image', BitmapLayer);
 
-    const { blurredTexture, opacity,clampToTerrain } = this.props;
+    const { blurredTexture, opacity, clampToTerrain } = this.props;
 
-    const  data  = props.data;
+    const { data } = props;
 
     if (!data) {
       return null;
@@ -296,47 +298,46 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
     });
   }
 
-
   renderLayers() {
     const {
-          rasterData,
-          blurredTexture,
-          opacity,
-          clampToTerrain,
-          tileSize,
-          maxRequests,
-          onTileLoad,
-          onTileUnload,
-          onTileError,
-          maxCacheSize,
-          maxCacheByteSize,
-          refinementStrategy,
-        } = this.props;
-    if (this.state.isTiled && this.state.initialized){
+      rasterData,
+      blurredTexture,
+      opacity,
+      clampToTerrain,
+      tileSize,
+      maxRequests,
+      onTileLoad,
+      onTileUnload,
+      onTileError,
+      maxCacheSize,
+      maxCacheByteSize,
+      refinementStrategy,
+    } = this.props;
+    if (this.state.isTiled && this.state.initialized) {
       return new TileLayer(this.getSubLayerProps({
-              id: 'tiles',
-            }), {
+        id: 'tiles',
+      }), {
         getTileData: this.getTiledBitmapData.bind(this),
         renderSubLayers: this.renderSubLayers.bind(this),
         updateTriggers: {
-                  getTileData: {
-                    rasterData: urlTemplateToUpdateTrigger(rasterData),
-                    blurredTexture,
-                    opacity,
-                    clampToTerrain,
-                  },
-                },
+          getTileData: {
+            rasterData: urlTemplateToUpdateTrigger(rasterData),
+            // blurredTexture,
+            // opacity,
+            clampToTerrain,
+          },
+        },
         extent: this.state.bitmapCogTiles.cog ? this.state.bitmapCogTiles.getBoundsAsLatLon(this.state.bitmapCogTiles.cog) : null,
         tileSize,
         minZoom: this.minZoom,
         maxZoom: this.maxZoom,
         maxRequests,
         onTileLoad,
-              onTileUnload,
-              onTileError,
-              maxCacheSize,
-              maxCacheByteSize,
-              refinementStrategy,
+        onTileUnload,
+        onTileError,
+        maxCacheSize,
+        maxCacheByteSize,
+        refinementStrategy,
       });
     }
     return null;
