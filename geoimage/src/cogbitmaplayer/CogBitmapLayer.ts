@@ -1,28 +1,21 @@
+import {CompositeLayer, CompositeLayerProps, DefaultProps, log, TextureSource, UpdateParameters,} from '@deck.gl/core';
 import {
-  Color,
-  CompositeLayer,
-  CompositeLayerProps,
-  DefaultProps,
-  Layer,
-  LayersList,
-  log,
-  TextureSource,
-  UpdateParameters,
-  COORDINATE_SYSTEM,
-} from '@deck.gl/core';
-import {
-  TileLayer, TileLayerProps, GeoBoundingBox, _TileLoadProps as TileLoadProps,
-  _Tile2DHeader as Tile2DHeader, _getURLFromTemplate as getURLFromTemplate, NonGeoBoundingBox,
+  _Tile2DHeader as Tile2DHeader,
+  _TileLoadProps as TileLoadProps,
+  GeoBoundingBox,
+  NonGeoBoundingBox,
+  TileLayer,
+  TileLayerProps,
 } from '@deck.gl/geo-layers';
-import { BitmapLayer } from '@deck.gl/layers';
-// import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
+import {BitmapLayer} from '@deck.gl/layers';
+import { _TerrainExtension as TerrainExtension } from '@deck.gl/extensions';
 // import { GL } from '@luma.gl/constants';
 // import GL from '@luma.gl/constants';
 // GL.GL.CLIP_DISTANCE0_WEBGL
-import type { MeshAttributes } from '@loaders.gl/schema';
+import type {MeshAttributes} from '@loaders.gl/schema';
 import CogTiles from '../cogtiles/cogtiles.ts';
 
-import { GeoImageOptions } from '../geoimage/geoimage.ts';
+import {GeoImageOptions} from '../geoimage/geoimage.ts';
 // import { TileBoundingBox, ZRange } from '../cogterrainlayer/CogTerrainLayer.js';
 export type TileBoundingBox = NonGeoBoundingBox | GeoBoundingBox;
 
@@ -60,7 +53,9 @@ export const urlType = {
   },
 };
 
-const DUMMY_DATA = [1];
+export type ClampToTerrainOptions = {
+  terrainDrawMode?: string
+}
 
 const defaultProps: DefaultProps<CogBitmapLayerProps> = {
   ...TileLayer.defaultProps,
@@ -78,7 +73,8 @@ const defaultProps: DefaultProps<CogBitmapLayerProps> = {
   // Color to use if texture is unavailable
   // color: { type: 'color', value: [255, 255, 255] },
   blurredTexture: true,
-  clampToTerrain: true,
+  opacity: 1,
+  clampToTerrain: false,
   // Object to decode height data, from (r, g, b) to height in meters
   // elevationDecoder: {
   //   type: 'object',
@@ -118,37 +114,22 @@ type _CogBitmapLayerProps = {
   /** Image url that encodes raster data. * */
   rasterData: URLTemplate;
 
-  // /** Image url to use as texture. * */
-  // texture?: URLTemplate;
-
-  // /** Martini error tolerance in meters, smaller number -> more detailed mesh. * */
-  // meshMaxError?: number;
-
   /** Bounding box of the bitmap image, [minX, minY, maxX, maxY] in world coordinates. * */
   bounds: Bounds | null;
-
-  // /** Color to use if texture is unavailable. * */
-  // color?: Color;
-
-  // /** Object to decode height data, from (r, g, b) to height in meters. * */
-  // elevationDecoder?: ElevationDecoder;
 
   /** Whether the rendered texture should be blurred or not - effects minFilter and maxFilter * */
   blurredTexture?: boolean;
 
+  /** Weather visualise the entire image with specified opacity (0-1) * */
+  opacity?: number;
+
   /** Whether the rendered texture should be clamped to terrain * */
-  clampToTerrain?: boolean;
-
-  // /** Whether to render the mesh in wireframe mode. * */
-  // wireframe?: boolean;
-
-  // /** Material props for lighting effect. * */
-  // material?: Material;
+  clampToTerrain?: ClampToTerrainOptions | boolean, // terrainDrawMode: 'drape',
 
   /**
    * TODO
    */
-  cogBitmapOptions: Object;
+  cogBitmapOptions: GeoImageOptions;
 
   /**
    * @deprecated Use `loadOptions.terrain.workerUrl` instead
@@ -207,7 +188,6 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
 
     const zoomRange = this.state.bitmapCogTiles.getZoomRange(cog);
     [this.minZoom, this.maxZoom] = zoomRange;
-    console.log(cog);
 
     this.setState({ initialized: true });
   }
@@ -242,10 +222,9 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
   }
 
   async getTiledBitmapData(tile: TileLoadProps): Promise<TextureSource> {
-    console.log('getTiledBitmapData');
-    const {
-      rasterData, fetch,
-    } = this.props;
+    // const {
+    //   rasterData, fetch,
+    // } = this.props;
     const { viewport } = this.context;
     // const dataUrl = getURLFromTemplate(rasterData, tile);
     // const textureUrl = texture && getURLFromTemplate(texture, tile);
@@ -267,15 +246,13 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
 
     // TODO - pass signal to getTile
     // abort request if signal is aborted
-    const cogBitmap = await this.state.bitmapCogTiles.getTile(
-      tile.index.x,
-      tile.index.y,
-      tile.index.z,
-      bounds,
-      // this.props.meshMaxError,
+      return await this.state.bitmapCogTiles.getTile(
+        tile.index.x,
+        tile.index.y,
+        tile.index.z,
+        // bounds,
+        // this.props.meshMaxError,
     );
-
-    return Promise.all([cogBitmap]);
   }
 
   renderSubLayers(
@@ -285,21 +262,15 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
         tile: Tile2DHeader<TextureSource>;
       },
   ) {
-    console.log('rendering sub layer and consoling props');
     const SubLayerClass = this.getSubLayerClass('image', BitmapLayer);
 
-    // const { color } = this.props;
-    console.log(this.props);
-    const { bounds, blurredTexture, clampToTerrain } = this.props;
+    const { blurredTexture, opacity,clampToTerrain } = this.props;
 
-    const { data } = props;
+    const  data  = props.data;
 
     if (!data) {
       return null;
     }
-
-    // const [raster, texture] = data;
-    const [image] = data;
 
     const {
       bbox: {
@@ -308,162 +279,66 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
     } = props.tile;
 
     return new SubLayerClass({ ...props, tileSize: 256 }, {
-      data: DUMMY_DATA,
-      // data: null,
-      image,
-      // texture,
+      data: null,
+      image: data,
       _instanced: false,
-      // coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      // getPosition: (d) => [0, 0, 0],
       bounds: [west, south, east, north],
-      // bounds,
-      opacity: 1,
+      opacity,
       textureParameters: {
         minFilter: blurredTexture ? 'linear' : 'nearest',
         magFilter: blurredTexture ? 'linear' : 'nearest',
       },
-      // extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
-      // ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode
-      //   ? { terrainDrawMode: this.cogTiles?.options?.clampToTerrain.terrainDrawMode }
-      //   : {}),
+      //  TODO check if works!!!
+      extensions: clampToTerrain ? [new TerrainExtension()] : [],
+      ...(clampToTerrain?.terrainDrawMode
+        ? { terrainDrawMode: clampToTerrain.terrainDrawMode }
+        : {}),
     });
   }
 
-  // Update zRange of viewport
-  onViewportLoad(tiles?: Tile2DHeader<MeshAndTexture>[]): void {
-    if (!tiles) {
-      return;
-    }
 
-    const { zRange } = this.state;
-    const ranges = tiles
-      .map((tile) => tile.content)
-      .filter((x) => x && x[0])
-      .map((arr) => {
-        // @ts-ignore
-        const bounds = arr[0]?.header?.boundingBox;
-        return bounds?.map((bound) => bound[2]);
-      });
-    if (ranges.length === 0) {
-      return;
-    }
-    const minZ = Math.min(...ranges.map((x) => x[0]));
-    const maxZ = Math.max(...ranges.map((x) => x[1]));
-
-    if (!zRange || minZ < zRange[0] || maxZ > zRange[1]) {
-      this.setState({ zRange: [Number.isFinite(minZ) ? minZ : 0, Number.isFinite(maxZ) ? maxZ : 0] });
-    }
-  }
-
-  // constructor(id:string, url:string, options:GeoImageOptions) {
-  //   super({});
-  //   this.id = id;
-  //   // this.state = {
-  //   //   initialized: false,
-  //   // };
-  //   // this._isLoaded = false;
-  //   this.cogTiles = new CogTiles(options);
-  //   this.blurredTexture = options.blurredTexture;
-  //   this.url = url;
-  //   // setTimeout(() => {
-  //   //   this.init(url);
-  //   // }, 500);
-  // }
-  //
-  // initializeState() {
-  //   this.state = {
-  //     initialized: false,
-  //   };
-  //
-  //   this.init(this.url);
-  // }
-  //
-  // async init(url:string) {
-  //   const cog = await this.cogTiles.initializeCog(url);
-  //   this.setState({ initialized: true });
-  //   this.tileSize = this.cogTiles.getTileSize(cog);
-  //   const zoomRange = this.cogTiles.getZoomRange(cog);
-  //   [this.minZoom, this.maxZoom] = zoomRange;
-  // }
-  //
-  renderLayers(): Layer | null | LayersList {
+  renderLayers() {
     const {
-      rasterData,
-      blurredTexture,
-      clampToTerrain,
-      tileSize,
-      maxZoom,
-      minZoom,
-      extent,
-      maxRequests,
-      onTileLoad,
-      onTileUnload,
-      onTileError,
-      maxCacheSize,
-      maxCacheByteSize,
-      refinementStrategy,
-    } = this.props;
-    console.log('render bitmap layers');
-    // console.log(this.state);
-    if (this.state.isTiled && this.state.initialized) {
-      console.log('start rendering tile layer');
-      return new TileLayer<any>(this.getSubLayerProps({
-        id: 'tiles',
-      }), {
+          rasterData,
+          blurredTexture,
+          opacity,
+          clampToTerrain,
+          tileSize,
+          maxRequests,
+          onTileLoad,
+          onTileUnload,
+          onTileError,
+          maxCacheSize,
+          maxCacheByteSize,
+          refinementStrategy,
+        } = this.props;
+    if (this.state.isTiled && this.state.initialized){
+      return new TileLayer(this.getSubLayerProps({
+              id: 'tiles',
+            }), {
         getTileData: this.getTiledBitmapData.bind(this),
-        // getTileData: (tileData: any) => this.state.bitmapCogTiles.getTile(
-        //   tileData.index.x,
-        //   tileData.index.y,
-        //   tileData.index.z,
-        // ),
         renderSubLayers: this.renderSubLayers.bind(this),
-        // renderSubLayers: (props: any) => {
-        //   const {
-        //     bbox: {
-        //       west, south, east, north,
-        //     },
-        //   } = props.tile;
-        //   // MK proc to tady funguje jen s 0?
-        //   console.log(props.data[0]);
-        //   return new BitmapLayer(props, {
-        //     data: DUMMY_DATA,
-        //     image: props.data[0],
-        //     bounds: [west, south, east, north],
-        //     opacity: 1, // 0.6
-        //     textureParameters: {
-        //       minFilter: blurredTexture ? 'linear' : 'nearest',
-        //       magFilter: blurredTexture ? 'linear' : 'nearest',
-        //     },
-        //     // extensions: this.cogTiles?.options?.clampToTerrain ? [new TerrainExtension()] : [],
-        //     // ...(this.cogTiles?.options?.clampToTerrain?.terrainDrawMode
-        //     //   ? { terrainDrawMode: this.cogTiles?.options?.clampToTerrain.terrainDrawMode }
-        //     //   : {}),
-        //   });
-        // },
         updateTriggers: {
-          getTileData: {
-            rasterData: urlTemplateToUpdateTrigger(rasterData),
-            blurredTexture,
-            clampToTerrain,
-            // texture: urlTemplateToUpdateTrigger(texture),
-            // meshMaxError,
-            // elevationDecoder,
-          },
-        },
-        onViewportLoad: this.onViewportLoad.bind(this),
-        zRange: this.state.zRange || null,
+                  getTileData: {
+                    rasterData: urlTemplateToUpdateTrigger(rasterData),
+                    blurredTexture,
+                    opacity,
+                    clampToTerrain,
+                  },
+                },
+        extent: this.state.bitmapCogTiles.cog ? this.state.bitmapCogTiles.getBoundsAsLatLon(this.state.bitmapCogTiles.cog) : null,
         tileSize,
-        maxZoom,
-        minZoom,
-        extent,
+        minZoom: this.minZoom,
+        maxZoom: this.maxZoom,
         maxRequests,
         onTileLoad,
-        onTileUnload,
-        onTileError,
-        maxCacheSize,
-        maxCacheByteSize,
-        refinementStrategy,
+              onTileUnload,
+              onTileError,
+              maxCacheSize,
+              maxCacheByteSize,
+              refinementStrategy,
       });
     }
+    return null;
   }
 }

@@ -27,8 +27,11 @@ const cogLayer = new CogBitmapLayer({
   //    heatmap
   rasterData: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
   isTiled: true,
+      blurredTexture: true,
+      opacity: 0.1,
   cogBitmapOptions: {
     type: 'image', useChannel: 30, useHeatMap: true, colorScaleValueRange: [0, 3], clipLow: 1, colorScale: chroma.brewer.Blues,
+    // type: 'image', useChannel: 30, color: "blue", useSingleColor: true,
   },
 },
   //     colors based on values
