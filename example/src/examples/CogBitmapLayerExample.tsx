@@ -98,17 +98,16 @@ const useInterval = (callback, delay) => {
 
 function CogBitmapLayerExample() {
   const [layer, setLayer] = useState(getCogLayer(1));
-  const [opacity, setOpacity] = useState(1);
-  const opacityRef = useRef(opacity);
-  console.log('xxx_render', opacity);
+  const opacityRef = useRef(1);
 
-  // useInterval(() => {
-  //   const newOpacity = opacityRef.current - 0.1;
-  //   setOpacity(newOpacity);
-  //   opacityRef.current = newOpacity;
-  //   setLayer(getCogLayer(newOpacity));
-  //   console.log('Interval tick!');
-  // }, 2000); // 1000ms = 1s
+  // Set true to test change opacity in interval
+  if (false) {
+    useInterval(() => {
+      const newOpacity = opacityRef.current - 0.1;
+      opacityRef.current = newOpacity;
+      setLayer(getCogLayer(newOpacity));
+    }, 2000);
+  }
 
   const initialViewState: InitialViewStateProps = {
     longitude: 0,
