@@ -25,11 +25,20 @@ const cogLayerDefinition = {
   //   'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/DEM_COP30_float32_wgs84_deflate_cog_float32.tif',
 
   //    heatmap
-  rasterData: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
-  isTiled: true,
+  // rasterData: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',
+  // cogBitmapOptions: {
+  //   type: 'image', useChannel: 30, useHeatMap: true, colorScaleValueRange: [0, 3], clipLow: 1, colorScale: chroma.brewer.Blues,
+  // },
+  rasterData: 'https://gisat-gis.eu-central-1.linodeobjects.com/esaUtepUnHabitat/rasters/regional/Kenya/Kenya2_WSFpopALL_COGeoN.tif',
   cogBitmapOptions: {
-    type: 'image', useChannel: 30, useHeatMap: true, colorScaleValueRange: [0, 3], clipLow: 1, colorScale: chroma.brewer.Blues,
+    type: 'image',
+    blurredTexture: false,
+    clipLow: 1,
+    useChannel: 7,
+    useSingleColor: true,
   },
+
+  isTiled: true,
 };
 //     colors based on values
 // 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/Manila/jrc_gsw_mercator_comp_cog_deflate_float32.tif',

@@ -119,9 +119,6 @@ type _CogBitmapLayerProps = {
   /** Bounding box of the bitmap image, [minX, minY, maxX, maxY] in world coordinates. * */
   bounds: Bounds | null;
 
-  /** Whether the rendered texture should be blurred or not - effects minFilter and maxFilter * */
-  blurredTexture?: boolean;
-
   /** Weather visualise the entire image with specified opacity (0-1) * */
   opacity?: number;
 
@@ -157,6 +154,7 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
     isTiled?: boolean;
     terrain?: MeshAttributes;
     zRange?: ZRange | null;
+    bitmapCogTiles: any;
   };
 
   // private _isLoaded: boolean;
@@ -171,7 +169,6 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
   //
   // tileSize: number;
   //
-  // blurredTexture: boolean;
 
   async initializeState(context: any) {
     super.initializeState(context);
@@ -265,8 +262,9 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
       },
   ) {
     const SubLayerClass = this.getSubLayerClass('image', BitmapLayer);
+    const { blurredTexture } = this.state.bitmapCogTiles.options;
 
-    const { blurredTexture, opacity, clampToTerrain } = this.props;
+    const { opacity, clampToTerrain } = this.props;
 
     const { data } = props;
 
@@ -327,7 +325,8 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
             clampToTerrain,
           },
         },
-        extent: this.state.bitmapCogTiles.cog ? this.state.bitmapCogTiles.getBoundsAsLatLon(this.state.bitmapCogTiles.cog) : null,
+        extent: this.state.bitmapCogTiles.cog
+          ? this.state.bitmapCogTiles.getBoundsAsLatLon(this.state.bitmapCogTiles.cog) : null,
         tileSize,
         minZoom: this.minZoom,
         maxZoom: this.maxZoom,

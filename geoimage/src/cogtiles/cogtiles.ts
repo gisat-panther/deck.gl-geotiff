@@ -17,6 +17,10 @@ export type Bounds = [minX: number, minY: number, maxX: number, maxY: number];
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
 
+const CogTilesGeoImageOptionsDefaults = {
+  blurredTexture: true,
+};
+
 class CogTiles {
   cog: Tiff;
 
@@ -37,7 +41,7 @@ class CogTiles {
   options: GeoImageOptions;
 
   constructor(options: GeoImageOptions) {
-    this.options = options;
+    this.options = { ...CogTilesGeoImageOptionsDefaults, ...options };
   }
 
   async initializeCog(url: string) {
