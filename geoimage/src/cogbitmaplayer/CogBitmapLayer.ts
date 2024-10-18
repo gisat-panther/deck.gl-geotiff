@@ -106,11 +106,6 @@ function urlTemplateToUpdateTrigger(template: URLTemplate): string {
 
 type MeshAndTexture = [MeshAttributes | null, TextureSource | null];
 
-/** All properties supported by CogBitmapLayer */
-export type CogBitmapLayerProps = _CogBitmapLayerProps &
-    TileLayerProps<MeshAndTexture> &
-    CompositeLayerProps;
-
 /** Props added by the CogBitmapLayer */
 type _CogBitmapLayerProps = {
   /** Image url that encodes raster data. * */
@@ -130,11 +125,18 @@ type _CogBitmapLayerProps = {
    */
   cogBitmapOptions: GeoImageOptions;
 
+  isTiled: boolean;
+
   /**
    * @deprecated Use `loadOptions.terrain.workerUrl` instead
    */
   workerUrl?: string;
 };
+
+/** All properties supported by CogBitmapLayer */
+export type CogBitmapLayerProps = _CogBitmapLayerProps &
+    TileLayerProps<MeshAndTexture> &
+    CompositeLayerProps;
 
 /** Render bitmap texture from cog raster images. */
 export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends CompositeLayer<
@@ -144,17 +146,18 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
 
   static layerName = 'CogBitmapLayer';
 
-  rasterUrl: string;
-
   minZoom: number;
 
   maxZoom: number;
 
   state!: {
+    initialized: boolean;
     isTiled?: boolean;
     terrain?: MeshAttributes;
     zRange?: ZRange | null;
     bitmapCogTiles: any;
+    minZoom: number;
+    maxZoom: number;
   };
 
   // private _isLoaded: boolean;
@@ -178,17 +181,17 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
       initialized: false,
     });
 
-    await this.init(this.rasterUrl);
+    await this.init();
   }
 
-  async init(rasterUrl: string) {
+  async init() {
     const cog = await this.state.bitmapCogTiles.initializeCog(this.props.rasterData);
-    // this.tileSize = this.terrainCogTiles.getTileSize(cog);
 
     const zoomRange = this.state.bitmapCogTiles.getZoomRange(cog);
-    [this.minZoom, this.maxZoom] = zoomRange;
 
-    this.setState({ initialized: true });
+    const [minZoom, maxZoom] = zoomRange;
+
+    this.setState({ initialized: true, minZoom, maxZoom });
   }
 
   updateState({ props, oldProps }: UpdateParameters<this>): void {
@@ -196,8 +199,8 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
     if (rasterDataChanged) {
       const { rasterData } = props;
       const isTiled = rasterData
-          && (Array.isArray(rasterData)
-              || (rasterData.includes('{x}') && rasterData.includes('{y}'))) || this.props.isTiled;
+          && ((Array.isArray(rasterData)
+              || (rasterData.includes('{x}') && rasterData.includes('{y}'))) || this.props.isTiled);
       this.setState({ isTiled });
     }
 
@@ -221,37 +224,16 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
   }
 
   async getTiledBitmapData(tile: TileLoadProps): Promise<TextureSource> {
-    // const {
-    //   rasterData, fetch,
-    // } = this.props;
-    const { viewport } = this.context;
-    // const dataUrl = getURLFromTemplate(rasterData, tile);
-    // const textureUrl = texture && getURLFromTemplate(texture, tile);
-
-    const { signal } = tile;
-    let bottomLeft = [0, 0] as [number, number];
-    let topRight = [0, 0] as [number, number];
-    if (viewport.isGeospatial) {
-      const bbox = tile.bbox as GeoBoundingBox;
-
-      bottomLeft = viewport.projectFlat([bbox.west, bbox.south]);
-      topRight = viewport.projectFlat([bbox.east, bbox.north]);
-    } else {
-      const bbox = tile.bbox as Exclude<TileBoundingBox, GeoBoundingBox>;
-      bottomLeft = [bbox.left, bbox.bottom];
-      topRight = [bbox.right, bbox.top];
-    }
-    const bounds: Bounds = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]];
-
     // TODO - pass signal to getTile
     // abort request if signal is aborted
-    return await this.state.bitmapCogTiles.getTile(
+    const tileData = await this.state.bitmapCogTiles.getTile(
       tile.index.x,
       tile.index.y,
       tile.index.z,
       // bounds,
       // this.props.meshMaxError,
     );
+    return tileData;
   }
 
   renderSubLayers(
@@ -278,7 +260,7 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
       },
     } = props.tile;
 
-    return new SubLayerClass({ ...props, tileSize: 256 }, {
+    return new SubLayerClass({ ...props, tileSize: this.state.bitmapCogTiles.tileSize }, {
       data: null,
       image: data,
       _instanced: false,
@@ -302,7 +284,7 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
       blurredTexture,
       opacity,
       clampToTerrain,
-      tileSize,
+      // tileSize,
       maxRequests,
       onTileLoad,
       onTileUnload,
@@ -310,8 +292,11 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
       maxCacheSize,
       maxCacheByteSize,
       refinementStrategy,
+      cogBitmapOptions,
     } = this.props;
     if (this.state.isTiled && this.state.initialized) {
+      const { tileSize } = this.state.bitmapCogTiles;
+
       return new TileLayer(this.getSubLayerProps({
         id: 'tiles',
       }), {
@@ -322,14 +307,15 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
             rasterData: urlTemplateToUpdateTrigger(rasterData),
             // blurredTexture,
             // opacity,
+            cogBitmapOptions,
             clampToTerrain,
           },
         },
         extent: this.state.bitmapCogTiles.cog
           ? this.state.bitmapCogTiles.getBoundsAsLatLon(this.state.bitmapCogTiles.cog) : null,
         tileSize,
-        minZoom: this.minZoom,
-        maxZoom: this.maxZoom,
+        minZoom: this.state.minZoom,
+        maxZoom: this.state.maxZoom,
         maxRequests,
         onTileLoad,
         onTileUnload,
