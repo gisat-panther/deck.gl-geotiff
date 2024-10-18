@@ -304,10 +304,10 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
         renderSubLayers: this.renderSubLayers.bind(this),
         updateTriggers: {
           getTileData: {
-            rasterData: urlTemplateToUpdateTrigger(rasterData),
+            // rasterData: urlTemplateToUpdateTrigger(rasterData),
             // blurredTexture,
             // opacity,
-            cogBitmapOptions,
+            // cogBitmapOptions,
             clampToTerrain,
           },
         },
