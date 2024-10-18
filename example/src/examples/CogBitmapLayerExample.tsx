@@ -29,12 +29,12 @@ const cogLayerDefinition = {
   // cogBitmapOptions: {
   //   type: 'image', useChannel: 30, useHeatMap: true, colorScaleValueRange: [0, 3], clipLow: 1, colorScale: chroma.brewer.Blues,
   // },
-  rasterData: 'https://gisat-gis.eu-central-1.linodeobjects.com/esaUtepUnHabitat/rasters/regional/Kenya/Kenya2_WSFpopALL_COGeoN.tif',
+  rasterData: 'https://gisat-gis.eu-central-1.linodeobjects.com/esaUtepUnHabitat/rasters/global/GHS-POP/GHS_POP_E2015_COGeoN.tif',
   cogBitmapOptions: {
     type: 'image',
     blurredTexture: false,
     clipLow: 1,
-    useChannel: 7,
+    useChannel: 0,
     useSingleColor: true,
   },
 
