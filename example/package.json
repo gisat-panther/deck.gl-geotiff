@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@deck.gl/react": "^9.0.4",
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.0.0",
     "@fortawesome/react-fontawesome": "^0.1.17",
     "@luma.gl/core": "^9.0.9",
@@ -23,9 +23,6 @@
     "react-scripts": "5.0.0",
     "recoil": "^0.6.1",
     "styled-components": "^5.3.3"
-  },
-  "peerDependencies": {
-    "deck.gl": "^8.9.7"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
