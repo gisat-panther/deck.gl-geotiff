@@ -26,17 +26,17 @@ Ensure Python 3.7 or higher is installed. Then, install **rio-cogeo** for creati
 ### Step 2: Prepare GeoTIFFs for COG Conversion
 GeoTIFF files should meet the following specifications:
 
-**Coordinate Reference System (CRS)**: Use Spherical Mercator, EPSG:3857.
+- **Coordinate Reference System (CRS)**: Use Spherical Mercator, EPSG:3857.
 
-**Extent and Tile Boundaries**: Ensure raster extent aligns with [Google Maps Tiles](https://docs.maptiler.com/google-maps-coordinates-tile-bounds-projection)
+- **Extent and Tile Boundaries**: Ensure raster extent aligns with [Google Maps Tiles](https://docs.maptiler.com/google-maps-coordinates-tile-bounds-projection)
 for the desired zoom level and tile number.
 
-**Resolution and Dimension**: 
-Set dimensions (512x512, 1024x1024, 2048x2024, ...) based on the required spatial resolution (in meters per pixel)
+- **Resolution and Dimension**: 
+Set dimensions (512x512, 1024x1024, 2048x2048, ...) based on the required spatial resolution (in meters per pixel)
 
-**NoData Value**: Define a NoData value.
+- **NoData Value**: Define a NoData value.
 
-**Compression**: Use Deflate compression for efficiency.
+- **Compression**: Use Deflate compression for efficiency.
 ##
 
 #### Adjust GeoTIFF with GDAL:
@@ -75,7 +75,7 @@ rio cogeo info output_cog.tif
   - supports all COG styles available in [Geoimage](./geoimage/src/geoimage/README.md) library from Geolib Visualiser
   - <ins>requirements</ins>: URL for COG file uploaded on S3 server, check this guide for [uploading cog files on S3](guideForS3.md) server
 
-    <img src = "/images/gisat_cog_explorer.jpg" width = "70%">
+    <img src = "/images/gisat_cog_explorer.jpg" width = "60%">
 
 
 # Example for region in Ethiopia
@@ -84,8 +84,8 @@ This example demonstrates how to convert a GeoTIFF file covering a region in Eth
 ### Input Requirements:
 Refer to the [Google Maps Tile Projection Guide](https://docs.maptiler.com/google-maps-coordinates-tile-bounds-projection/#4/16.84/26.01) to align coordinates with tile boundaries. For this region in Ethiopia, which fits entirely within the zoom level 4 TMS Tile (9,8), the Coordinate bounds are: 2504689, 0 to 5009377, 2504689. 
 
-| <img src="/images/Ethiopia_region_maptiler_zoom4_1.jpg" alt="Example region" width="90%"> | <img src="/images/Ethiopia_region_maptiler_zoom4_2.jpg" alt="Coordinate bounds" width="90%"> |
-    |:--------------------------------------------------------:|:---------------------------------------------------------------------------------:|
+| <img src="/images/Ethiopia_region_maptiler_zoom4_1.jpg" alt="Example region" width="40%"> | <img src="/images/Ethiopia_region_maptiler_zoom4_2.jpg" alt="Coordinate bounds" width="40%"> |
+    
 
 
 For expected spatial resolution, which is approx. 300m per pixel, the output dimension 8192 x 8192 pixels is used.
