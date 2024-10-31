@@ -44,7 +44,7 @@ Set dimensions (512x512, 1024x1024, 2048x2048, ...) based on the required spatia
 If your GeoTIFF does not meet these specifications, use [gdalwarp](https://gdal.org/en/latest/programs/gdalwarp.html):
 
 ```
-gdalwarp -t_srs EPSG:3857 -r near -co COMPRESS=DEFLATE input.tif output_projected.tif
+gdalwarp -t_srs EPSG:3857 -r near -co COMPRESS=DEFLATE input.tif input_projected.tif
 
 use  -te  -ts  -ot  -dstnodata  and other gdalwarp options to ensure GeoTIFF will meet required specifications
 ```
@@ -59,7 +59,7 @@ use --dtype  --nodata  and other options for specification
 ```
 
 ### Step 4: Validate and Check COG Metadata
-Validate the COG file with [rio-cogeo](https://cogeotiff.github.io/rio-cogeo/CLI/) to ensure it’s properly formatted:
+- Validate the COG file with [rio-cogeo](https://cogeotiff.github.io/rio-cogeo/CLI/) to ensure it’s properly formatted:
 ```
 rio cogeo validate output_cog.tif
 ```
@@ -67,13 +67,16 @@ To view COG metadata, use:
 ```
 rio cogeo info output_cog.tif
 ```
+- You can display a COG file saved locally on your computer e.g. with **QGIS**. 
+In *Layer Properties* you can check detailed information about format, compression, bands, metadata, etc.
+
 
 ### Step 5: Validate in COG Explorer
 - [COG Explorer](https://gisat-panther.github.io/app-gisat-cog-explorer/)
   - application for verification and style creation for COG files developed by Gisat
   - based on Panther components
   - supports all COG styles available in [Geoimage](./geoimage/src/geoimage/README.md) library from Geolib Visualiser
-  - <ins>requirements</ins>: URL for COG file uploaded on S3 server, check this guide for [uploading cog files on S3](guideForS3.md) server
+  - <ins>requirements</ins>: URL for COG file uploaded on S3 server
 
     <img src = "/images/gisat_cog_explorer.jpg" width = "60%">
 
@@ -93,24 +96,44 @@ For expected spatial resolution, which is approx. 300m per pixel, the output dim
 ### Reproject GeoTIFF with GDAL
 
 ```bash
-gdalwarp -te 2504689 0 5009377 2504689 -ts 8192 8192 -t_srs EPSG:3857 -ot Float32 -dstnodata -200 -r near -co COMPRESS=DEFLATE -co BIGTIFF=YES  ET_hanpp_luc_2023.tif ET_hanpp_luc_2023_3857_zoom4.tif
+gdalwarp -te 2504689 0 5009377 2504689 -ts 8192 8192 -t_srs EPSG:3857 -ot Float32 -dstnodata -200 -r near -co COMPRESS=DEFLATE -co BIGTIFF=YES  ET_input.tif ET_input_3857_zoom4.tif
   ```
 ### Convert the prepared GeoTIFF to COG with rio-cogeo:
 
 ```bash
-rio cogeo create --blocksize 256 --overview-blocksize 256 --dtype float32 --nodata -200 ET_hanpp_luc_2023_3857_zoom4.tif ET_hanpp_luc_2023_3857_zoom4_COG.tif
+rio cogeo create --blocksize 256 --overview-blocksize 256 --dtype float32 --nodata -200 ET_input_3857_zoom4.tif ET_output_3857_zoom4_COG.tif
   ```
 ### Validation and check COG metadata:
 
 ```bash
-rio cogeo validate ET_hanpp_luc_2023_3857_zoom4_COG.tif
+rio cogeo validate ET_output_3857_zoom4_COG.tif
 
-rio cogeo info ET_hanpp_luc_2023_3857_zoom4_COG.tif
+rio cogeo info ET_output_3857_zoom4_COG.tif
   ```
+
+- You can display a COG file saved locally on your computer e.g. with **QGIS**. 
+In *Layer Properties* you can check detailed information about format, compression, bands, metadata, etc.
+
+
 ### Validate in COG Explorer:
-[COG for example region in Ethiopia](https://gisat-panther.github.io/app-gisat-cog-explorer/?cogUrl=https%3A%2F%2Fgisat-gis.eu-central-1.linodeobjects.com%2FLuisa_COG_testy%2FET_hanpp_luc_2023_flipped_3857_zoom4_COG.tif&useAutoRange=false&lon=40.05178627107696&lat=12.90097768896166&boxRange=2029256.5862873467&useSingleColor=true&useChannel=1)
+- **Upload data into your S3 server**
+
+You must update visibility in file *Properties* (right click on the uploaded file) that it is readable for everyone:
+- **Get URL link**
+
+To get the final URL data, modify *bucket-name*, *project_folder* based on your directory structure and *cog_file_name* based on your COG file:
 
 
+***Example***, below is the directory which you can see in WinSCP:
+- /bucket-name/project_folder/test_cog/imagery.tif
+- replace `/bucket-name/` with `https://bucket-name.eu-central-1.linodeobjects.com/`
+- resulting in COG url: `https://bucket-name.eu-central-1.linodeobjects.com/project_folder/test_cog/imagery.tif`
+
+
+Put COG Url into [COGexplorer](https://gisat-panther.github.io/app-gisat-cog-explorer/)
+
+
+# 
 # More information about COG format
 
 These are links for existing articles about COGs:
