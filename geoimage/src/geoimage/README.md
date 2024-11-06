@@ -1,5 +1,5 @@
 # Geoimage
-##### A Javascript library for generating bitmaps out of **geoTIFF** files.
+##### A Javascript library for rendering bitmaps and terrain out of **geoTIFF** files.
 <img src = "/images/example0crop1.png" width = "100%">
 
 ### Features
@@ -7,6 +7,7 @@
 - Create RGB pictures out of RGB geoTIFF data.
 - Generate pictures out of non-RGB geoTIFF data with different processing options.
 
+[//]: # (TODO Vojta)
 ##### Terrain texture generation
 - Generate heightmaps out of single-channel geoTIFF elevation data.
 - The **elevation data** is encoded into the bitmap as [Mapbox Terrain-RGB](https://docs.mapbox.com/data/tilesets/guides/access-elevation-data/#decode-data).
@@ -19,6 +20,7 @@
 - Automatic data range
 - Manual data range
 - Assign color to specific data value (example [here](../cogbitmaplayer/README.md#assigning-color-to-specific-data-value))
+
 ### Data processing options
 - `useAutoRange : boolean` - set automatic range of color gradient **(default false)**
 - `useDataForOpacity : boolean` - visualise data with opacity of each pixel according to its value **(default false)**
@@ -48,16 +50,19 @@ etc. and [Color Brewer pallete names](https://www.datanovia.com/en/wp-content/up
 in this format: `chroma.brewer.Greens`
 
 #### Additional terrain processing options
-- `terrainMinValue: number` - noData value retreived from input file's metadata is subsitute by this value **(default 0)**
+- `terrainMinValue: number` - noData value retrieved from input file's metadata is substitute by this value **(default 0)**
 - `terrainSkirtHeight: number` - defines height of individual tiles edges, so there are no white spaces between individual 3D tiles **(default 100)**
-- `terrainColor: chroma.Color` - color of terrain model **(default [133, 133, 133, 255])**
 
+[//]: # (- `terrainColor: chroma.Color` - color of terrain model **&#40;default [133, 133, 133, 255]&#41;**)
+
+[//]: # (TODO update)
 - Setting **opacity for terrain layers**: when using a terrain layer without defining a bitmap overlay, 
 setting the opacity of the model is straightforward: set `alpha` in terrainOptions (0-100). 
 However, if a bitmap overlay is defined (`bitmapUrl` and `bitmapOptions`), the opacity for 
 the overlay is taken from its definition in `bitmapOptions`, not from `terrainOptions` 
 (which is recommended to be set to 100 unless the opacities are combined). 
 
+[//]: # (TODO update: Mariana: ja bych to klidne cely odmazala, ale mozna vidis dal nez ja..)
 ### Return options
 **Method returns Image DataUrl**
 

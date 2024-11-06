@@ -2,7 +2,11 @@
 
 The Geolib Visualizer is a library that extends the `deck.gl` framework to enable the visualization of geospatial data, 
 currently supporting Cloud-Optimized GeoTIFF (COG) files. This library offers an efficient way to display bitmap and 
-terrain data in applications with advanced customization options.
+terrain data in applications with advanced customization options using [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md)
+and [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md). Another developed libraries [GeoImage](./geoimage/src/geoimage/README.md) 
+and [CogTiles](./geoimage/src/cogtiles/README.md) enhance rendering options.
+
+<img src = "/images/ManillaCogHeatmap.png" width = "100%">
 
 ## Key Features
 
@@ -10,12 +14,6 @@ terrain data in applications with advanced customization options.
 - **Bitmap and Terrain Layers**: Supports visualizing both bitmap and elevation data.
 - **Customizable Rendering**: Allows custom color scales, opacity control, and flexible geographic bounds.
 
-
-[//]: # (It provides an easy and efficient way to render both bitmap and terrain representations of COG datasets using [CogBitmapLayer]&#40;./geoimage/src/cogbitmaplayer/README.md&#41; and [CogTerrainLayer]&#40;./geoimage/src/cogterrainlayer/README.md&#41;, and [GeoImage]&#40;./geoimage/src/geoimage/README.md&#41; and [CogTiles]&#40;./geoimage/src/cogtiles/README.md&#41; libraries)
-
-
-[//]: # ()
-[//]: # (<img src = "/images/ManillaCogHeatmap.png" width = "100%">)
 
 ## Installation
 
@@ -51,21 +49,17 @@ import geolib from '@gisatcz/deckgl-geolib'
 ### 1. COG Bitmap Layer (`CogBitmapLayer`)
 
 The `CogBitmapLayer` is designed for visualizing Cloud-Optimized GeoTIFF files as raster layers. 
-The example below demonstrates its implementation:
+The example below demonstrates its implementation, for more information and examples refer to the [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md).
 
 ```typescript
 const CogBitmapLayer = geolib.CogBitmapLayer;
 
-const cogLayer = new CogBitmapLayer(
+const cogBitmapLayer = new CogBitmapLayer(
   id: 'cog_bitmap_name',
   rasterData:  'cog_bitmap_data_url.tif',
   isTiled: true,
-  terrainOptions: {
-    type: 'image',
-    blurredTexture: false,
-    clipLow: 1,
-    useChannel: 0,
-    useSingleColor: true,
+  cogBitmapOptions: {
+    type: 'image'
   }
 );
 ```
@@ -74,24 +68,22 @@ const cogLayer = new CogBitmapLayer(
 For 3D terrain rendering, use `CogTerrainLayer` to visualize elevation data stored 
 in Cloud-Optimized GeoTIFF format:
 
+[//]: # (TODO: remove minZoom & maxZoom)
+
 ```typescript
 const CogTerrainLayer = geolib.CogTerrainLayer;
 
-const cogLayer = new CogTerrainLayer(
+const cogTerrainLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
-  minZoom: 12,
+  minZoom: 12,                                  
   maxZoom: 14,
-  opacity: 1,
   isTiled: true,
-  useChannel: null,
   tileSize: 256,
   meshMaxError: 1,
   operation: 'terrain+draw',
   terrainOptions: {
     type: 'terrain',
-    multiplier: 1,
-    terrainSkirtHeight: 1,
   }
 );
 ```
