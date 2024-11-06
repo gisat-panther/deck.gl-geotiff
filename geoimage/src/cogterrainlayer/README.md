@@ -31,7 +31,7 @@ const CogTerrainLayer = geolib.CogTerrainLayer;
 
 Display simple terrain
 ```typescript
-const cogTerrainLayer = new CogTerrainLayer(
+const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
   minZoom: 12,
@@ -47,7 +47,7 @@ const cogTerrainLayer = new CogTerrainLayer(
 Display multiplied terrain with custom skirt height 
 (height of individual tiles edges, so there are no white spaces between individual 3D tiles) and defined minimal terrain value.
 ```typescript
-const cogTerrainLayer = new CogTerrainLayer(
+const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
   minZoom: 12,
@@ -65,7 +65,7 @@ const cogTerrainLayer = new CogTerrainLayer(
 ```
 Adjust `meshMaxError`: Martini error tolerance in meters, smaller number -> more detailed mesh, **(default 4.0)**.
 ```typescript
-const cogTerrainLayer = new CogTerrainLayer(
+const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
   minZoom: 12,
@@ -84,7 +84,7 @@ const cogTerrainLayer = new CogTerrainLayer(
 [//]: # (TODO check if useChannel works properly)
 Adjust `opacity` and display second channel.
 ```typescript
-const cogTerrainLayer = new CogTerrainLayer(
+const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
   minZoom: 12,
@@ -105,7 +105,7 @@ const cogTerrainLayer = new CogTerrainLayer(
 
 Display terrain with tile service overlay
 ```typescript
-const terrainLayer = new CogTerrainLayer(
+const cogLayer = new CogTerrainLayer(
     'cog_data_url.tif',
     {type:'terrain'},
     'tile-service.com/{z}/{x}/{y}.png'
@@ -113,7 +113,7 @@ const terrainLayer = new CogTerrainLayer(
 ```
 Display terrain with stylized COG overlay
 ```typescript
-const terrainLayer = new CogTerrainLayer(
+const cogLayer = new CogTerrainLayer(
     'cog.tif',
     {type:'terrain'},
     'cog-overlay.tif',

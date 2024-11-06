@@ -30,7 +30,7 @@ const CogBitmapLayer = geolib.CogBitmapLayer;
 ```
 Display simple rgb image. If you don't specify a channel to process, it defaults to grayscale, RGB, or RGBA depending on the channel count
 ```typescript
-const cogBitmapLayer = new CogBitmapLayer(
+const cogLayer = new CogBitmapLayer(
   id: 'cog_bitmap_name',
   rasterData:  'cog_bitmap_data_url.tif',
   isTiled: true,
@@ -43,7 +43,7 @@ Display the second channel as a heatmap with data from 0 to 1000
 - Currently, when `useAutoRange` is `true`, min and max data value for each image is calculated separately, thus it is recommended to set min and max values in `colorScaleValueRange`.
 
 ```typescript
-const cogBitmapLayer = new CogBitmapLayer(
+const cogLayer = new CogBitmapLayer(
   id: 'cog_bitmap_name',
   rasterData:  'cog_bitmap_data_url.tif',
   isTiled: true,
@@ -59,7 +59,7 @@ const cogBitmapLayer = new CogBitmapLayer(
 Display the second channel as a heatmap with data from 0 to 1000 with custom color scale 
 
 ```typescript
-const cogBitmapLayer = new CogBitmapLayer(
+const cogLayer = new CogBitmapLayer(
   id: 'cog_bitmap_name',
   rasterData:  'cog_bitmap_data_url.tif',
   isTiled: true,
@@ -74,7 +74,7 @@ const cogBitmapLayer = new CogBitmapLayer(
 ```
 Display the third channel as a green color and only show data from 100 to 200, the clipped data should be visualized with yellow color
 ```typescript
-const cogBitmapLayer = new CogBitmapLayer(
+const cogLayer = new CogBitmapLayer(
   id: 'cog_bitmap_name',
   rasterData:  'cog_bitmap_data_url.tif',
   isTiled: true,
@@ -92,7 +92,7 @@ const cogBitmapLayer = new CogBitmapLayer(
 <a name='assigning-color-to-specific-data-value'></a>
 Assign color to specific data values 
 ```typescript
-const cogBitmapLayer = new CogBitmapLayer(
+const cogLayer = new CogBitmapLayer(
   id: 'cog_bitmap_name',
   rasterData:  'cog_bitmap_data_url.tif',
   isTiled: true,

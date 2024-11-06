@@ -46,7 +46,7 @@ Import package into project:
 import geolib from '@gisatcz/deckgl-geolib'
 ```
 
-### 1. COG Bitmap Layer (`CogBitmapLayer`)
+### 1. COG Bitmap Layer
 
 The `CogBitmapLayer` is designed for visualizing Cloud-Optimized GeoTIFF files as raster layers. 
 The example below demonstrates its implementation, for more information and examples refer to the [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md).
@@ -54,7 +54,7 @@ The example below demonstrates its implementation, for more information and exam
 ```typescript
 const CogBitmapLayer = geolib.CogBitmapLayer;
 
-const cogBitmapLayer = new CogBitmapLayer(
+const cogLayer = new CogBitmapLayer(
   id: 'cog_bitmap_name',
   rasterData:  'cog_bitmap_data_url.tif',
   isTiled: true,
@@ -63,17 +63,18 @@ const cogBitmapLayer = new CogBitmapLayer(
   }
 );
 ```
-### 2. COG Terrain Layer (`CogTerrainLayer`)
+### 2. COG Terrain Layer
 
 For 3D terrain rendering, use `CogTerrainLayer` to visualize elevation data stored 
-in Cloud-Optimized GeoTIFF format:
+in Cloud-Optimized GeoTIFF format, for more information and examples refer to the [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md).
+
 
 [//]: # (TODO: remove minZoom & maxZoom)
 
 ```typescript
 const CogTerrainLayer = geolib.CogTerrainLayer;
 
-const cogTerrainLayer = new CogTerrainLayer(
+const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
   minZoom: 12,                                  
@@ -88,7 +89,7 @@ const cogTerrainLayer = new CogTerrainLayer(
 );
 ```
 
-add layer to `DeckGL` instance, visit [deck.gl](https://deck.gl/docs/get-started/using-with-react) for more about ***deck.gl*** compoments.
+add layer to `DeckGL` instance, visit [deck.gl](https://deck.gl/docs/get-started/using-with-react) for more about deck.gl compoments.
 ```javascript
 <DeckGL
     initialViewState={INITIAL_VIEW_STATE}
