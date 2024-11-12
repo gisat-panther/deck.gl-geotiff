@@ -27,15 +27,11 @@ import geolib from '@gisatcz/deckgl-geolib';
 
 const CogTerrainLayer = geolib.CogTerrainLayer;
 ```
-[//]: # (TODO: remove minZoom & maxZoom)
-
 Display simple terrain
 ```typescript
 const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
-  minZoom: 12,
-  maxZoom: 14,
   isTiled: true,
   tileSize: 256,
   operation: 'terrain+draw',
@@ -50,8 +46,6 @@ Display multiplied terrain with custom skirt height
 const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
-  minZoom: 12,
-  maxZoom: 14,
   isTiled: true,
   tileSize: 256,
   operation: 'terrain+draw',
@@ -68,8 +62,6 @@ Adjust `meshMaxError`: Martini error tolerance in meters, smaller number -> more
 const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
-  minZoom: 12,
-  maxZoom: 14,
   isTiled: true,
   useChannel: null,
   tileSize: 256,
@@ -87,8 +79,6 @@ Adjust `opacity` and display second channel.
 const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
-  minZoom: 12,
-  maxZoom: 14,
   opacity: 0.5,
   isTiled: true,
   useChannel: 1,

@@ -69,16 +69,12 @@ For 3D terrain rendering, use `CogTerrainLayer` to visualize elevation data stor
 in Cloud-Optimized GeoTIFF format, for more information and examples refer to the [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md).
 
 
-[//]: # (TODO: remove minZoom & maxZoom)
-
 ```typescript
 const CogTerrainLayer = geolib.CogTerrainLayer;
 
 const cogLayer = new CogTerrainLayer(
   id: 'cog_terrain_name',
   elevationData:  'cog_terrain_data_url.tif',
-  minZoom: 12,                                  
-  maxZoom: 14,
   isTiled: true,
   tileSize: 256,
   meshMaxError: 1,

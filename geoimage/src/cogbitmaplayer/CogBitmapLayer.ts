@@ -146,10 +146,6 @@ export default class CogBitmapLayer<ExtraPropsT extends {} = {}> extends Composi
 
   static layerName = 'CogBitmapLayer';
 
-  minZoom: number;
-
-  maxZoom: number;
-
   state!: {
     initialized: boolean;
     isTiled?: boolean;

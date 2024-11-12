@@ -186,14 +186,12 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
 
   terrainUrl: string;
 
-  minZoom: number;
-
-  maxZoom: number;
-
   state!: {
 	  isTiled?: boolean;
 	  terrain?: MeshAttributes;
 	  zRange?: ZRange | null;
+    minZoom: number;
+    maxZoom: number;
 	};
 
   async initializeState(context: any) {
@@ -212,9 +210,10 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
     // this.tileSize = this.terrainCogTiles.getTileSize(cog);
 
     const zoomRange = this.state.terrainCogTiles.getZoomRange(cog);
-    [this.minZoom, this.maxZoom] = zoomRange;
 
-    this.setState({ initialized: true });
+    const [minZoom, maxZoom] = zoomRange;
+
+    this.setState({ initialized: true, minZoom, maxZoom });
   }
 
   updateState({ props, oldProps }: UpdateParameters<this>): void {
@@ -379,8 +378,6 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
       meshMaxError,
       elevationDecoder,
       tileSize,
-      maxZoom,
-      minZoom,
       extent,
       maxRequests,
       onTileLoad,
@@ -410,8 +407,8 @@ export default class TerrainLayer<ExtraPropsT extends {} = {}> extends Composite
           onViewportLoad: this.onViewportLoad.bind(this),
           zRange: this.state.zRange || null,
           tileSize,
-          maxZoom,
-          minZoom,
+          minZoom: this.state.minZoom,
+          maxZoom: this.state.maxZoom,
           extent,
           maxRequests,
           onTileLoad,
