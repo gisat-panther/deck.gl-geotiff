@@ -116,8 +116,8 @@ const styleClasses = [
 const cogLayer = new TerrainLayer({
   // globální
   elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v3/DEM/dtm.bareearth_ensemble_p10_250m_s_2018_go_epsg4326_v20230221_deflate_cog.tif',
-  minZoom: 0,
-  maxZoom: 9,
+  // minZoom: 0,
+  // maxZoom: 9,
   meshMaxError: 10,
 
   // elevationData: 'https://gisat-gis.eu-central-1.linodeobjects.com/3dflus/d8/LITC52_53_4g_5m_4326_cog_nodata.tif',
