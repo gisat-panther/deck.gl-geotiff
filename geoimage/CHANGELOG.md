@@ -1,3 +1,15 @@
+# v1.11.1 (Wed Nov 13 2024)
+
+#### 🐾 Patch
+
+
+#### Authors: 2
+
+- Mariana Kecová ([@MariDani](https://github.com/MariDani))
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v1.11.0 (Wed Nov 13 2024)
 
 #### 🚀 Enhancement
