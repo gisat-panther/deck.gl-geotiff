@@ -8,9 +8,9 @@
 
 The Geolib Visualizer is a library that extends the `deck.gl` framework to enable the visualization of geospatial data, 
 currently supporting Cloud-Optimized GeoTIFF (COG) files. This library offers an efficient way to display bitmap and 
-terrain data in applications with advanced customization options using [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md)
-and [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md). Another developed libraries [GeoImage](./geoimage/src/geoimage/README.md) 
-and [CogTiles](./geoimage/src/cogtiles/README.md) enhance rendering options.
+terrain data in applications with advanced customization options using [CogBitmapLayer](../geoimage/src/cogbitmaplayer/README.md)
+and [CogTerrainLayer](../geoimage/src/cogterrainlayer/README.md). Another developed libraries [GeoImage](../geoimage/src/geoimage/README.md) 
+and [CogTiles](../geoimage/src/cogtiles/README.md) enhance rendering options.
 
 <img src = "/images/ManillaCogHeatmap.png" width = "100%">
 
@@ -40,7 +40,7 @@ For more information, visit the [npm package page](https://www.npmjs.com/package
 You can visit the package page to explore further versions and additional information.
 
 ## COG Data Preparation
-For seamless integration of Geolib Visualizer library, please make sure you have followed our workflow [Data Preparation Guide for converting GeoTIFFs to COG files](dataPreparation.md).
+For seamless integration of Geolib Visualizer library, please make sure you have followed our workflow [Data Preparation Guide for converting GeoTIFFs to COG files](../dataPreparation.md).
 
 
 
@@ -55,7 +55,7 @@ import geolib from '@gisatcz/deckgl-geolib'
 ### 1. COG Bitmap Layer
 
 The `CogBitmapLayer` is designed for visualizing Cloud-Optimized GeoTIFF files as raster layers. 
-The example below demonstrates its implementation, for more information and examples refer to the [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md).
+The example below demonstrates its implementation, for more information and examples refer to the [CogBitmapLayer](../geoimage/src/cogbitmaplayer/README.md).
 
 ```typescript
 const CogBitmapLayer = geolib.CogBitmapLayer;
@@ -72,7 +72,7 @@ const cogLayer = new CogBitmapLayer(
 ### 2. COG Terrain Layer
 
 For 3D terrain rendering, use `CogTerrainLayer` to visualize elevation data stored 
-in Cloud-Optimized GeoTIFF format, for more information and examples refer to the [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md).
+in Cloud-Optimized GeoTIFF format, for more information and examples refer to the [CogTerrainLayer](../geoimage/src/cogterrainlayer/README.md).
 
 
 ```typescript
@@ -111,7 +111,7 @@ yarn start
 ```
 The example is defaultly running at http://localhost:5173/
 
-The bitmap and terrain example files are located here [example/src/examples](./example/src/examples)
+The bitmap and terrain example files are located here [example/src/examples](../example/src/examples)
 
 [//]: # (## Contributions)
 
