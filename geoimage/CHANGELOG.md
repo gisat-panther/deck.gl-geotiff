@@ -1,3 +1,14 @@
+# v1.11.2 (Wed Nov 13 2024)
+
+#### 🐾 Patch
+
+
+#### Authors: 1
+
+- Vojtěch Dubrovský ([@vdubr](https://github.com/vdubr))
+
+---
+
 # v1.11.1 (Wed Nov 13 2024)
 
 #### 🐾 Patch
