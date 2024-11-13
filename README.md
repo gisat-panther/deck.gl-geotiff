@@ -1,3 +1,9 @@
+<p align="right">
+  <a href="https://npmjs.org/package/deck.gl">
+    <img src="https://img.shields.io/npm/v/@gisatcz/deckgl-geolib.svg?style=flat-square" alt="version" />
+  </a>
+</p>
+
 # 3DFLUS - Geolib Visualizer
 
 The Geolib Visualizer is a library that extends the `deck.gl` framework to enable the visualization of geospatial data, 
