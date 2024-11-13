@@ -24,5 +24,8 @@
     "eslint": "^8.43.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-react": "^7.32.2"
+  },
+  "dependencies": {
+    "auto": "^11.2.1"
   }
 }

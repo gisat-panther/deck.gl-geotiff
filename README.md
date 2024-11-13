@@ -1,14 +1,21 @@
 # 3DFLUS - Geolib Visualizer
-The Geolib Visualizer is a library that extends the functionality of the deck.gl library to visualize geospatial data. 
-Currently, it supports Cloud-Optimized GeoTIFF (COG). 
-It provides an easy and efficient way to render both bitmap and terrain representations of COG datasets using [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md) and [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md), and [GeoImage](./geoimage/src/geoimage/README.md) and [CogTiles](./geoimage/src/cogtiles/README.md) libraries
 
-Additionally, we provide a [guide for COG data preparation](dataPreparation.md) which currently includes step-by-step instructions on converting GeoTIFFs into COG files. 
-This resource enables seamless integration with Geolib Visualizer.
+The Geolib Visualizer is a library that extends the `deck.gl` framework to enable the visualization of geospatial data, 
+currently supporting Cloud-Optimized GeoTIFF (COG) files. This library offers an efficient way to display bitmap and 
+terrain data in applications with advanced customization options using [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md)
+and [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md). Another developed libraries [GeoImage](./geoimage/src/geoimage/README.md) 
+and [CogTiles](./geoimage/src/cogtiles/README.md) enhance rendering options.
 
 <img src = "/images/ManillaCogHeatmap.png" width = "100%">
 
-### Installation
+## Key Features
+
+- **COG Rendering**: Efficiently loads and displays Cloud-Optimized GeoTIFF files.
+- **Bitmap and Terrain Layers**: Supports visualizing both bitmap and elevation data.
+- **Customizable Rendering**: Allows custom color scales, opacity control, and flexible geographic bounds.
+
+
+## Installation
 
 To use the Geolib Visualizer library, you need to have deck.gl and its dependencies installed. 
 
@@ -23,46 +30,62 @@ or
 yarn add @gisatcz/deckgl-geolib
 ```
 
-The npm package can be found [here](https://www.npmjs.com/package/@gisatcz/deckgl-geolib). 
+For more information, visit the [npm package page](https://www.npmjs.com/package/@gisatcz/deckgl-geolib). 
 You can visit the package page to explore further versions and additional information.
 
-### Usage
+## COG Data Preparation
+For seamless integration of Geolib Visualizer library, please make sure you have followed our workflow [Data Preparation Guide for converting GeoTIFFs to COG files](dataPreparation.md).
 
-Import package into project
+
+
+## Usage
+
+Import package into project:
 
 ```typescript
 import geolib from '@gisatcz/deckgl-geolib'
 ```
 
-Create bitmap layer
+### 1. COG Bitmap Layer
+
+The `CogBitmapLayer` is designed for visualizing Cloud-Optimized GeoTIFF files as raster layers. 
+The example below demonstrates its implementation, for more information and examples refer to the [CogBitmapLayer](./geoimage/src/cogbitmaplayer/README.md).
+
 ```typescript
 const CogBitmapLayer = geolib.CogBitmapLayer;
 
 const cogLayer = new CogBitmapLayer(
-    'CogBitmapLayer',
-    'cog_data_url.tif',
-    {
-        type: 'image', 
-        useChannel: 0, 
-        useHeatMap: true, 
-        colorScale: ['#fde725', '#5dc962', '#20908d', '#3a528b', '#440154'], 
-        colorScaleValueRange: [1, 100, 200, 300, 366],
-    },
+  id: 'cog_bitmap_name',
+  rasterData:  'cog_bitmap_data_url.tif',
+  isTiled: true,
+  cogBitmapOptions: {
+    type: 'image'
+  }
 );
 ```
+### 2. COG Terrain Layer
 
-or create terrain layer
+For 3D terrain rendering, use `CogTerrainLayer` to visualize elevation data stored 
+in Cloud-Optimized GeoTIFF format, for more information and examples refer to the [CogTerrainLayer](./geoimage/src/cogterrainlayer/README.md).
+
+
 ```typescript
 const CogTerrainLayer = geolib.CogTerrainLayer;
 
 const cogLayer = new CogTerrainLayer(
-    'CogTerrainLayer',
-    'cog_data_url.tif',
-    { type: 'terrain'},
+  id: 'cog_terrain_name',
+  elevationData:  'cog_terrain_data_url.tif',
+  isTiled: true,
+  tileSize: 256,
+  meshMaxError: 1,
+  operation: 'terrain+draw',
+  terrainOptions: {
+    type: 'terrain',
+  }
 );
 ```
 
-add layer to `DeckGL` instance, visit [deck.gl](https://deck.gl/docs/get-started/using-with-react) for more about ***deck.gl*** compoments.
+add layer to `DeckGL` instance, visit [deck.gl](https://deck.gl/docs/get-started/using-with-react) for more about deck.gl compoments.
 ```javascript
 <DeckGL
     initialViewState={INITIAL_VIEW_STATE}
@@ -70,7 +93,7 @@ add layer to `DeckGL` instance, visit [deck.gl](https://deck.gl/docs/get-started
     layers={cogLayer} />
 ```
 
-### Development
+## Development
 Clone the repository and install dependencies
 ```
 yarn install
@@ -80,13 +103,13 @@ Start an example
 ```
 yarn start
 ```
-The example is defaultly running at http://localhost:3000/
+The example is defaultly running at http://localhost:5173/
 
 The bitmap and terrain example files are located here [example/src/examples](./example/src/examples)
 
-[//]: # (### Contributions)
+[//]: # (## Contributions)
 
 [//]: # (Contributions and feedback are welcome! If you encounter any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request.)
 
 [//]: # ()
-[//]: # (### License)
+[//]: # (## License)

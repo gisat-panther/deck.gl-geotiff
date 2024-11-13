@@ -10,10 +10,16 @@ import { worldToLngLat } from '@math.gl/web-mercator';
 import LZWDecoder from './lzw';
 
 // Bitmap styling
-import GeoImage, { GeoImageOptions } from '../geoimage/geoimage.ts'; // TODO: remove absolute path
+import GeoImage, { GeoImageOptions } from '../geoimage/geoimage.ts';
+
+export type Bounds = [minX: number, minY: number, maxX: number, maxY: number];
 
 const EARTH_CIRCUMFERENCE = 40075000.0;
 const EARTH_HALF_CIRCUMFERENCE = 20037500.0;
+
+const CogTilesGeoImageOptionsDefaults = {
+  blurredTexture: true,
+};
 
 class CogTiles {
   cog: Tiff;
@@ -35,9 +41,7 @@ class CogTiles {
   options: GeoImageOptions;
 
   constructor(options: GeoImageOptions) {
-    this.options = options;
-
-    // this.testCog()
+    this.options = { ...CogTilesGeoImageOptionsDefaults, ...options };
   }
 
   async initializeCog(url: string) {
@@ -53,17 +57,6 @@ class CogTiles {
     this.cog.images.forEach((image:TiffImage) => {
       image.loadGeoTiffTags();
     });
-
-    /*
-        console.log("---- START OF COG INFO DUMP ----")
-        this.cog.images[0].tags.forEach((tag) => {
-            //console.log(tag.value.name)
-            console.log(tag.name + ":")
-            console.log(tag.value)
-        })
-        console.log("---- END OF COG INFO DUMP ----")
-        */
-    // console.log(this.cog)
 
     this.tileSize = this.getTileSize(this.cog);
 
@@ -94,8 +87,6 @@ class CogTiles {
 
   getBoundsAsLatLon(cog: Tiff) {
     const { bbox } = cog.images[cog.images.length - 1];
-
-    // console.log(bbox)
 
     const minX = Math.min(bbox[0], bbox[2]);
     const maxX = Math.max(bbox[0], bbox[2]);
@@ -156,7 +147,7 @@ class CogTiles {
     return cartographicPositionAdjusted;
   }
 
-  async getTile(x: number, y: number, z: number) {
+  async getTile(x: number, y: number, z: number, bounds:Bounds, meshMaxError: number) {
     const wantedMpp = this.getResolutionFromZoomLevel(this.tileSize, z);
     const img = this.cog.getImageByResolution(wantedMpp);
     // await img.loadGeoTiffTags(1)
@@ -211,7 +202,7 @@ img.tags.get(339).value as Array<number>,
     // console.log("Single channel pixel format: " + bitsPerSample/)
 
     if (x - ox >= 0 && y - oy >= 0 && x - ox < tilesX && y - oy < tilesY) {
-      // console.log("getting tile: " + [x - ox, y - oy]);
+      // console.log(`getting tile: ${[x - ox, y - oy]}`);
       const tile = await img.getTile((x - ox), (y - oy));
       // console.time("Request to data time: ")
 
@@ -254,11 +245,14 @@ img.tags.get(339).value as Array<number>,
 
       // console.log(decompressedFormatted)
 
+      // const { meshMaxError, bounds, elevationDecoder } = this.options;
+
       decompressed = await this.geo.getMap({
         rasters: [decompressedFormatted],
         width: this.tileSize,
         height: this.tileSize,
-      }, this.options);
+        bounds,
+      }, this.options, meshMaxError);
 
       // console.log(decompressed.length)
 
@@ -316,39 +310,6 @@ img.tags.get(339).value as Array<number>,
       return Number.isNaN(Number(noDataValue)) ? undefined : Number(noDataValue);
     }
     return undefined;
-  }
-
-  async testCog() {
-    const url = 'https://gisat-gis.eu-central-1.linodeobjects.com/eman/versions/v2/Quadrants/Q3_Bolivia_ASTER_2002_RGB_COG_LZW.tif';
-    this.options = {
-      type: 'image', multiplier: 1.0, useChannel: 1, alpha: 180, clipLow: 1, clipHigh: Number.MAX_VALUE,
-    };
-
-    const c = await this.initializeCog(url);
-    const middleImage = c.images[Math.floor(c.images.length / 2)];
-
-    console.log(middleImage);
-
-    const imageTileIndex = this.getImageTileIndex(middleImage);
-
-    console.log(imageTileIndex);
-
-    const x = Math.floor(middleImage.tileCount.x / 2);
-    const y = Math.floor(middleImage.tileCount.y / 2);
-
-    console.log(c.getTile(x, y, Math.floor(c.images.length / 2)));
-
-    const tileGlobalX = x + imageTileIndex[0];
-    const tileGlobalY = y + imageTileIndex[1];
-    const tileGlobalZ = imageTileIndex[2];
-
-    const tile = await this.getTile(tileGlobalX, tileGlobalY, tileGlobalZ);
-
-    if (tile === false) {
-      console.log("couldn't retrieve tile");
-    } else {
-      console.log(tile);
-    }
   }
 }
 

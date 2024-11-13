@@ -35,7 +35,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          yarn install
-          yarn run build
+          npm ci
+          npm run build
           cd geoimage
           npx auto shipit

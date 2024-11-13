@@ -18,10 +18,10 @@ jobs:
 
       - name: Set the correct Node version using nvm
         shell: bash -l {0}
-        run: yarn install
+        run: npm i
 
       - name: Fix Code Style
-        run: yarn run lintFix
+        run: npm run lintFix
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v2.3.0

@@ -1,130 +1,144 @@
 # Data Preparation Guide for converting GeoTIFFs to COG files
 
-This guide provides step-by-step instructions on how to convert your GeoTIFF files 
-to Cloud-Optimized GeoTIFF (COG) for seamless integration with Geolib Visualizer.
+This guide provides a detailed workflow for converting GeoTIFF files to Cloud-Optimized GeoTIFFs (COG) for seamless integration with Geolib Visualizer, ensuring compatibility with Panther.
 
-We are using [rio-cogeo](https://cogeotiff.github.io/rio-cogeo/) library for creating COG files.
+We are using [gdalwarp](https://gdal.org/en/latest/programs/gdalwarp.html), GDAL warping utility for preparation of correct input GeoTIFF files and [rio-cogeo](https://cogeotiff.github.io/rio-cogeo/) library for creating COG files.
 
-:point_right: *TO DO: compare and add GDAL method for creating COGs without using rio-cogeo*
+### Step 1: Install Requirements
+Ensure Python 3.7 or higher is installed. Then, install **rio-cogeo** for creating COGs and **gdal** for pre-processing.
+
+
+- rio-cogeo
+
+  Using pip
+  ```bash
+  pip install rio-cogeo
+  ```
+  Using conda
+  ```bash
+  conda install -c conda-forge rio-cogeo
+  ```
+- GDAL
+  ```bash
+  conda install -c conda-forge gdal
+  ```
+
+### Step 2: Prepare GeoTIFFs for COG Conversion
+GeoTIFF files should meet the following specifications:
+
+- **Coordinate Reference System (CRS)**: Use Spherical Mercator, EPSG:3857.
+
+- **Extent and Tile Boundaries**: Ensure raster extent aligns with [Google Maps Tiles](https://docs.maptiler.com/google-maps-coordinates-tile-bounds-projection)
+for the desired zoom level and tile number.
+
+- **Resolution and Dimension**: 
+Set dimensions (512x512, 1024x1024, 2048x2048, ...) based on the required spatial resolution (in meters per pixel)
+
+- **NoData Value**: Define a NoData value.
+
+- **Compression**: Use Deflate compression for efficiency.
+##
+
+#### Adjust GeoTIFF with GDAL:
+
+If your GeoTIFF does not meet these specifications, use [gdalwarp](https://gdal.org/en/latest/programs/gdalwarp.html):
+
+```
+gdalwarp -t_srs EPSG:3857 -r near -co COMPRESS=DEFLATE input.tif input_projected.tif
+
+use  -te  -ts  -ot  -dstnodata  and other gdalwarp options to ensure GeoTIFF will meet required specifications
+```
+
+### Step 3: Convert to Cloud-Optimized GeoTIFF (COG)
+Use [rio-cogeo ](https://cogeotiff.github.io/rio-cogeo/CLI/) to generate a COG from your prepared GeoTIFF:
+
+```
+rio cogeo create --blocksize 256 --overview-blocksize 256 input_projected.tif output_cog.tif
+
+use --dtype  --nodata  and other options for specification
+```
+
+### Step 4: Validate and Check COG Metadata
+- Validate the COG file with [rio-cogeo](https://cogeotiff.github.io/rio-cogeo/CLI/) to ensure it’s properly formatted:
+```
+rio cogeo validate output_cog.tif
+```
+To view COG metadata, use:
+```
+rio cogeo info output_cog.tif
+```
+- You can display a COG file saved locally on your computer e.g. with **QGIS**. 
+In *Layer Properties* you can check detailed information about format, compression, bands, metadata, etc.
+
+
+### Step 5: Validate in COG Explorer
+- [COG Explorer](https://gisat-panther.github.io/app-gisat-cog-explorer/)
+  - application for verification and style creation for COG files developed by Gisat
+  - based on Panther components
+  - supports all COG styles available in [Geoimage](./geoimage/src/geoimage/README.md) library from Geolib Visualiser
+  - <ins>requirements</ins>: URL for COG file uploaded on S3 server
+
+    <img src = "/images/gisat_cog_explorer.jpg" width = "60%">
+
+
+# Example for region in Ethiopia
+This example demonstrates how to convert a GeoTIFF file covering a region in Ethiopia to a Cloud-Optimized GeoTIFF (COG) for a zoom level 4 tile alignment.
+
+### Input Requirements:
+Refer to the [Google Maps Tile Projection Guide](https://docs.maptiler.com/google-maps-coordinates-tile-bounds-projection/#4/16.84/26.01) to align coordinates with tile boundaries. For this region in Ethiopia, which fits entirely within the zoom level 4 TMS Tile (9,8), the Coordinate bounds are: 2504689, 0 to 5009377, 2504689. 
+
+| <img src="/images/Ethiopia_region_maptiler_zoom4_1.jpg" alt="Example region" width="40%"> | <img src="/images/Ethiopia_region_maptiler_zoom4_2.jpg" alt="Coordinate bounds" width="40%"> |
+    
+
+
+For expected spatial resolution, which is approx. 300m per pixel, the output dimension 8192 x 8192 pixels is used.
+
+### Reproject GeoTIFF with GDAL
+
+```bash
+gdalwarp -te 2504689 0 5009377 2504689 -ts 8192 8192 -t_srs EPSG:3857 -ot Float32 -dstnodata -200 -r near -co COMPRESS=DEFLATE -co BIGTIFF=YES  ET_input.tif ET_input_3857_zoom4.tif
+  ```
+### Convert the prepared GeoTIFF to COG with rio-cogeo:
+
+```bash
+rio cogeo create --blocksize 256 --overview-blocksize 256 --dtype float32 --nodata -200 ET_input_3857_zoom4.tif ET_output_3857_zoom4_COG.tif
+  ```
+### Validation and check COG metadata:
+
+```bash
+rio cogeo validate ET_output_3857_zoom4_COG.tif
+
+rio cogeo info ET_output_3857_zoom4_COG.tif
+  ```
+
+- You can display a COG file saved locally on your computer e.g. with **QGIS**. 
+In *Layer Properties* you can check detailed information about format, compression, bands, metadata, etc.
+
+
+### Validate in COG Explorer:
+- **Upload data into your S3 server**
+
+You must update visibility in file *Properties* (right click on the uploaded file) that it is readable for everyone:
+- **Get URL link**
+
+To get the final URL data, modify *bucket-name*, *project_folder* based on your directory structure and *cog_file_name* based on your COG file:
+
+
+***Example***, below is the directory which you can see in WinSCP:
+- /bucket-name/project_folder/test_cog/imagery.tif
+- replace `/bucket-name/` with `https://bucket-name.eu-central-1.linodeobjects.com/`
+- resulting in COG url: `https://bucket-name.eu-central-1.linodeobjects.com/project_folder/test_cog/imagery.tif`
+
+
+Put COG Url into [COGexplorer](https://gisat-panther.github.io/app-gisat-cog-explorer/)
+
+
+# 
+# More information about COG format
 
 These are links for existing articles about COGs:
 - [Planet Developers: An Introduction to Cloud Optimized GeoTIFFS (COGs) Part 1: Overview](https://developers.planet.com/docs/planetschool/an-introduction-to-cloud-optimized-geotiffs-cogs-part-1-overview/)
 - [Planet Developers: An Introduction to Cloud Optimized GeoTIFFS (COGs) Part 2: Converting Regular GeoTIFFs into COGs](https://developers.planet.com/docs/planetschool/an-introduction-to-cloud-optimized-geotiffs-cogs-part-2-converting-regular-geotiffs-into-cogs/)
 - [Planet Developers: An Introduction to Cloud Optimized GeoTIFFS (COGs) Part 3: Dynamic Web Tiling with Titiler](https://developers.planet.com/docs/planetschool/an-introduction-to-cloud-optimized-geotiffs-cogs-part-3-dynamic-web-tiling-with-titiler/)
 - [Medium: COGs in production](https://sean-rennie.medium.com/cogs-in-production-e9a42c7f54e4)
-
-## Step 1: Install Requirements
-Before converting GeoTIFFs into COG files, install the required dependencies:
-
-- python 3.7
-- rio-cogeo
-
-  with pip
-  ```bash
-  pip install rio-cogeo
-  ```
-  or with conda
-  ```bash
-  conda install -c conda-forge rio-cogeo
-  ```
-- optional GDAL
-  ```bash
-  conda install -c conda-forge gdal
-  ```
-
-
-## Step 2: Inspect GeoTIFFs
-Prior to conversion, inspect your GeoTIFFs for selecting suitable COG conversion options 
-based on data format, extent, metadata availability, bands/channels, etc..
-
-- rio-cogeo
-    ```bash
-    rio cogeo info file.tif
-    ```
-- GDAL
-    ```bash
-    gdalinfo file.tif
-    ```
-- QGIS
-
-## Step 3: Convert to COG
-Now, let's convert the preprocessed GeoTIFFs into COG files. We use the [Command-line interface (CLI)
-for rio-cogeo](https://cogeotiff.github.io/rio-cogeo/CLI/):
-
-The creation template is `rio cogeo create [OPTIONS] INPUT OUTPUT`
-
-:fire: Important options:
-- `--cog-profile` - Geolib Visualizer supports currently only `deflate`
-- `--web-optimized` - important for creation COG files optimized for Web
-- `--aligned-levels` - number of zoom levels for which is COG aligned with base maps, 
-we use `8` levels which has the best results based on our testing
-- `--dtype` - data type can be specified here (sometimes it does not work properly); 
-data types supported by [CogTiles](./geoimage/src/cogtiles/README.md):
-  - uint8, uint16, uint32, int8, int16, int32, float32, float64
-- `--zoom-level` - for a certain type of data, we can specify the zoom level. 
-For instance, if your data is not continuous and has clear edges, and you want to zoom in significantly 
-while avoiding blurred edges. However, for other continuous data, such as imagery, 
-this is not necessary. See examples below:
-  - not continuous snow cover
-
-    | <img src="/images/create_cog_blurred.jpg" alt="not blurred edges" width="90%"> | <img src="/images/create_cog_not_blurred.jpg" alt="not blurred edges" width="90%"> |
-    |:--------------------------------------------------------:|:---------------------------------------------------------------------------------:|
-    |                *Not using `--zoom-level`*                |                             *Using `--zoom-level=16`*                             |
-  
-  - :exclamation: be careful, new data values are calculated when using `zoom-level`. This can cause
-unwanted artefacts within your COG dataset, see the below example of DEM data:
-
-    | <img src="/images/copdem_cog_deflate_float32_levels8.jpg" alt="correct visualization" width="90%"> | <img src="/images/copdem_cog_deflate_float32_zoom16_levels8.jpg" alt="unwatend artefacts" width="90%"> |
-    |:--------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------:|
-    |                        *Correct visualization without using `--zoom-level`*                        |                   *Using `--zoom-level=16` resulting in creation unwated artefacts*                    |
-
-- `--blocksize` - set to `256`
-- `--overview-blocksize` - set to `256`
-- `--nodata` - based on data content no data value can be added here and these pixels won't be displayed in Geolib Visualizer
-- `--forward-band-tags` - forward band tags to output bands; this could transfer more metadata to COG
-
-### Example commands:
-- continous data (e.g. DEM, imagery, slope)
-  ```bash
-  rio cogeo create --cog-profile=deflate --blocksize=256 --overview-blocksize=256 --web-optimized --aligned-levels=8 --dtype=float32 --nodata=0 file.tif cog_file.tif
-  ```
-- not continous data - `zoom-level` used
-  ```bash
-  rio cogeo create --cog-profile=deflate --blocksize=256 --overview-blocksize=256 --web-optimized --aligned-levels=8 --dtype=float32 --nodata=0  --zoom-level=16 file.tif cog_file.tif
-  ```
-:point_up: if you have memory errors, try to add this option: `--config CHECK_DISK_FREE_SPACE=FALSE`
-
-
-:point_right: *TO DO: try `--use-cog-driver` option*
-
-:point_right: *TO DO: add GDAL transformation*
-
-## Step 4: Verify COG Files
-After the conversion, verify the generated COG files to ensure they are correctly formatted and optimized:
-
-- rio-cogeo
-    ```bash
-    rio cogeo validate
-    ```
-
-- QGIS
-
-  You can display a COG file saved locally on your computer by dragging and dropping it onto the Layers menu. 
-  
-  Or use link for COG file uploaded on a server *Layer -> Add Layer -> Add Raster Layer*
-
-  <img src = "/images/qgis-add-cog-url.jpg" width = "50%">
-
-  Then in *Layer Properties* you can check detailed information about format, compression, bands, metadata, etc.
-
-
-- [COG Explorer](https://gisat-panther.github.io/app-gisat-cog-explorer/)
-  - application for verification and style creation for COG files developed by Gisat
-  - based on Panther components
-  - supports all COG styles available in [Geoimage](./geoimage/src/geoimage/README.md) library from Geolib Visualiser
-  - <ins>requirements</ins>: URL for COG file uploaded on S3 server, check this guide for [uploading cog files on S3](guideForS3.md) server
-
-    <img src = "/images/gisat_cog_explorer.jpg" width = "70%">
-
-:point_right: *TO DO: add GDAL verification*
 
