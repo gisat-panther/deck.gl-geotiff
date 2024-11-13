@@ -40,6 +40,9 @@ const cogLayer = new CogTerrainLayer(
     }
 );
 ```
+
+<img src = "/images/cogTerrainLayer.jpg" width = "50%" alt="COG terrain visualization.">
+
 Display multiplied terrain with custom skirt height 
 (height of individual tiles edges, so there are no white spaces between individual 3D tiles) and defined minimal terrain value.
 ```typescript
@@ -101,6 +104,9 @@ const cogLayer = new CogTerrainLayer(
     'tile-service.com/{z}/{x}/{y}.png'
 )
 ```
+
+<img src = "/images/cogTerrainLayer_overlay.jpg" width = "50%"  alt="COG terrain visualization with satellite imagery overlay.">
+
 Display terrain with stylized COG overlay
 ```typescript
 const cogLayer = new CogTerrainLayer(

@@ -39,6 +39,9 @@ const cogLayer = new CogBitmapLayer(
   }
 );
 ```
+
+<img src = "/images/cogBitmapLayer_rgb.jpg" width = "50%" alt="COG bitmap RGB image.">
+
 Display the second channel as a heatmap with data from 0 to 1000
 - Currently, when `useAutoRange` is `true`, min and max data value for each image is calculated separately, thus it is recommended to set min and max values in `colorScaleValueRange`.
 
@@ -65,13 +68,15 @@ const cogLayer = new CogBitmapLayer(
   isTiled: true,
   cogBitmapOptions: {
     type: 'image',
-    colorScaleValueRange: [0,1000]
+    colorScaleValueRange: [100, 200, 300]
     useChannel: 1,
     useHeatmap: true,
-    colorScale: ['green', '#3182bd', [255, 0, 0]]
+    colorScale: ['yellow', '#20908d', [68, 1, 84]]
   }
 );
 ```
+<img src = "/images/cogBitmapLayer_customColor.jpg" width = "50%" alt="COG bitmap image with custom color scale.">
+
 Display the third channel as a green color and only show data from 100 to 200, the clipped data should be visualized with yellow color
 ```typescript
 const cogLayer = new CogBitmapLayer(
@@ -84,11 +89,13 @@ const cogLayer = new CogBitmapLayer(
     useSingleColor: true,
     clipLow: 100, 
     clipHigh: 200,
-    color: [0, 255, 0, 255], 
+    color: [32, 144, 81, 255], 
     clippedColor: 'yellow'
   }
 );
 ```
+<img src = "/images/cogBitmapLayer_clip.jpg" width = "50%" alt="COG bitmap image with clipped areas.">
+
 <a name='assigning-color-to-specific-data-value'></a>
 Assign color to specific data values 
 ```typescript
